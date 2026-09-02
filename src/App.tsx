@@ -22,8 +22,13 @@ import { WaterSidebar } from './components/WaterPlatform/WaterSidebar';
 import { WaterDistrictTree } from './components/WaterPlatform/WaterDistrictTree';
 import { WaterBreadcrumbBar } from './components/WaterPlatform/WaterBreadcrumbBar';
 import { WaterFilterBar } from './components/WaterPlatform/WaterFilterBar';
-import { WaterFacilityTable } from './components/WaterPlatform/WaterFacilityTable';
+import { 
+  WaterFacilityTable, 
+  ALL_WATER_FACILITY_COLUMNS, 
+  DEFAULT_WATER_VISIBLE_KEYS 
+} from './components/WaterPlatform/WaterFacilityTable';
 import { WaterFacilityModal } from './components/WaterPlatform/WaterFacilityModal';
+
 import { WaterDetailDrawer } from './components/WaterPlatform/WaterDetailDrawer';
 import { WaterOperationModal } from './components/WaterPlatform/WaterOperationModal';
 import { WaterDisableModal } from './components/WaterPlatform/WaterDisableModal';
@@ -112,8 +117,21 @@ export default function App() {
   };
 
   const [waterFilters, setWaterFilters] = useState<WaterFilterParams>(initialWaterFilterState);
+  const [waterVisibleColumns, setWaterVisibleColumns] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('col_settings_water_facility_table');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // fallback
+    }
+    return DEFAULT_WATER_VISIBLE_KEYS;
+  });
 
   // Water Modals
+
   const [waterFacilityModalOpen, setWaterFacilityModalOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<WaterFacility | null>(null);
   const [viewingFacility, setViewingFacility] = useState<WaterFacility | null>(null);
@@ -212,7 +230,7 @@ export default function App() {
     facilityName: '',
     permitNumberOrOwner: '',
     dateRange: '',
-    status: '全部',
+    status: '',
     selectedDistrict: '西宁市',
   };
   const [faultFilters, setFaultFilters] = useState<FaultFilterParams>(initialFaultFilterState);
@@ -263,7 +281,7 @@ export default function App() {
       if (faultFilters.dateRange && !item.faultTime.includes(faultFilters.dateRange.trim())) {
         return false;
       }
-      if (faultFilters.status && faultFilters.status !== '全部' && item.status !== faultFilters.status) {
+      if (faultFilters.status && item.status !== faultFilters.status) {
         return false;
       }
       return true;
@@ -874,7 +892,7 @@ export default function App() {
               {/* Main Content: 1、行政区划独立块 + 右侧搜索与数据台账 */}
               <div className="flex-1 flex overflow-hidden p-2.5 gap-2.5 min-w-0 min-h-0">
                 {/* 1、行政区划的背景是单独的一个块 */}
-                <div className="w-52 xl:w-56 shrink-0 h-full flex flex-col min-h-0">
+                <div className="w-48 sm:w-52 shrink-0 h-full flex flex-col min-h-0">
                   <WaterDistrictTree
                     districts={initialDistricts}
                     selectedDistrict={selectedDistrict}
@@ -923,6 +941,14 @@ export default function App() {
                         onClear={handleWaterClear}
                         onOpenAddModal={handleOpenAddFacility}
                         onExport={handleExportWaterData}
+                        columnSettings={{
+                          columns: ALL_WATER_FACILITY_COLUMNS,
+                          visibleKeys: waterVisibleColumns,
+                          onChange: (keys) => {
+                            setWaterVisibleColumns(keys);
+                            addToast('已更新表格显示字段', `当前显示 ${keys.length} 项字段`, 'info');
+                          },
+                        }}
                       />
                     </div>
 
@@ -931,11 +957,17 @@ export default function App() {
                       <WaterFacilityTable
                         facilities={filteredFacilities}
                         selectedIds={waterSelectedIds}
+                        visibleKeys={waterVisibleColumns}
+                        onVisibleKeysChange={(keys) => {
+                          setWaterVisibleColumns(keys);
+                          addToast('已更新表格显示字段', `当前显示 ${keys.length} 项字段`, 'info');
+                        }}
                         onToggleSelect={(id) => {
                           setWaterSelectedIds((prev) =>
                             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
                           );
                         }}
+
                         onToggleSelectAll={() => {
                           if (waterSelectedIds.length === filteredFacilities.length) {
                             setWaterSelectedIds([]);

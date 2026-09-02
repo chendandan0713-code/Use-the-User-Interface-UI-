@@ -14,14 +14,44 @@ import {
   ChevronRight,
   ExternalLink,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Columns3
 } from 'lucide-react';
 import { WaterFacility } from '../../types';
 import { CustomSelect } from '../Common/CustomSelect';
+import { ColumnSettingPopover, ColumnItem } from '../Common/ColumnSettingPopover';
+
+export const ALL_WATER_FACILITY_COLUMNS: ColumnItem[] = [
+  { key: 'name', label: '设施名称', required: true, defaultVisible: true },
+  { key: 'code', label: '计量设施(器具)编号', defaultVisible: true },
+  { key: 'waterOwner', label: '取水权人名称', defaultVisible: false },
+  { key: 'permitNumber', label: '取水许可证编号', defaultVisible: false },
+  { key: 'status', label: '使用状态', defaultVisible: true },
+  { key: 'reportMethod', label: '上报方式', defaultVisible: true },
+  { key: 'transmissionMethod', label: '数据传输方式', defaultVisible: true },
+  { key: 'waterSourceType', label: '水源类型', defaultVisible: true },
+  { key: 'fundingSource', label: '建设来源', defaultVisible: true },
+  { key: 'fundingYear', label: '资金年份', defaultVisible: true },
+  { key: 'specModel', label: '规格型号', defaultVisible: true },
+  { key: 'facilityType', label: '计量设施类型', defaultVisible: true },
+  { key: 'waterUsage', label: '取水用途', defaultVisible: false },
+  { key: 'district', label: '所属行政区划', defaultVisible: false },
+  { key: 'isArchived', label: '档案是否完善', defaultVisible: true },
+  { key: 'lastReportTime', label: '最新到报时间', defaultVisible: true },
+  { key: 'lastCalibrationTime', label: '最新检定校准时间', defaultVisible: true },
+  { key: 'calibrationExpiryDate', label: '检定校准有效期限', defaultVisible: true },
+  { key: 'isReportedToNational', label: '是否上报部平台', defaultVisible: true },
+];
+
+export const DEFAULT_WATER_VISIBLE_KEYS: string[] = ALL_WATER_FACILITY_COLUMNS
+  .filter((c) => c.defaultVisible !== false)
+  .map((c) => c.key);
 
 interface WaterFacilityTableProps {
   facilities: WaterFacility[];
   selectedIds: string[];
+  visibleKeys?: string[];
+  onVisibleKeysChange?: (keys: string[]) => void;
   onToggleSelect: (id: string) => void;
   onToggleSelectAll: () => void;
   onEdit: (facility: WaterFacility) => void;
@@ -42,6 +72,8 @@ interface WaterFacilityTableProps {
 export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
   facilities,
   selectedIds,
+  visibleKeys: externalVisibleKeys,
+  onVisibleKeysChange,
   onToggleSelect,
   onToggleSelectAll,
   onEdit,
@@ -58,6 +90,27 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
   onPageChange,
   onPageSizeChange,
 }) => {
+  const [internalVisibleKeys, setInternalVisibleKeys] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('col_settings_water_facility_table');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // fallback
+    }
+    return DEFAULT_WATER_VISIBLE_KEYS;
+  });
+
+  const visibleKeys = externalVisibleKeys || internalVisibleKeys;
+  const setVisibleKeys = (keys: string[]) => {
+    setInternalVisibleKeys(keys);
+    if (onVisibleKeysChange) onVisibleKeysChange(keys);
+  };
+
+  const isColVisible = (key: string) => visibleKeys.includes(key);
+
   const [activeMoreMenuId, setActiveMoreMenuId] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [jumpPageInput, setJumpPageInput] = useState('1');
@@ -95,6 +148,9 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
     }
   };
 
+  // Calculate dynamic colSpan for empty row
+  const activeColSpan = 1 + visibleKeys.length + 1; // 序号 + visible fields + 操作
+
   return (
     <div className="bg-white rounded-xl border border-slate-300 shadow-xs flex flex-col relative h-full min-h-0 flex-1 overflow-hidden">
       
@@ -114,23 +170,96 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                   <span className="font-semibold text-slate-700">序号</span>
                 </div>
               </th>
-              <th className="py-3 px-3 min-w-[170px] whitespace-nowrap border-r border-slate-300">设施名称</th>
-              <th className="py-3 px-3 min-w-[150px] whitespace-nowrap border-r border-slate-300">计量设施(器具)编号</th>
-              <th className="py-3 px-3 min-w-[80px] whitespace-nowrap text-center border-r border-slate-300">使用状态</th>
-              <th className="py-3 px-3 min-w-[80px] whitespace-nowrap text-center border-r border-slate-300">上报方式</th>
-              <th className="py-3 px-3 min-w-[95px] whitespace-nowrap text-center border-r border-slate-300">数据传输方式</th>
-              <th className="py-3 px-3 min-w-[80px] whitespace-nowrap text-center border-r border-slate-300">水源类型</th>
-              <th className="py-3 px-3 min-w-[100px] whitespace-nowrap text-center border-r border-slate-300">建设来源</th>
-              <th className="py-3 px-3 min-w-[70px] whitespace-nowrap text-center border-r border-slate-300">资金年份</th>
-              <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300">规格型号</th>
-              <th className="py-3 px-3 min-w-[95px] whitespace-nowrap text-center border-r border-slate-300">计量设施类型</th>
-              <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300">档案是否完善</th>
-              <th className="py-3 px-3 min-w-[105px] whitespace-nowrap text-center border-r border-slate-300">最新到报时间</th>
-              <th className="py-3 px-3 min-w-[105px] whitespace-nowrap text-center border-r border-slate-300">最新检定校准时间</th>
-              <th className="py-3 px-3 min-w-[110px] whitespace-nowrap text-center border-r border-slate-300">检定校准有效期限</th>
-              <th className="py-3 px-3 min-w-[100px] whitespace-nowrap text-center border-r border-slate-300">是否上报部平台</th>
+
+              {isColVisible('name') && (
+                <th className="py-3 px-3 min-w-[170px] whitespace-nowrap border-r border-slate-300">设施名称</th>
+              )}
+
+              {isColVisible('code') && (
+                <th className="py-3 px-3 min-w-[150px] whitespace-nowrap border-r border-slate-300">计量设施(器具)编号</th>
+              )}
+
+              {isColVisible('waterOwner') && (
+                <th className="py-3 px-3 min-w-[160px] whitespace-nowrap border-r border-slate-300">取水权人名称</th>
+              )}
+
+              {isColVisible('permitNumber') && (
+                <th className="py-3 px-3 min-w-[150px] whitespace-nowrap border-r border-slate-300">许可证编号</th>
+              )}
+
+              {isColVisible('status') && (
+                <th className="py-3 px-3 min-w-[80px] whitespace-nowrap text-center border-r border-slate-300">使用状态</th>
+              )}
+
+              {isColVisible('reportMethod') && (
+                <th className="py-3 px-3 min-w-[80px] whitespace-nowrap text-center border-r border-slate-300">上报方式</th>
+              )}
+
+              {isColVisible('transmissionMethod') && (
+                <th className="py-3 px-3 min-w-[95px] whitespace-nowrap text-center border-r border-slate-300">数据传输方式</th>
+              )}
+
+              {isColVisible('waterSourceType') && (
+                <th className="py-3 px-3 min-w-[80px] whitespace-nowrap text-center border-r border-slate-300">水源类型</th>
+              )}
+
+              {isColVisible('fundingSource') && (
+                <th className="py-3 px-3 min-w-[100px] whitespace-nowrap text-center border-r border-slate-300">建设来源</th>
+              )}
+
+              {isColVisible('fundingYear') && (
+                <th className="py-3 px-3 min-w-[70px] whitespace-nowrap text-center border-r border-slate-300">资金年份</th>
+              )}
+
+              {isColVisible('specModel') && (
+                <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300">规格型号</th>
+              )}
+
+              {isColVisible('facilityType') && (
+                <th className="py-3 px-3 min-w-[95px] whitespace-nowrap text-center border-r border-slate-300">计量设施类型</th>
+              )}
+
+              {isColVisible('waterUsage') && (
+                <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300">取水用途</th>
+              )}
+
+              {isColVisible('district') && (
+                <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300">所属行政区划</th>
+              )}
+
+              {isColVisible('isArchived') && (
+                <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300">档案是否完善</th>
+              )}
+
+              {isColVisible('lastReportTime') && (
+                <th className="py-3 px-3 min-w-[105px] whitespace-nowrap text-center border-r border-slate-300">最新到报时间</th>
+              )}
+
+              {isColVisible('lastCalibrationTime') && (
+                <th className="py-3 px-3 min-w-[105px] whitespace-nowrap text-center border-r border-slate-300">最新检定校准时间</th>
+              )}
+
+              {isColVisible('calibrationExpiryDate') && (
+                <th className="py-3 px-3 min-w-[110px] whitespace-nowrap text-center border-r border-slate-300">检定校准有效期限</th>
+              )}
+
+              {isColVisible('isReportedToNational') && (
+                <th className="py-3 px-3 min-w-[100px] whitespace-nowrap text-center border-r border-slate-300">是否上报部平台</th>
+              )}
+
+              {/* Sticky Right Operation Column with Column Setting button */}
               <th className="py-3 px-4 min-w-[170px] text-center sticky right-0 bg-[#ebf3fb] border-l border-slate-300 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.1)] z-30">
-                操作
+                <div className="flex items-center justify-center gap-1.5">
+                  <span>操作</span>
+                  <ColumnSettingPopover
+                    columns={ALL_WATER_FACILITY_COLUMNS}
+                    visibleKeys={visibleKeys}
+                    onChange={setVisibleKeys}
+                    storageKey="water_facility_table"
+                    buttonText=""
+                    className="inline-block"
+                  />
+                </div>
               </th>
             </tr>
           </thead>
@@ -168,157 +297,214 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                     </td>
 
                     {/* 设施名称 */}
-                    <td className="py-2.5 px-3 border-r border-slate-200 max-w-[200px]">
-                      <div className="relative group max-w-full">
-                        <span
-                          className="font-medium text-slate-900 hover:text-blue-600 cursor-pointer block truncate"
-                          onClick={() => onViewDetail(facility)}
-                          title={facility.name}
-                        >
-                          {facility.name}
-                        </span>
-
-                        {/* 鼠标悬停小黑弹窗 Tooltip */}
-                        <div
-                          className={`absolute left-0 ${
-                            index === 0 ? 'top-full mt-1.5' : 'bottom-full mb-1.5'
-                          } hidden group-hover:block z-50 pointer-events-none drop-shadow-md`}
-                        >
-                          <div className="relative bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-md whitespace-nowrap shadow-xl border border-slate-700/60 font-normal">
+                    {isColVisible('name') && (
+                      <td className="py-2.5 px-3 border-r border-slate-200 max-w-[200px]">
+                        <div className="relative group max-w-full">
+                          <span
+                            className="font-medium text-slate-900 hover:text-blue-600 cursor-pointer block truncate"
+                            onClick={() => onViewDetail(facility)}
+                            title={facility.name}
+                          >
                             {facility.name}
-                            {/* 小三角 */}
-                            {index === 0 ? (
-                              <div className="absolute bottom-full left-3 -mb-1 border-4 border-transparent border-b-slate-900" />
-                            ) : (
-                              <div className="absolute top-full left-3 -mt-1 border-4 border-transparent border-t-slate-900" />
-                            )}
+                          </span>
+
+                          {/* 鼠标悬停小黑弹窗 Tooltip */}
+                          <div
+                            className={`absolute left-0 ${
+                              index === 0 ? 'top-full mt-1.5' : 'bottom-full mb-1.5'
+                            } hidden group-hover:block z-50 pointer-events-none drop-shadow-md`}
+                          >
+                            <div className="relative bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-md whitespace-nowrap shadow-xl border border-slate-700/60 font-normal">
+                              {facility.name}
+                              {index === 0 ? (
+                                <div className="absolute bottom-full left-3 -mb-1 border-4 border-transparent border-b-slate-900" />
+                              ) : (
+                                <div className="absolute top-full left-3 -mt-1 border-4 border-transparent border-t-slate-900" />
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
+                    )}
 
                     {/* 计量设施(器具)编号 */}
-                    <td className="py-2.5 px-3 border-r border-slate-200">
-                      <div className="flex items-center gap-1.5 font-mono text-blue-600 font-medium">
-                        <span>{facility.code}</span>
-                        <button
-                          type="button"
-                          title="复制编号"
-                          onClick={() => handleCopyCode(facility.code)}
-                          className="text-slate-400 hover:text-blue-600 p-0.5 rounded transition"
-                        >
-                          {copiedCode === facility.code ? (
-                            <Check className="w-3 h-3 text-emerald-600" />
-                          ) : (
-                            <Copy className="w-3 h-3" />
-                          )}
-                        </button>
-                      </div>
-                    </td>
+                    {isColVisible('code') && (
+                      <td className="py-2.5 px-3 border-r border-slate-200">
+                        <div className="flex items-center gap-1.5 font-mono text-blue-600 font-medium">
+                          <span>{facility.code}</span>
+                          <button
+                            type="button"
+                            title="复制编号"
+                            onClick={() => handleCopyCode(facility.code)}
+                            className="text-slate-400 hover:text-blue-600 p-0.5 rounded transition"
+                          >
+                            {copiedCode === facility.code ? (
+                              <Check className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    )}
+
+                    {/* 取水权人名称 */}
+                    {isColVisible('waterOwner') && (
+                      <td className="py-2.5 px-3 border-r border-slate-200 max-w-[180px] truncate" title={facility.waterOwner}>
+                        <span className="text-slate-800">{facility.waterOwner || '-'}</span>
+                      </td>
+                    )}
+
+                    {/* 许可证编号 */}
+                    {isColVisible('permitNumber') && (
+                      <td className="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-700 whitespace-nowrap">
+                        {facility.permitNumber || '-'}
+                      </td>
+                    )}
 
                     {/* 使用状态 */}
-                    <td className="py-2.5 px-3 text-center border-r border-slate-200">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                          isNormal
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : isFault
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                            : 'bg-slate-100 text-slate-600 border border-slate-200'
-                        }`}
-                      >
+                    {isColVisible('status') && (
+                      <td className="py-2.5 px-3 text-center border-r border-slate-200">
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            isNormal ? 'bg-emerald-500 animate-pulse' : isFault ? 'bg-amber-500' : 'bg-slate-400'
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                            isNormal
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : isFault
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-slate-100 text-slate-600 border border-slate-200'
                           }`}
-                        />
-                        {facility.status}
-                      </span>
-                    </td>
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isNormal ? 'bg-emerald-500 animate-pulse' : isFault ? 'bg-amber-500' : 'bg-slate-400'
+                            }`}
+                          />
+                          {facility.status}
+                        </span>
+                      </td>
+                    )}
 
                     {/* 上报方式 */}
-                    <td className="py-2.5 px-3 text-center border-r border-slate-200">
-                      <span className="text-slate-600 font-medium">{facility.reportMethod}</span>
-                    </td>
+                    {isColVisible('reportMethod') && (
+                      <td className="py-2.5 px-3 text-center border-r border-slate-200">
+                        <span className="text-slate-600 font-medium">{facility.reportMethod}</span>
+                      </td>
+                    )}
 
                     {/* 数据传输方式 */}
-                    <td className="py-2.5 px-3 text-center border-r border-slate-200">
-                      <span
-                        className={`text-[11px] px-1.5 py-0.5 rounded ${
-                          facility.transmissionMethod === '在线'
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'bg-slate-100 text-slate-500'
-                        }`}
-                      >
-                        {facility.transmissionMethod}
-                      </span>
-                    </td>
+                    {isColVisible('transmissionMethod') && (
+                      <td className="py-2.5 px-3 text-center border-r border-slate-200">
+                        <span
+                          className={`text-[11px] px-1.5 py-0.5 rounded ${
+                            facility.transmissionMethod === '在线'
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'bg-slate-100 text-slate-500'
+                          }`}
+                        >
+                          {facility.transmissionMethod}
+                        </span>
+                      </td>
+                    )}
 
                     {/* 水源类型 */}
-                    <td className="py-2.5 px-3 text-center text-slate-600 border-r border-slate-200">
-                      {facility.waterSourceType}
-                    </td>
+                    {isColVisible('waterSourceType') && (
+                      <td className="py-2.5 px-3 text-center text-slate-600 border-r border-slate-200">
+                        {facility.waterSourceType}
+                      </td>
+                    )}
 
                     {/* 建设来源 */}
-                    <td className="py-2.5 px-3 text-center border-r border-slate-200">
-                      <span className="text-slate-700">{facility.fundingSource}</span>
-                    </td>
+                    {isColVisible('fundingSource') && (
+                      <td className="py-2.5 px-3 text-center border-r border-slate-200">
+                        <span className="text-slate-700">{facility.fundingSource}</span>
+                      </td>
+                    )}
 
                     {/* 资金年份 */}
-                    <td className="py-2.5 px-3 text-center font-mono text-slate-600 border-r border-slate-200">
-                      {facility.fundingYear}
-                    </td>
+                    {isColVisible('fundingYear') && (
+                      <td className="py-2.5 px-3 text-center font-mono text-slate-600 border-r border-slate-200">
+                        {facility.fundingYear}
+                      </td>
+                    )}
 
                     {/* 规格型号 */}
-                    <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
-                      {facility.specModel || '-'}
-                    </td>
+                    {isColVisible('specModel') && (
+                      <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
+                        {facility.specModel || '-'}
+                      </td>
+                    )}
 
                     {/* 计量设施类型 */}
-                    <td className="py-2.5 px-3 text-center text-slate-700 border-r border-slate-200">
-                      {facility.facilityType || '-'}
-                    </td>
+                    {isColVisible('facilityType') && (
+                      <td className="py-2.5 px-3 text-center text-slate-700 border-r border-slate-200">
+                        {facility.facilityType || '-'}
+                      </td>
+                    )}
+
+                    {/* 取水用途 */}
+                    {isColVisible('waterUsage') && (
+                      <td className="py-2.5 px-3 text-center text-slate-700 border-r border-slate-200">
+                        {facility.waterUsage || '-'}
+                      </td>
+                    )}
+
+                    {/* 所属行政区划 */}
+                    {isColVisible('district') && (
+                      <td className="py-2.5 px-3 text-center text-slate-600 border-r border-slate-200">
+                        {facility.district || '-'}
+                      </td>
+                    )}
 
                     {/* 档案是否完善 */}
-                    <td className="py-2.5 px-3 text-center border-r border-slate-200">
-                      <span
-                        className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
-                          facility.isArchived
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-slate-100 text-slate-500'
-                        }`}
-                      >
-                        {facility.isArchived ? '是' : '否'}
-                      </span>
-                    </td>
+                    {isColVisible('isArchived') && (
+                      <td className="py-2.5 px-3 text-center border-r border-slate-200">
+                        <span
+                          className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                            facility.isArchived
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-slate-100 text-slate-500'
+                          }`}
+                        >
+                          {facility.isArchived ? '是' : '否'}
+                        </span>
+                      </td>
+                    )}
 
                     {/* 最新到报时间 */}
-                    <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
-                      {facility.lastReportTime}
-                    </td>
+                    {isColVisible('lastReportTime') && (
+                      <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
+                        {facility.lastReportTime}
+                      </td>
+                    )}
 
                     {/* 最新检定校准时间 */}
-                    <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
-                      {facility.lastCalibrationTime}
-                    </td>
+                    {isColVisible('lastCalibrationTime') && (
+                      <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
+                        {facility.lastCalibrationTime}
+                      </td>
+                    )}
 
                     {/* 检定校准有效期限 */}
-                    <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
-                      {facility.calibrationExpiryDate}
-                    </td>
+                    {isColVisible('calibrationExpiryDate') && (
+                      <td className="py-2.5 px-3 text-center font-mono text-slate-500 border-r border-slate-200">
+                        {facility.calibrationExpiryDate}
+                      </td>
+                    )}
 
                     {/* 是否上报部平台 */}
-                    <td className="py-2.5 px-3 text-center border-r border-slate-200">
-                      <span
-                        className={`text-[11px] px-1.5 py-0.5 rounded font-medium ${
-                          facility.isReportedToNational
-                            ? 'text-emerald-700 bg-emerald-50'
-                            : 'text-slate-400 bg-slate-50'
-                        }`}
-                      >
-                        {facility.isReportedToNational ? '是' : '否'}
-                      </span>
-                    </td>
+                    {isColVisible('isReportedToNational') && (
+                      <td className="py-2.5 px-3 text-center border-r border-slate-200">
+                        <span
+                          className={`text-[11px] px-1.5 py-0.5 rounded font-medium ${
+                            facility.isReportedToNational
+                              ? 'text-emerald-700 bg-emerald-50'
+                              : 'text-slate-400 bg-slate-50'
+                          }`}
+                        >
+                          {facility.isReportedToNational ? '是' : '否'}
+                        </span>
+                      </td>
+                    )}
 
                     {/* 操作 (编辑, 详情, 更多 ▾) Sticky Right Column */}
                     <td
@@ -455,7 +641,7 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
               })
             ) : (
               <tr>
-                <td colSpan={17} className="py-12 text-center text-slate-400">
+                <td colSpan={activeColSpan} className="py-12 text-center text-slate-400">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <AlertCircle className="w-8 h-8 text-slate-300" />
                     <span>暂无符合筛选条件的计量设施数据</span>
@@ -565,3 +751,4 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
     </div>
   );
 };
+

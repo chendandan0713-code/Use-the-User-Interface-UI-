@@ -58,7 +58,7 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
   };
 
   return (
-    <aside className="w-56 h-full min-h-full flex-shrink-0 bg-[#006be6] text-white flex flex-col select-none border-r border-blue-600/50 shadow-md">
+    <aside className="w-52 h-full min-h-full flex-shrink-0 bg-[#006be6] text-white flex flex-col select-none border-r border-blue-600/50 shadow-md">
       {/* Scrollable menu items */}
       <div className="flex-1 overflow-y-auto min-h-0 py-2.5 px-2 space-y-1 text-[13px] font-medium custom-scrollbar">
         
@@ -72,8 +72,8 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
               : 'text-blue-100 hover:bg-white/10 hover:text-white'
           }`}
         >
-          <LayoutDashboard className="w-4 h-4 opacity-80" />
-          <span>首页</span>
+          <LayoutDashboard className="w-4 h-4 opacity-85 shrink-0" />
+          <span className="truncate">首页</span>
         </button>
 
         {/* 一张图 */}
@@ -86,8 +86,8 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
               : 'text-blue-100 hover:bg-white/10 hover:text-white'
           }`}
         >
-          <Map className="w-4 h-4 opacity-80" />
-          <span>一张图</span>
+          <Map className="w-4 h-4 opacity-85 shrink-0" />
+          <span className="truncate">一张图</span>
         </button>
 
         {/* 综合应用场景 */}
@@ -100,8 +100,8 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
               : 'text-blue-100 hover:bg-white/10 hover:text-white'
           }`}
         >
-          <Layers className="w-4 h-4 opacity-80" />
-          <span>综合应用场景</span>
+          <Layers className="w-4 h-4 opacity-85 shrink-0" />
+          <span className="truncate">综合应用场景</span>
         </button>
 
         {/* 计划用水管理 */}
@@ -111,14 +111,14 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
             onClick={() => toggleSection('plan')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-blue-100 hover:bg-white/10 hover:text-white transition"
           >
-            <div className="flex items-center gap-2.5">
-              <CalendarCheck className="w-4 h-4 opacity-80" />
-              <span>计划用水管理</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <CalendarCheck className="w-4 h-4 opacity-85 shrink-0" />
+              <span className="truncate">计划用水管理</span>
             </div>
             {expandedSections.plan ? (
-              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              <ChevronDown className="w-3.5 h-3.5 opacity-70 shrink-0" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+              <ChevronRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
             )}
           </button>
         </div>
@@ -130,14 +130,14 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
             onClick={() => toggleSection('waterCalc')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-blue-100 hover:bg-white/10 hover:text-white transition"
           >
-            <div className="flex items-center gap-2.5">
-              <Calculator className="w-4 h-4 opacity-80" />
-              <span>取用水量核算</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Calculator className="w-4 h-4 opacity-85 shrink-0" />
+              <span className="truncate">取用水量核算</span>
             </div>
             {expandedSections.waterCalc ? (
-              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              <ChevronDown className="w-3.5 h-3.5 opacity-70 shrink-0" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+              <ChevronRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
             )}
           </button>
         </div>
@@ -149,49 +149,49 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
             onClick={() => toggleSection('dataCollect')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-blue-100 hover:bg-white/10 hover:text-white transition"
           >
-            <div className="flex items-center gap-2.5">
-              <Database className="w-4 h-4 opacity-80" />
-              <span>数据归集</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Database className="w-4 h-4 opacity-85 shrink-0" />
+              <span className="truncate">数据归集</span>
             </div>
             {expandedSections.dataCollect ? (
-              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              <ChevronDown className="w-3.5 h-3.5 opacity-70 shrink-0" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+              <ChevronRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
             )}
           </button>
         </div>
 
         {/* 计量监管 (Active Expanded Group from Image 1) */}
-        <div className="pt-1">
+        <div className="pt-0.5">
           <button
             type="button"
             onClick={() => toggleSection('metering')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-blue-800/60 text-white font-semibold border border-blue-400/30"
           >
-            <div className="flex items-center gap-2.5">
-              <Gauge className="w-4 h-4 text-cyan-200" />
-              <span>计量监管</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Gauge className="w-4 h-4 text-cyan-200 shrink-0" />
+              <span className="truncate">计量监管</span>
             </div>
             {expandedSections.metering ? (
-              <ChevronDown className="w-3.5 h-3.5" />
+              <ChevronDown className="w-3.5 h-3.5 shrink-0" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3.5 h-3.5 shrink-0" />
             )}
           </button>
 
           {expandedSections.metering && (
-            <div className="pl-2 mt-1 space-y-0.5 ml-2 py-1">
+            <div className="pl-1.5 mt-1 space-y-0.5 ml-2 py-0.5">
               <button
                 type="button"
                 onClick={() => handleMenuClick('audit', '计量审核管理')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'audit'
-                    ? 'bg-white text-blue-900 font-semibold shadow-sm'
+                    ? 'bg-white text-blue-900 font-semibold shadow-xs'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <ClipboardCheck className="w-3.5 h-3.5" />
-                <span>计量审核管理</span>
+                <ClipboardCheck className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">计量审核管理</span>
               </button>
 
               <button
@@ -199,12 +199,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('facility_management', '计量设施管理')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'facility_management'
-                    ? 'bg-white text-blue-800 font-bold shadow-md ring-1 ring-blue-200'
+                    ? 'bg-white text-blue-800 font-bold shadow-xs ring-1 ring-blue-200'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <Boxes className="w-3.5 h-3.5 text-blue-600" />
-                <span>计量设施管理</span>
+                <Boxes className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                <span className="truncate">计量设施管理</span>
               </button>
 
               <button
@@ -212,12 +212,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('relation', '关联关系维护')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'relation'
-                    ? 'bg-white text-blue-900 font-semibold'
+                    ? 'bg-white text-blue-900 font-semibold shadow-xs'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <Link2 className="w-3.5 h-3.5" />
-                <span>关联关系维护</span>
+                <Link2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">关联关系维护</span>
               </button>
 
               <button
@@ -225,12 +225,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('fault', '故障记录')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'fault'
-                    ? 'bg-white text-blue-800 font-bold shadow-md ring-1 ring-blue-200'
+                    ? 'bg-white text-blue-800 font-bold shadow-xs ring-1 ring-blue-200'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <AlertOctagon className={`w-3.5 h-3.5 ${activeSubMenu === 'fault' ? 'text-blue-600' : ''}`} />
-                <span>故障记录</span>
+                <AlertOctagon className={`w-3.5 h-3.5 shrink-0 ${activeSubMenu === 'fault' ? 'text-blue-600' : ''}`} />
+                <span className="truncate">故障记录</span>
               </button>
 
               <button
@@ -238,12 +238,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('calibration', '检定记录')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'calibration'
-                    ? 'bg-white text-blue-900 font-semibold'
+                    ? 'bg-white text-blue-900 font-semibold shadow-xs'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <FileCheck2 className="w-3.5 h-3.5" />
-                <span>检定记录</span>
+                <FileCheck2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">检定记录</span>
               </button>
 
               <button
@@ -251,12 +251,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('toggle_logs', '停用启用记录')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'toggle_logs'
-                    ? 'bg-white text-blue-900 font-semibold'
+                    ? 'bg-white text-blue-900 font-semibold shadow-xs'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <ToggleLeft className="w-3.5 h-3.5" />
-                <span>停用启用记录</span>
+                <ToggleLeft className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">停用启用记录</span>
               </button>
 
               <button
@@ -264,12 +264,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('replace_logs', '换表记录')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'replace_logs'
-                    ? 'bg-white text-blue-900 font-semibold'
+                    ? 'bg-white text-blue-900 font-semibold shadow-xs'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>换表记录</span>
+                <RefreshCw className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">换表记录</span>
               </button>
 
               <button
@@ -277,12 +277,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('health', '计量健康状态管理')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'health'
-                    ? 'bg-white text-blue-900 font-semibold'
+                    ? 'bg-white text-blue-900 font-semibold shadow-xs'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <HeartPulse className="w-3.5 h-3.5" />
-                <span>计量健康状态管理</span>
+                <HeartPulse className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">计量健康状态管理</span>
               </button>
 
               <button
@@ -290,12 +290,12 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
                 onClick={() => handleMenuClick('grid', '计量网格化管理')}
                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition flex items-center gap-2 ${
                   activeSubMenu === 'grid'
-                    ? 'bg-white text-blue-900 font-semibold'
+                    ? 'bg-white text-blue-900 font-semibold shadow-xs'
                     : 'text-blue-100 hover:bg-white/15 hover:text-white'
                 }`}
               >
-                <Grid className="w-3.5 h-3.5" />
-                <span>计量网格化管理</span>
+                <Grid className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">计量网格化管理</span>
               </button>
             </div>
           )}
@@ -308,14 +308,14 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
             onClick={() => toggleSection('dataStandard')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-blue-100 hover:bg-white/10 hover:text-white transition"
           >
-            <div className="flex items-center gap-2.5">
-              <SlidersHorizontal className="w-4 h-4 opacity-80" />
-              <span>数据规范整合</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <SlidersHorizontal className="w-4 h-4 opacity-85 shrink-0" />
+              <span className="truncate">数据规范整合</span>
             </div>
             {expandedSections.dataStandard ? (
-              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              <ChevronDown className="w-3.5 h-3.5 opacity-70 shrink-0" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+              <ChevronRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
             )}
           </button>
         </div>
@@ -327,14 +327,14 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
             onClick={() => toggleSection('qualityControl')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-blue-100 hover:bg-white/10 hover:text-white transition"
           >
-            <div className="flex items-center gap-2.5">
-              <ShieldCheck className="w-4 h-4 opacity-80" />
-              <span>数据质量控制</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <ShieldCheck className="w-4 h-4 opacity-85 shrink-0" />
+              <span className="truncate">数据质量控制</span>
             </div>
             {expandedSections.qualityControl ? (
-              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              <ChevronDown className="w-3.5 h-3.5 opacity-70 shrink-0" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+              <ChevronRight className="w-3.5 h-3.5 opacity-70 shrink-0" />
             )}
           </button>
         </div>
@@ -349,15 +349,15 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
               : 'text-blue-100 hover:bg-white/10 hover:text-white'
           }`}
         >
-          <Settings className="w-4 h-4 opacity-80" />
-          <span>系统配置</span>
+          <Settings className="w-4 h-4 opacity-85 shrink-0" />
+          <span className="truncate">系统配置</span>
         </button>
 
       </div>
 
       {/* Footer copyright */}
-      <div className="p-3 border-t border-blue-500/40 text-[11px] text-blue-200 text-center">
-        <span>青海省西宁市水务局 © 2026</span>
+      <div className="p-2.5 border-t border-blue-500/40 text-[11px] text-blue-200 text-center leading-tight">
+        <span>西宁水务局 © 2026</span>
       </div>
     </aside>
   );

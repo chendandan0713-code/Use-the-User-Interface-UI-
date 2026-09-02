@@ -30,7 +30,7 @@ export const FaultFilterBar: React.FC<FaultFilterBarProps> = ({
           onChange={(e) =>
             onFilterChange({ ...filterParams, facilityName: e.target.value })
           }
-          className="w-48 h-8 px-3 bg-slate-50 hover:bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 rounded-md border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition"
+          className="w-[260px] shrink-0 h-8 px-3 bg-slate-50 hover:bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 rounded-md border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition"
         />
 
         {/* 取水许可编号/取水权人 */}
@@ -44,11 +44,11 @@ export const FaultFilterBar: React.FC<FaultFilterBarProps> = ({
               permitNumberOrOwner: e.target.value,
             })
           }
-          className="w-56 h-8 px-3 bg-slate-50 hover:bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 rounded-md border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition"
+          className="w-[260px] shrink-0 h-8 px-3 bg-slate-50 hover:bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 rounded-md border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition"
         />
 
         {/* 申请时间 */}
-        <div className="relative">
+        <div className="relative w-[260px] shrink-0">
           <input
             type="text"
             placeholder="申请时间：开始 - 结束"
@@ -56,30 +56,31 @@ export const FaultFilterBar: React.FC<FaultFilterBarProps> = ({
             onChange={(e) =>
               onFilterChange({ ...filterParams, dateRange: e.target.value })
             }
-            className="w-52 h-8 pl-3 pr-8 bg-slate-50 hover:bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 rounded-md border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition"
+            className="w-full h-8 pl-3 pr-8 bg-slate-50 hover:bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 rounded-md border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition"
           />
           <Calendar className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5 pointer-events-none" />
         </div>
 
         {/* 状态 */}
-        <CustomSelect
-          className="w-36"
-          labelPrefix="状态"
-          value={filterParams.status}
-          onChange={(val) =>
-            onFilterChange({ ...filterParams, status: val })
-          }
-          placeholder="全部状态"
-          options={[
-            { value: '全部', label: '全部状态' },
-            { value: '故障待审', label: '故障待审' },
-            { value: '处理待审', label: '处理待审' },
-            { value: '故障中', label: '故障中' },
-            { value: '故障驳回', label: '故障驳回' },
-            { value: '处理驳回', label: '处理驳回' },
-            { value: '已完成', label: '已完成' },
-          ]}
-        />
+        <div className="w-[260px] shrink-0">
+          <CustomSelect
+            className="w-full"
+            labelPrefix="状态"
+            value={filterParams.status}
+            onChange={(val) =>
+              onFilterChange({ ...filterParams, status: val })
+            }
+            placeholder="请选择"
+            options={[
+              { value: '故障待审', label: '故障待审' },
+              { value: '处理待审', label: '处理待审' },
+              { value: '故障中', label: '故障中' },
+              { value: '故障驳回', label: '故障驳回' },
+              { value: '处理驳回', label: '处理驳回' },
+              { value: '已完成', label: '已完成' },
+            ]}
+          />
+        </div>
 
         {/* 操作按钮组 */}
         <div className="flex items-center gap-2 ml-auto">

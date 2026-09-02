@@ -22,17 +22,17 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
   );
 
   return (
-    <div className="w-full h-full min-w-0 bg-white rounded-xl border border-slate-300 p-3.5 flex flex-col shadow-xs overflow-hidden">
+    <div className="w-full h-full min-w-0 bg-white rounded-xl border border-slate-300 p-3 flex flex-col shadow-xs overflow-hidden">
       {/* Card Header: 行政区划标题 */}
-      <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-200">
+      <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-200">
         <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
-          <MapPin className="w-3.5 h-3.5 text-blue-600" />
+          <MapPin className="w-4 h-4 text-blue-600" />
           <span>行政区划</span>
         </div>
       </div>
 
       {/* Search Input */}
-      <div className="relative mb-3">
+      <div className="relative mb-2.5">
         <input
           type="text"
           value={searchTerm}
@@ -53,7 +53,7 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
             }}
             className={`flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer transition-all ${
               selectedDistrict === districts.name
-                ? 'bg-blue-50 text-blue-700 font-semibold'
+                ? 'bg-blue-50 text-blue-700 font-semibold shadow-2xs'
                 : 'text-slate-700 hover:bg-slate-50'
             }`}
           >
@@ -73,20 +73,20 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
                 )}
               </button>
               {isCityExpanded ? (
-                <FolderOpen className="w-4 h-4 text-blue-500" />
+                <FolderOpen className="w-4 h-4 text-blue-500 shrink-0" />
               ) : (
-                <Folder className="w-4 h-4 text-blue-500" />
+                <Folder className="w-4 h-4 text-blue-500 shrink-0" />
               )}
               <span className="truncate">{districts.name}</span>
             </div>
-            <span className="text-[10px] px-1.5 py-0.2 bg-slate-100 text-slate-500 rounded-full font-normal">
+            <span className="text-[11px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-full font-normal shrink-0">
               {districts.count}
             </span>
           </div>
 
           {/* Child Sub-Districts */}
           {isCityExpanded && filteredChildren && (
-            <div className="pl-4 mt-1 space-y-0.5 ml-1">
+            <div className="pl-4 mt-1 space-y-1 ml-1">
               {filteredChildren.map((item) => {
                 const isSelected = selectedDistrict === item.name;
                 return (
@@ -95,22 +95,22 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
                     onClick={() => onSelectDistrict(item.name)}
                     className={`flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-blue-100/70 text-blue-700 font-semibold shadow-xs'
+                        ? 'bg-blue-100/80 text-blue-700 font-semibold shadow-2xs'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <FileText
-                        className={`w-3.5 h-3.5 ${
+                        className={`w-3.5 h-3.5 shrink-0 ${
                           isSelected ? 'text-blue-600' : 'text-slate-400'
                         }`}
                       />
                       <span className="truncate">{item.name}</span>
                     </div>
                     <span
-                      className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                      className={`text-[11px] px-1.5 py-0.5 rounded-full shrink-0 ${
                         isSelected
-                          ? 'bg-blue-200/70 text-blue-800'
+                          ? 'bg-blue-200/70 text-blue-800 font-medium'
                           : 'bg-slate-100 text-slate-400'
                       }`}
                     >
@@ -121,7 +121,7 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
               })}
 
               {filteredChildren.length === 0 && (
-                <div className="py-3 text-center text-slate-400 text-[11px]">
+                <div className="py-2 text-center text-slate-400 text-[11px]">
                   未匹配到区县
                 </div>
               )}
@@ -131,18 +131,18 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
       </div>
 
       {/* Selected Scope Indicator */}
-      <div className="pt-2.5 border-t border-slate-100 mt-2 flex items-center justify-between text-[11px] text-slate-500">
-        <div className="flex items-center gap-1 truncate">
-          <MapPin className="w-3 h-3 text-blue-500 flex-shrink-0" />
-          <span className="truncate font-medium">辖区: {selectedDistrict || '全市'}</span>
+      <div className="pt-2 border-t border-slate-100 mt-2 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="flex items-center gap-1.5 truncate">
+          <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+          <span className="truncate font-medium">{selectedDistrict || '全市'}</span>
         </div>
         {selectedDistrict !== districts.name && (
           <button
             type="button"
             onClick={() => onSelectDistrict(districts.name)}
-            className="text-blue-600 hover:underline text-[10px] flex-shrink-0"
+            className="text-blue-600 hover:underline text-[11px] flex-shrink-0 font-medium cursor-pointer"
           >
-            重置全市
+            重置
           </button>
         )}
       </div>

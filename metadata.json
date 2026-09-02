@@ -1,0 +1,6 @@
+{
+  "name": "智慧水务与智能制造数字化管理平台",
+  "description": "集成西宁市取用水计量监管平台与智造生产工单协同系统的高品质企业级前端应用",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

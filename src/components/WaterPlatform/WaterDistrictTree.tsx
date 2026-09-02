@@ -22,7 +22,7 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
   );
 
   return (
-    <div className="w-56 flex-shrink-0 bg-white rounded-xl border border-slate-300 p-3.5 flex flex-col h-full shadow-xs">
+    <div className="w-full h-full min-w-0 bg-white rounded-xl border border-slate-300 p-3.5 flex flex-col shadow-xs overflow-hidden">
       {/* Card Header: 行政区划标题 */}
       <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-200">
         <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">

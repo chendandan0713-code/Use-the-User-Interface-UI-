@@ -55,6 +55,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
           {/* Header */}
           <thead className="bg-[#ebf3fb] text-slate-800 font-semibold border-b border-slate-300 sticky top-0 z-10 select-none">
             <tr>
+              <th className="px-2.5 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center w-14">序号</th>
               <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">取水权人</th>
               <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">证照编号</th>
               <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">计量设施名称</th>
@@ -76,13 +77,18 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
 
           {/* Body */}
           <tbody className="divide-y divide-slate-100 text-slate-700 bg-white">
-            {records.map((record) => {
+            {records.map((record, index) => {
               const isRejected = record.status === '故障驳回' || record.status === '处理驳回';
               return (
                 <tr 
                   key={record.id} 
                   className="hover:bg-blue-50/40 transition-colors group h-10"
                 >
+                  {/* 序号 */}
+                  <td className="px-2.5 py-2 border-r border-slate-100 text-center font-mono text-slate-500 text-xs whitespace-nowrap">
+                    {(currentPage - 1) * pageSize + index + 1}
+                  </td>
+
                   {/* 取水权人 */}
                   <td className="px-3 py-2 border-r border-slate-100 max-w-[160px] truncate" title={record.waterOwner}>
                     {record.waterOwner}

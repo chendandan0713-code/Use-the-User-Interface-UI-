@@ -103,13 +103,16 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
         <table className="w-full text-left text-xs border-collapse">
           <thead>
             <tr className="bg-[#ebf3fb] text-slate-800 border-b border-slate-300 font-semibold sticky top-0 z-10 select-none">
-              <th className="py-3 px-3 w-10 text-center border-r border-slate-300">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={onToggleSelectAll}
-                  className="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500 border-slate-300 cursor-pointer"
-                />
+              <th className="py-3 px-2 w-16 min-w-[64px] text-center border-r border-slate-300">
+                <div className="flex items-center justify-center gap-1.5">
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={onToggleSelectAll}
+                    className="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500 border-slate-300 cursor-pointer"
+                  />
+                  <span className="font-semibold text-slate-700">序号</span>
+                </div>
               </th>
               <th className="py-3 px-3 min-w-[170px] whitespace-nowrap border-r border-slate-300">设施名称</th>
               <th className="py-3 px-3 min-w-[150px] whitespace-nowrap border-r border-slate-300">计量设施(器具)编号</th>
@@ -149,14 +152,19 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                       isSelected ? 'bg-blue-50/70' : index % 2 === 1 ? 'bg-slate-50/40' : 'bg-white'
                     } ${isMoreOpen ? 'relative z-50' : 'relative'}`}
                   >
-                    {/* Select Checkbox */}
-                    <td className="py-2.5 px-3 text-center border-r border-slate-200">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => onToggleSelect(facility.id)}
-                        className="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500 border-slate-300 cursor-pointer"
-                      />
+                    {/* Select Checkbox & 序号 */}
+                    <td className="py-2.5 px-2 text-center border-r border-slate-200 select-none whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => onToggleSelect(facility.id)}
+                          className="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500 border-slate-300 cursor-pointer"
+                        />
+                        <span className="text-slate-500 font-mono text-xs w-6 text-center">
+                          {(currentPage - 1) * pageSize + index + 1}
+                        </span>
+                      </div>
                     </td>
 
                     {/* 设施名称 */}

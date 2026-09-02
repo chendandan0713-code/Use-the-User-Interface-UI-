@@ -874,7 +874,7 @@ export default function App() {
               {/* Main Content: 1、行政区划独立块 + 右侧搜索与数据台账 */}
               <div className="flex-1 flex overflow-hidden p-2.5 gap-2.5 min-w-0 min-h-0">
                 {/* 1、行政区划的背景是单独的一个块 */}
-                <div className="w-48 xl:w-52 shrink-0 h-full flex flex-col min-h-0 overflow-hidden">
+                <div className="w-52 xl:w-56 shrink-0 h-full flex flex-col min-h-0">
                   <WaterDistrictTree
                     districts={initialDistricts}
                     selectedDistrict={selectedDistrict}

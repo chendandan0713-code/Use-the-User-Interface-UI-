@@ -14,6 +14,7 @@ interface CustomSelectProps {
   onChange: (value: any) => void;
   options: SelectOption[];
   placeholder?: string;
+  labelPrefix?: string;
   className?: string;
   dropdownClassName?: string;
   disabled?: boolean;
@@ -28,6 +29,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange,
   options,
   placeholder = '请选择',
+  labelPrefix,
   className = '',
   dropdownClassName = '',
   disabled = false,
@@ -71,7 +73,12 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   }, [isOpen]);
 
   const selectedOption = options.find((opt) => String(opt.value) === String(value));
-  const displayText = selectedOption ? selectedOption.label : placeholder;
+  let displayText = selectedOption ? selectedOption.label : placeholder;
+  if (labelPrefix) {
+    displayText = selectedOption 
+      ? `${labelPrefix}：${selectedOption.label}` 
+      : `${labelPrefix}：${placeholder}`;
+  }
 
   // Size variations
   const sizeClasses = {

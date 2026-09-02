@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, AlertCircle, FileText } from 'lucide-react';
 import { FaultRecord, WaterFacility } from '../../types';
+import { CustomSelect } from '../Common/CustomSelect';
 
 interface FaultApplyModalProps {
   isOpen: boolean;
@@ -156,17 +157,28 @@ export const FaultApplyModal: React.FC<FaultApplyModalProps> = ({
                   className="w-full h-8 px-3 bg-slate-50 border border-slate-300 rounded text-slate-700 outline-none"
                 />
               ) : (
-                <select
-                  value={formData.facilityId}
-                  onChange={handleFacilitySelect}
-                  className="w-full h-8 px-3 bg-white border border-slate-300 rounded text-slate-700 outline-none focus:border-blue-500"
-                >
-                  {facilities.map((fac) => (
-                    <option key={fac.id} value={fac.id}>
-                      {fac.name} ({fac.code}) - {fac.waterOwner}
-                    </option>
-                  ))}
-                </select>
+                <CustomSelect
+                  className="w-full"
+                  value={formData.facilityId || ''}
+                  onChange={(facId) => {
+                    const fac = facilities.find((f) => f.id === facId);
+                    if (fac) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        facilityId: fac.id,
+                        facilityName: fac.name,
+                        facilityCode: fac.code,
+                        waterOwner: fac.waterOwner,
+                        permitNumber: fac.permitNumber,
+                        district: fac.district,
+                      }));
+                    }
+                  }}
+                  options={facilities.map((fac) => ({
+                    value: fac.id,
+                    label: `${fac.name} (${fac.code}) - ${fac.waterOwner}`,
+                  }))}
+                />
               )}
             </div>
           </div>

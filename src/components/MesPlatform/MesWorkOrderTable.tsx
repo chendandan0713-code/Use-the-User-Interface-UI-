@@ -64,13 +64,13 @@ export const MesWorkOrderTable: React.FC<MesWorkOrderTableProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-300 shadow-xs flex flex-col relative">
+    <div className="bg-white rounded-xl border border-slate-300 shadow-xs flex flex-col relative h-full min-h-0 flex-1 overflow-hidden">
       
       {/* Table Area */}
-      <div className="overflow-x-auto min-h-[360px] custom-scrollbar border-b border-slate-300">
+      <div className="overflow-auto flex-1 min-h-0 custom-scrollbar border-b border-slate-300">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="bg-slate-100/90 text-slate-700 border-b border-slate-300 font-semibold sticky top-0 z-10 select-none">
+            <tr className="bg-[#ebf3fb] text-slate-800 border-b border-slate-300 font-semibold sticky top-0 z-10 select-none">
               <th className="py-3 px-3 w-10 text-center border-r border-slate-300">
                 <input
                   type="checkbox"
@@ -91,7 +91,7 @@ export const MesWorkOrderTable: React.FC<MesWorkOrderTableProps> = ({
               <th className="py-3 px-3 min-w-[70px] whitespace-nowrap text-center border-r border-slate-300">类型</th>
               <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300">生产计划</th>
               <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300">进度与状态</th>
-              <th className="py-3 px-3 min-w-[140px] text-center sticky right-0 bg-slate-100/95 border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-20">
+              <th className="py-3 px-3 min-w-[140px] text-center sticky right-0 bg-[#ebf3fb] border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-20">
                 <div className="flex items-center justify-between px-2">
                   <span>操作</span>
                   {/* Settings Cog Icon matching Image 2 */}
@@ -312,33 +312,33 @@ export const MesWorkOrderTable: React.FC<MesWorkOrderTableProps> = ({
       </div>
 
       {/* Footer Pagination */}
-      <div className="p-3 border-t border-slate-200 bg-slate-50/60 rounded-b-xl flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+      <div className="shrink-0 py-1.5 px-3.5 border-t border-slate-200 bg-slate-50/60 rounded-b-xl flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
         <div className="flex items-center gap-2">
           <span>共 <strong className="text-slate-800">{totalCount}</strong> 条生产工单</span>
           {selectedIds.length > 0 && (
-            <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-              已选中 {selectedIds.length} 项工单
+            <span className="text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200 text-[11px]">
+              已选 {selectedIds.length} 项工单
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             disabled={currentPage === 1}
             onClick={() => onPageChange(currentPage - 1)}
-            className="p-1 rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+            className="w-6 h-6 flex items-center justify-center rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
 
-          <span className="font-semibold text-slate-800 px-2">第 {currentPage} / {totalPages} 页</span>
+          <span className="font-semibold text-slate-800 px-1.5">第 {currentPage} / {totalPages} 页</span>
 
           <button
             type="button"
             disabled={currentPage >= totalPages}
             onClick={() => onPageChange(currentPage + 1)}
-            className="p-1 rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+            className="w-6 h-6 flex items-center justify-center rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>

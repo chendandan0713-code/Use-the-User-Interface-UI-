@@ -17,6 +17,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { WaterFacility } from '../../types';
+import { CustomSelect } from '../Common/CustomSelect';
 
 interface WaterFacilityTableProps {
   facilities: WaterFacility[];
@@ -95,13 +96,13 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-300 shadow-xs flex flex-col relative">
+    <div className="bg-white rounded-xl border border-slate-300 shadow-xs flex flex-col relative h-full min-h-0 flex-1 overflow-hidden">
       
       {/* Table Container with Horizontal and Vertical Scrolling */}
-      <div className="overflow-x-auto min-h-[380px] custom-scrollbar border-b border-slate-300">
+      <div className="overflow-auto flex-1 min-h-0 custom-scrollbar border-b border-slate-300">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="bg-slate-100/90 text-slate-700 border-b border-slate-300 font-semibold sticky top-0 z-10 select-none">
+            <tr className="bg-[#ebf3fb] text-slate-800 border-b border-slate-300 font-semibold sticky top-0 z-10 select-none">
               <th className="py-3 px-3 w-10 text-center border-r border-slate-300">
                 <input
                   type="checkbox"
@@ -125,7 +126,7 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
               <th className="py-3 px-3 min-w-[105px] whitespace-nowrap text-center border-r border-slate-300">最新检定校准时间</th>
               <th className="py-3 px-3 min-w-[110px] whitespace-nowrap text-center border-r border-slate-300">检定校准有效期限</th>
               <th className="py-3 px-3 min-w-[100px] whitespace-nowrap text-center border-r border-slate-300">是否上报部平台</th>
-              <th className="py-3 px-4 min-w-[170px] text-center sticky right-0 bg-slate-100 border-l border-slate-300 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.1)] z-30">
+              <th className="py-3 px-4 min-w-[170px] text-center sticky right-0 bg-[#ebf3fb] border-l border-slate-300 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.1)] z-30">
                 操作
               </th>
             </tr>
@@ -159,14 +160,32 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                     </td>
 
                     {/* 设施名称 */}
-                    <td className="py-2.5 px-3 border-r border-slate-200">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium text-slate-900 hover:text-blue-600 cursor-pointer" onClick={() => onViewDetail(facility)}>
+                    <td className="py-2.5 px-3 border-r border-slate-200 max-w-[200px]">
+                      <div className="relative group max-w-full">
+                        <span
+                          className="font-medium text-slate-900 hover:text-blue-600 cursor-pointer block truncate"
+                          onClick={() => onViewDetail(facility)}
+                          title={facility.name}
+                        >
                           {facility.name}
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.2 bg-slate-100 text-slate-500 rounded border border-slate-200">
-                          {facility.district}
-                        </span>
+
+                        {/* 鼠标悬停小黑弹窗 Tooltip */}
+                        <div
+                          className={`absolute left-0 ${
+                            index === 0 ? 'top-full mt-1.5' : 'bottom-full mb-1.5'
+                          } hidden group-hover:block z-50 pointer-events-none drop-shadow-md`}
+                        >
+                          <div className="relative bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-md whitespace-nowrap shadow-xl border border-slate-700/60 font-normal">
+                            {facility.name}
+                            {/* 小三角 */}
+                            {index === 0 ? (
+                              <div className="absolute bottom-full left-3 -mb-1 border-4 border-transparent border-b-slate-900" />
+                            ) : (
+                              <div className="absolute top-full left-3 -mt-1 border-4 border-transparent border-t-slate-900" />
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </td>
 
@@ -441,26 +460,26 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
       </div>
 
       {/* Pagination Bar matching Image 1: 共210条 < 1 2 3 4 5 ... 10 > 20条/页 跳到 1 页 */}
-      <div className="p-3 border-t border-slate-300 bg-slate-50/70 rounded-b-xl flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 select-none">
+      <div className="shrink-0 py-1.5 px-3.5 border-t border-slate-300 bg-slate-50/70 rounded-b-xl flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 select-none">
         
         {/* Left: Total records info */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <span>共 <strong className="text-slate-800 font-semibold">{totalCount}</strong> 条</span>
           {selectedIds.length > 0 && (
-            <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-              已选中 <strong>{selectedIds.length}</strong> 项
+            <span className="text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200 text-[11px]">
+              已选 <strong>{selectedIds.length}</strong> 项
             </span>
           )}
         </div>
 
         {/* Right: Page Navigation Controls */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           {/* Previous Page Button */}
           <button
             type="button"
             disabled={currentPage === 1}
             onClick={() => onPageChange(currentPage - 1)}
-            className="p-1 rounded border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            className="w-6 h-6 flex items-center justify-center rounded border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -472,7 +491,7 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                 key={pageNum}
                 type="button"
                 onClick={() => onPageChange(pageNum)}
-                className={`min-w-6 h-6 px-1.5 rounded text-xs font-medium transition ${
+                className={`min-w-6 h-6 px-1.5 flex items-center justify-center rounded text-xs font-medium transition ${
                   currentPage === pageNum
                     ? 'bg-blue-600 text-white shadow-xs font-bold'
                     : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300'
@@ -481,11 +500,11 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                 {pageNum}
               </button>
             ))}
-            <span className="text-slate-400 px-1">...</span>
+            <span className="text-slate-400 px-0.5 text-xs">...</span>
             <button
               type="button"
               onClick={() => onPageChange(10)}
-              className={`min-w-6 h-6 px-1.5 rounded text-xs font-medium transition ${
+              className={`min-w-6 h-6 px-1.5 flex items-center justify-center rounded text-xs font-medium transition ${
                 currentPage === 10
                   ? 'bg-blue-600 text-white font-bold'
                   : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300'
@@ -500,22 +519,25 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
             type="button"
             disabled={currentPage >= totalPages}
             onClick={() => onPageChange(currentPage + 1)}
-            className="p-1 rounded border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            className="w-6 h-6 flex items-center justify-center rounded border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
 
           {/* Page Size Dropdown */}
-          <select
+          <CustomSelect
+            size="xs"
+            placement="top"
+            className="w-24"
             value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="h-7 px-2 bg-white text-slate-700 text-xs rounded border border-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
-          >
-            <option value={10}>10 条/页</option>
-            <option value={20}>20 条/页</option>
-            <option value={50}>50 条/页</option>
-            <option value={100}>100 条/页</option>
-          </select>
+            onChange={(val) => onPageSizeChange(Number(val))}
+            options={[
+              { value: 10, label: '10 条/页' },
+              { value: 20, label: '20 条/页' },
+              { value: 50, label: '50 条/页' },
+              { value: 100, label: '100 条/页' },
+            ]}
+          />
 
           {/* Jump To Page Input */}
           <form onSubmit={handleJumpPage} className="flex items-center gap-1">
@@ -524,7 +546,7 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
               type="text"
               value={jumpPageInput}
               onChange={(e) => setJumpPageInput(e.target.value)}
-              className="w-10 h-7 text-center bg-white text-slate-800 text-xs rounded border border-slate-300 focus:outline-none focus:border-blue-500"
+              className="w-9 h-6 text-center bg-white text-slate-800 text-xs rounded border border-slate-300 focus:outline-none focus:border-blue-500"
             />
             <span>页</span>
           </form>

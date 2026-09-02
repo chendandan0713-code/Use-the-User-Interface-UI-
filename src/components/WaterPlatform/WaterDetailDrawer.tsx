@@ -502,7 +502,7 @@ export const WaterDetailDrawer: React.FC<WaterDetailDrawerProps> = ({
             <div className="space-y-3">
               <div className="border border-slate-200 rounded-sm overflow-hidden bg-white">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                  <thead className="bg-[#ebf3fb] border-b border-slate-300 text-slate-800 font-semibold">
                     <tr>
                       <th className="px-4 py-2.5">故障编号</th>
                       <th className="px-4 py-2.5">上报时间</th>
@@ -548,7 +548,7 @@ export const WaterDetailDrawer: React.FC<WaterDetailDrawerProps> = ({
             <div className="space-y-3">
               <div className="border border-slate-200 rounded-sm overflow-hidden bg-white">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                  <thead className="bg-[#ebf3fb] border-b border-slate-300 text-slate-800 font-semibold">
                     <tr>
                       <th className="px-4 py-2.5">操作类型</th>
                       <th className="px-4 py-2.5">变更前状态</th>
@@ -631,7 +631,7 @@ export const WaterDetailDrawer: React.FC<WaterDetailDrawerProps> = ({
             <div className="space-y-3">
               <div className="border border-slate-200 rounded-sm overflow-hidden bg-white">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                  <thead className="bg-[#ebf3fb] border-b border-slate-300 text-slate-800 font-semibold">
                     <tr>
                       <th className="px-4 py-2.5">证书编号</th>
                       <th className="px-4 py-2.5">检定机构</th>
@@ -704,7 +704,7 @@ export const WaterDetailDrawer: React.FC<WaterDetailDrawerProps> = ({
             <div className="space-y-3">
               <div className="border border-slate-200 rounded-sm overflow-hidden bg-white">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                  <thead className="bg-[#ebf3fb] border-b border-slate-300 text-slate-800 font-semibold">
                     <tr>
                       <th className="px-4 py-2.5">换表工单</th>
                       <th className="px-4 py-2.5">原表具编号/底数</th>

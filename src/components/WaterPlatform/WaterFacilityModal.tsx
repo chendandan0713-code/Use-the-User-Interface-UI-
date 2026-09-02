@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Building2, MapPin, Gauge, ShieldCheck, Check } from 'lucide-react';
 import { WaterFacility, WaterUsageType, WaterSourceType, MeteringMethod, TransmissionMethod, FundingSource, ReportMethod } from '../../types';
+import { CustomSelect } from '../Common/CustomSelect';
 
 interface WaterFacilityModalProps {
   isOpen: boolean;
@@ -186,19 +187,20 @@ export const WaterFacilityModal: React.FC<WaterFacilityModalProps> = ({
             {/* 所属区县 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">所属区县</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={formData.district || '城东区'}
-                onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="城东区">城东区</option>
-                <option value="城中区">城中区</option>
-                <option value="城西区">城西区</option>
-                <option value="城北区">城北区</option>
-                <option value="湟中区">湟中区</option>
-                <option value="大通县">大通县</option>
-                <option value="湟源县">湟源县</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, district: val })}
+                options={[
+                  { value: '城东区', label: '城东区' },
+                  { value: '城中区', label: '城中区' },
+                  { value: '城西区', label: '城西区' },
+                  { value: '城北区', label: '城北区' },
+                  { value: '湟中区', label: '湟中区' },
+                  { value: '大通县', label: '大通县' },
+                  { value: '湟源县', label: '湟源县' },
+                ]}
+              />
             </div>
 
             {/* 取水权人名称 */}
@@ -240,32 +242,34 @@ export const WaterFacilityModal: React.FC<WaterFacilityModalProps> = ({
             {/* 水源类型 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">水源类型</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={formData.waterSourceType || '地表水'}
-                onChange={(e) => setFormData({ ...formData, waterSourceType: e.target.value as WaterSourceType })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="地表水">地表水</option>
-                <option value="地下水">地下水</option>
-                <option value="水库水">水库水</option>
-                <option value="泉水">泉水</option>
-                <option value="自备井">自备井</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, waterSourceType: val as WaterSourceType })}
+                options={[
+                  { value: '地表水', label: '地表水' },
+                  { value: '地下水', label: '地下水' },
+                  { value: '水库水', label: '水库水' },
+                  { value: '泉水', label: '泉水' },
+                  { value: '自备井', label: '自备井' },
+                ]}
+              />
             </div>
 
             {/* 建设来源 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">建设来源</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={formData.fundingSource || '中央发展基金'}
-                onChange={(e) => setFormData({ ...formData, fundingSource: e.target.value as FundingSource })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="中央发展基金">中央发展基金</option>
-                <option value="自计量">自计量</option>
-                <option value="省级水利专项">省级水利专项</option>
-                <option value="市级统筹">市级统筹</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, fundingSource: val as FundingSource })}
+                options={[
+                  { value: '中央发展基金', label: '中央发展基金' },
+                  { value: '自计量', label: '自计量' },
+                  { value: '省级水利专项', label: '省级水利专项' },
+                  { value: '市级统筹', label: '市级统筹' },
+                ]}
+              />
             </div>
 
             {/* 资金年份 */}
@@ -304,44 +308,47 @@ export const WaterFacilityModal: React.FC<WaterFacilityModalProps> = ({
             {/* 使用状态 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">使用状态</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={formData.status || '正常'}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="正常">正常</option>
-                <option value="故障">故障</option>
-                <option value="停用">停用</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, status: val as any })}
+                options={[
+                  { value: '正常', label: '正常' },
+                  { value: '故障', label: '故障' },
+                  { value: '停用', label: '停用' },
+                ]}
+              />
             </div>
 
             {/* 上报方式 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">上报方式</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={formData.reportMethod || '在线'}
-                onChange={(e) => setFormData({ ...formData, reportMethod: e.target.value as ReportMethod })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="在线">在线</option>
-                <option value="接口">接口</option>
-                <option value="非在线">非在线</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, reportMethod: val as ReportMethod })}
+                options={[
+                  { value: '在线', label: '在线' },
+                  { value: '接口', label: '接口' },
+                  { value: '非在线', label: '非在线' },
+                ]}
+              />
             </div>
 
             {/* 数据传输方式 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">数据传输方式</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={formData.transmissionMethod || '在线'}
-                onChange={(e) => setFormData({ ...formData, transmissionMethod: e.target.value as TransmissionMethod })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="在线">在线</option>
-                <option value="非在线">非在线</option>
-                <option value="无线4G">无线4G</option>
-                <option value="NB-IoT">NB-IoT</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, transmissionMethod: val as TransmissionMethod })}
+                options={[
+                  { value: '在线', label: '在线' },
+                  { value: '非在线', label: '非在线' },
+                  { value: '无线4G', label: '无线4G' },
+                  { value: 'NB-IoT', label: 'NB-IoT' },
+                ]}
+              />
             </div>
 
           </div>

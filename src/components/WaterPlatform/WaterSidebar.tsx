@@ -58,9 +58,9 @@ export const WaterSidebar: React.FC<WaterSidebarProps> = ({
   };
 
   return (
-    <aside className="w-56 flex-shrink-0 bg-[#006be6] text-white flex flex-col select-none border-r border-blue-600/50 shadow-md">
+    <aside className="w-56 h-full min-h-full flex-shrink-0 bg-[#006be6] text-white flex flex-col select-none border-r border-blue-600/50 shadow-md">
       {/* Scrollable menu items */}
-      <div className="flex-1 overflow-y-auto py-2.5 px-2 space-y-1 text-[13px] font-medium custom-scrollbar">
+      <div className="flex-1 overflow-y-auto min-h-0 py-2.5 px-2 space-y-1 text-[13px] font-medium custom-scrollbar">
         
         {/* 首页 */}
         <button

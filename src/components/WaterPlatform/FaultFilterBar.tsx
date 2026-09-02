@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, RotateCcw, Plus, Calendar } from 'lucide-react';
 import { FaultFilterParams } from '../../types';
+import { CustomSelect } from '../Common/CustomSelect';
 
 interface FaultFilterBarProps {
   filterParams: FaultFilterParams;
@@ -18,7 +19,7 @@ export const FaultFilterBar: React.FC<FaultFilterBarProps> = ({
   onOpenApplyModal,
 }) => {
   return (
-    <div className="bg-white rounded-xl border border-slate-300 p-4 shadow-xs mb-3">
+    <div className="bg-white rounded-xl border border-slate-300 p-4 shadow-xs">
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         
         {/* 计量设施名称 */}
@@ -80,26 +81,23 @@ export const FaultFilterBar: React.FC<FaultFilterBarProps> = ({
           <label className="text-slate-600 whitespace-nowrap font-medium">
             状态
           </label>
-          <div className="relative">
-            <select
-              value={filterParams.status}
-              onChange={(e) =>
-                onFilterChange({ ...filterParams, status: e.target.value })
-              }
-              className="w-32 h-8 px-2.5 pr-7 bg-slate-50 hover:bg-slate-100 focus:bg-white text-slate-800 rounded-md border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition appearance-none cursor-pointer"
-            >
-              <option value="全部">全部状态</option>
-              <option value="故障待审">故障待审</option>
-              <option value="处理待审">处理待审</option>
-              <option value="故障中">故障中</option>
-              <option value="故障驳回">故障驳回</option>
-              <option value="处理驳回">处理驳回</option>
-              <option value="已完成">已完成</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400 text-[10px]">
-              ▼
-            </div>
-          </div>
+          <CustomSelect
+            className="w-32"
+            value={filterParams.status}
+            onChange={(val) =>
+              onFilterChange({ ...filterParams, status: val })
+            }
+            placeholder="全部状态"
+            options={[
+              { value: '全部', label: '全部状态' },
+              { value: '故障待审', label: '故障待审' },
+              { value: '处理待审', label: '处理待审' },
+              { value: '故障中', label: '故障中' },
+              { value: '故障驳回', label: '故障驳回' },
+              { value: '处理驳回', label: '处理驳回' },
+              { value: '已完成', label: '已完成' },
+            ]}
+          />
         </div>
 
         {/* 操作按钮组 */}

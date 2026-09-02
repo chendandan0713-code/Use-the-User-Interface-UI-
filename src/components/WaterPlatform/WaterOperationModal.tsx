@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Sliders, History, Save, Check } from 'lucide-react';
 import { WaterFacility } from '../../types';
+import { CustomSelect } from '../Common/CustomSelect';
 
 interface WaterOperationModalProps {
   isOpen: boolean;
@@ -70,16 +71,17 @@ export const WaterOperationModal: React.FC<WaterOperationModalProps> = ({
           <form onSubmit={handleSave} className="p-5 space-y-4 text-xs">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">自动上报采集周期</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={reportCycle}
-                onChange={(e) => setReportCycle(e.target.value)}
-                className="w-full h-8 px-2.5 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="5分钟">每 5 分钟 (高精密度)</option>
-                <option value="15分钟">每 15 分钟 (标准规范)</option>
-                <option value="1小时">每 1 小时 (节能模式)</option>
-                <option value="1天">每天 1 次 (人工抄报)</option>
-              </select>
+                onChange={(val) => setReportCycle(val)}
+                options={[
+                  { value: '5分钟', label: '每 5 分钟 (高精密度)' },
+                  { value: '15分钟', label: '每 15 分钟 (标准规范)' },
+                  { value: '1小时', label: '每 1 小时 (节能模式)' },
+                  { value: '1天', label: '每天 1 次 (人工抄报)' },
+                ]}
+              />
             </div>
 
             <div>

@@ -11,6 +11,7 @@ import {
   Edit3
 } from 'lucide-react';
 import { FaultRecord } from '../../types';
+import { CustomSelect } from '../Common/CustomSelect';
 
 interface FaultRecordTableProps {
   records: FaultRecord[];
@@ -45,30 +46,30 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-300 shadow-xs flex flex-col flex-1 overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-300 shadow-xs flex flex-col relative h-full min-h-0 flex-1 overflow-hidden">
       
       {/* Table Container */}
-      <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar">
+      <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto custom-scrollbar">
         <table className="w-full text-[12px] text-left border-collapse min-w-[1400px]">
           
           {/* Header */}
-          <thead className="bg-[#f2f4f8] text-slate-700 font-medium border-b border-slate-200 sticky top-0 z-10 select-none">
+          <thead className="bg-[#ebf3fb] text-slate-800 font-semibold border-b border-slate-300 sticky top-0 z-10 select-none">
             <tr>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap">取水权人</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap">证照编号</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap">计量设施名称</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">计量器具编号</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">故障水表底数</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap">故障情况说明</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">故障图片</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">上报人</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">故障时间</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">故障解除底数</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap">故障解除说明</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">解除证明材料</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">处理人</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">处理时间</th>
-              <th className="px-3 py-2.5 border-r border-slate-200/80 whitespace-nowrap text-center">状态</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">取水权人</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">证照编号</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">计量设施名称</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">计量器具编号</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">故障水表底数</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">故障情况说明</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">故障图片</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">上报人</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">故障时间</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">故障解除底数</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap">故障解除说明</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">解除证明材料</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">处理人</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">处理时间</th>
+              <th className="px-3 py-2.5 border-r border-slate-300/80 whitespace-nowrap text-center">状态</th>
               <th className="px-3 py-2.5 whitespace-nowrap text-center">流程</th>
             </tr>
           </thead>
@@ -253,7 +254,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
       </div>
 
       {/* Pagination matching screenshot: 共210条 < 1 2 [3] 4 5 ... 10 > [20条/页 ▾] 跳到 [ 1 ] 页 */}
-      <div className="px-4 py-3 border-t border-slate-200/80 bg-white flex flex-wrap items-center justify-end gap-3 text-xs text-slate-600 select-none">
+      <div className="shrink-0 px-3.5 py-1.5 border-t border-slate-200/80 bg-white flex flex-wrap items-center justify-end gap-2 text-xs text-slate-600 select-none">
         
         {/* Total Count */}
         <span className="text-slate-500 mr-2">共{totalCount}条</span>
@@ -264,7 +265,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
             type="button"
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="w-7 h-7 flex items-center justify-center border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+            className="w-6 h-6 flex items-center justify-center border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -272,7 +273,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
           <button
             type="button"
             onClick={() => setCurrentPage(1)}
-            className={`w-7 h-7 flex items-center justify-center rounded transition cursor-pointer ${
+            className={`w-6 h-6 flex items-center justify-center rounded text-xs transition cursor-pointer ${
               currentPage === 1 ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-100 text-slate-700'
             }`}
           >
@@ -282,7 +283,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
           <button
             type="button"
             onClick={() => setCurrentPage(2)}
-            className={`w-7 h-7 flex items-center justify-center rounded transition cursor-pointer ${
+            className={`w-6 h-6 flex items-center justify-center rounded text-xs transition cursor-pointer ${
               currentPage === 2 ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-100 text-slate-700'
             }`}
           >
@@ -292,7 +293,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
           <button
             type="button"
             onClick={() => setCurrentPage(3)}
-            className={`w-7 h-7 flex items-center justify-center rounded border transition cursor-pointer ${
+            className={`w-6 h-6 flex items-center justify-center rounded border text-xs transition cursor-pointer ${
               currentPage === 3 ? 'border-blue-500 text-blue-600 font-semibold bg-blue-50/50' : 'hover:bg-slate-100 text-slate-700'
             }`}
           >
@@ -302,7 +303,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
           <button
             type="button"
             onClick={() => setCurrentPage(4)}
-            className={`w-7 h-7 flex items-center justify-center rounded transition cursor-pointer ${
+            className={`w-6 h-6 flex items-center justify-center rounded text-xs transition cursor-pointer ${
               currentPage === 4 ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-100 text-slate-700'
             }`}
           >
@@ -312,19 +313,19 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
           <button
             type="button"
             onClick={() => setCurrentPage(5)}
-            className={`w-7 h-7 flex items-center justify-center rounded transition cursor-pointer ${
+            className={`w-6 h-6 flex items-center justify-center rounded text-xs transition cursor-pointer ${
               currentPage === 5 ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-100 text-slate-700'
             }`}
           >
             5
           </button>
 
-          <span className="text-slate-400 px-1">...</span>
+          <span className="text-slate-400 px-0.5 text-xs">...</span>
 
           <button
             type="button"
             onClick={() => setCurrentPage(10)}
-            className={`w-7 h-7 flex items-center justify-center rounded transition cursor-pointer ${
+            className={`w-6 h-6 flex items-center justify-center rounded text-xs transition cursor-pointer ${
               currentPage === 10 ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-100 text-slate-700'
             }`}
           >
@@ -335,28 +336,26 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
             type="button"
             onClick={() => setCurrentPage((p) => Math.min(10, p + 1))}
             disabled={currentPage === 10}
-            className="w-7 h-7 flex items-center justify-center border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+            className="w-6 h-6 flex items-center justify-center border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* Page Size Select */}
-        <div className="relative">
-          <select
-            value={pageSize}
-            onChange={(e) => setPageSize(Number(e.target.value))}
-            className="h-7 px-2 pr-6 border border-slate-300 rounded text-slate-700 bg-white outline-none cursor-pointer text-xs appearance-none"
-          >
-            <option value={10}>10 条/页</option>
-            <option value={20}>20 条/页</option>
-            <option value={50}>50 条/页</option>
-            <option value={100}>100 条/页</option>
-          </select>
-          <div className="absolute inset-y-0 right-0 flex items-center px-1.5 pointer-events-none text-slate-400 text-[10px]">
-            ▼
-          </div>
-        </div>
+        <CustomSelect
+          size="xs"
+          placement="top"
+          className="w-24"
+          value={pageSize}
+          onChange={(val) => setPageSize(Number(val))}
+          options={[
+            { value: 10, label: '10 条/页' },
+            { value: 20, label: '20 条/页' },
+            { value: 50, label: '50 条/页' },
+            { value: 100, label: '100 条/页' },
+          ]}
+        />
 
         {/* Jump to */}
         <div className="flex items-center gap-1 text-slate-600">
@@ -372,7 +371,7 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
                 if (val >= 1 && val <= 10) setCurrentPage(val);
               }
             }}
-            className="w-10 h-7 text-center border border-slate-300 rounded text-slate-800 outline-none focus:border-blue-500"
+            className="w-9 h-6 text-center border border-slate-300 rounded text-slate-800 outline-none focus:border-blue-500 text-xs"
           />
           <span>页</span>
         </div>

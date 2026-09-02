@@ -788,34 +788,36 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans relative">
+    <div className="h-screen w-screen bg-slate-100 flex flex-col font-sans relative overflow-hidden">
       
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
       {/* Top Main Navigation */}
-      <Navbar
-        currentPlatform={currentPlatform}
-        onPlatformChange={setCurrentPlatform}
-        subTab={subTab}
-        onSubTabChange={(tab) => {
-          setSubTab(tab);
-          if (tab === 'third_party') {
+      <div className="shrink-0 z-30">
+        <Navbar
+          currentPlatform={currentPlatform}
+          onPlatformChange={setCurrentPlatform}
+          subTab={subTab}
+          onSubTabChange={(tab) => {
+            setSubTab(tab);
+            if (tab === 'third_party') {
+              setIsLoggedIn(false);
+              addToast('已跳转至统一身份认证登录门户', '', 'info');
+            } else {
+              addToast(`已切换至【${tab === 'user_client' ? '取水户端' : '管理端'}】`, '', 'info');
+            }
+          }}
+          searchTerm={globalSearchTerm}
+          onSearchChange={setGlobalSearchTerm}
+          onNotify={addToast}
+          onLogout={() => {
             setIsLoggedIn(false);
-            addToast('已跳转至统一身份认证登录门户', '', 'info');
-          } else {
-            addToast(`已切换至【${tab === 'user_client' ? '取水户端' : '管理端'}】`, '', 'info');
-          }
-        }}
-        searchTerm={globalSearchTerm}
-        onSearchChange={setGlobalSearchTerm}
-        onNotify={addToast}
-        onLogout={() => {
-          setIsLoggedIn(false);
-          addToast('已安全退出管理系统', '会话状态已安全归档', 'info');
-        }}
-        currentUser={currentUserRole}
-      />
+            addToast('已安全退出管理系统', '会话状态已安全归档', 'info');
+          }}
+          currentUser={currentUserRole}
+        />
+      </div>
 
       {/* Quick Floating Switch to Login Page for testing */}
       <div className="fixed bottom-4 right-4 z-40">
@@ -833,66 +835,74 @@ export default function App() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         
         {/* ========================================================================= */}
         {/* VIEW 1: 西宁市取用水管理平台 (Image 1) */}
         {/* ========================================================================= */}
         {currentPlatform === 'water' && (
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden min-h-0">
             {/* Left Sidebar Menu */}
-            <WaterSidebar
-              activeSubMenu={activeWaterMenu}
-              onSubMenuChange={setActiveWaterMenu}
-              onNotify={addToast}
-            />
+            <div className="shrink-0 h-full flex flex-col min-h-0 overflow-hidden">
+              <WaterSidebar
+                activeSubMenu={activeWaterMenu}
+                onSubMenuChange={setActiveWaterMenu}
+                onNotify={addToast}
+              />
+            </div>
 
             {/* Right Container: Breadcrumb Bar on Top + Content Area Underneath */}
-            <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-100/75">
+            <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-slate-100/75">
               {/* 2、面包屑在行政区划和搜索的上面，用白色底框 */}
-              <WaterBreadcrumbBar
-                activeMenu={activeWaterMenu}
-                selectedDistrict={selectedDistrict}
-                totalFacilitiesCount={
-                  activeWaterMenu === 'fault'
-                    ? filteredFaultRecords.length
-                    : filteredFacilities.length
-                }
-                onSelectMenu={setActiveWaterMenu}
-                onSwitchPlatform={() => {
-                  setCurrentPlatform('mes');
-                  addToast('已切换至生产工单协同系统', '欢迎查阅表二 (生产工单与任务台账)', 'info');
-                }}
-              />
-
-              {/* Main Content: 1、行政区划独立块 + 右侧搜索与数据台账 */}
-              <div className="flex-1 flex overflow-hidden p-3 gap-3 min-w-0">
-                {/* 1、行政区划的背景是单独的一个块 */}
-                <WaterDistrictTree
-                  districts={initialDistricts}
+              <div className="shrink-0 z-20">
+                <WaterBreadcrumbBar
+                  activeMenu={activeWaterMenu}
                   selectedDistrict={selectedDistrict}
-                  onSelectDistrict={(dist) => {
-                    setSelectedDistrict(dist);
-                    setWaterFilters((prev) => ({ ...prev, selectedDistrict: dist }));
-                    setFaultFilters((prev) => ({ ...prev, selectedDistrict: dist }));
-                    addToast(`已筛选区县: ${dist}`, `当前区域台账已更新`, 'info');
+                  totalFacilitiesCount={
+                    activeWaterMenu === 'fault'
+                      ? filteredFaultRecords.length
+                      : filteredFacilities.length
+                  }
+                  onSelectMenu={setActiveWaterMenu}
+                  onSwitchPlatform={() => {
+                    setCurrentPlatform('mes');
+                    addToast('已切换至生产工单协同系统', '欢迎查阅表二 (生产工单与任务台账)', 'info');
                   }}
                 />
+              </div>
+
+              {/* Main Content: 1、行政区划独立块 + 右侧搜索与数据台账 */}
+              <div className="flex-1 flex overflow-hidden p-2.5 gap-2.5 min-w-0 min-h-0">
+                {/* 1、行政区划的背景是单独的一个块 */}
+                <div className="w-48 xl:w-52 shrink-0 h-full flex flex-col min-h-0 overflow-hidden">
+                  <WaterDistrictTree
+                    districts={initialDistricts}
+                    selectedDistrict={selectedDistrict}
+                    onSelectDistrict={(dist) => {
+                      setSelectedDistrict(dist);
+                      setWaterFilters((prev) => ({ ...prev, selectedDistrict: dist }));
+                      setFaultFilters((prev) => ({ ...prev, selectedDistrict: dist }));
+                      addToast(`已筛选区县: ${dist}`, `当前区域台账已更新`, 'info');
+                    }}
+                  />
+                </div>
 
                 {/* Main Data & Query Area */}
                 {activeWaterMenu === 'fault' ? (
-                  <main className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3 min-w-0">
+                  <main className="flex-1 flex flex-col gap-2 min-w-0 min-h-0 overflow-hidden">
                     {/* Fault Query & Filter Form */}
-                    <FaultFilterBar
-                      filterParams={faultFilters}
-                      onFilterChange={setFaultFilters}
-                      onSearch={handleFaultSearch}
-                      onReset={handleFaultReset}
-                      onOpenApplyModal={handleOpenApplyFault}
-                    />
+                    <div className="shrink-0">
+                      <FaultFilterBar
+                        filterParams={faultFilters}
+                        onFilterChange={setFaultFilters}
+                        onSearch={handleFaultSearch}
+                        onReset={handleFaultReset}
+                        onOpenApplyModal={handleOpenApplyFault}
+                      />
+                    </div>
 
                     {/* Fault Data Table */}
-                    <div className="flex-1 min-w-0 flex flex-col">
+                    <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
                       <FaultRecordTable
                         records={filteredFaultRecords}
                         onViewProgress={handleViewFaultProgress}
@@ -902,20 +912,22 @@ export default function App() {
                     </div>
                   </main>
                 ) : (
-                  <main className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3 min-w-0">
+                  <main className="flex-1 flex flex-col gap-2 min-w-0 min-h-0 overflow-hidden">
                     {/* Query & Filter Form */}
-                    <WaterFilterBar
-                      filterParams={waterFilters}
-                      onFilterChange={setWaterFilters}
-                      onSearch={handleWaterSearch}
-                      onReset={handleWaterReset}
-                      onClear={handleWaterClear}
-                      onOpenAddModal={handleOpenAddFacility}
-                      onExport={handleExportWaterData}
-                    />
+                    <div className="shrink-0">
+                      <WaterFilterBar
+                        filterParams={waterFilters}
+                        onFilterChange={setWaterFilters}
+                        onSearch={handleWaterSearch}
+                        onReset={handleWaterReset}
+                        onClear={handleWaterClear}
+                        onOpenAddModal={handleOpenAddFacility}
+                        onExport={handleExportWaterData}
+                      />
+                    </div>
 
                     {/* Data Table */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
                       <WaterFacilityTable
                         facilities={filteredFacilities}
                         selectedIds={waterSelectedIds}
@@ -964,19 +976,21 @@ export default function App() {
         {/* VIEW 2: 智能制造生产工单系统 (Image 2) */}
         {/* ========================================================================= */}
         {currentPlatform === 'mes' && (
-          <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/70">
+          <div className="flex-1 flex flex-col overflow-hidden min-h-0 bg-slate-50/70">
             {/* Header Tabs: 首页, 工单信息, 生产工单, 生产任务, 报工记录, 委外工单, 委外任务 */}
-            <MesHeaderTabs
-              activeTab={mesActiveTab}
-              onTabChange={setMesActiveTab}
-              onNotify={addToast}
-            />
+            <div className="shrink-0 z-20">
+              <MesHeaderTabs
+                activeTab={mesActiveTab}
+                onTabChange={setMesActiveTab}
+                onNotify={addToast}
+              />
+            </div>
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-y-auto p-4 lg:p-5 custom-scrollbar flex flex-col min-w-0">
+            <main className="flex-1 overflow-hidden p-3 lg:p-3.5 flex flex-col min-w-0 min-h-0 gap-2">
               
               {/* Header Title & Switch back */}
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div className="shrink-0 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-slate-400">制造执行中心</span>
                   <span className="text-slate-300">/</span>
@@ -1004,17 +1018,19 @@ export default function App() {
               </div>
 
               {/* MES Filter Bar with Barcode Scan Button */}
-              <MesFilterBar
-                filterParams={mesFilters}
-                onFilterChange={setMesFilters}
-                onReset={handleMesReset}
-                onOpenAddModal={handleOpenAddWorkOrder}
-                onOpenScanner={() => setMesScannerOpen(true)}
-                onNotify={addToast}
-              />
+              <div className="shrink-0">
+                <MesFilterBar
+                  filterParams={mesFilters}
+                  onFilterChange={setMesFilters}
+                  onReset={handleMesReset}
+                  onOpenAddModal={handleOpenAddWorkOrder}
+                  onOpenScanner={() => setMesScannerOpen(true)}
+                  onNotify={addToast}
+                />
+              </div>
 
               {/* MES Work Order Table */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
                 <MesWorkOrderTable
                   orders={filteredWorkOrders}
                   selectedIds={mesSelectedIds}

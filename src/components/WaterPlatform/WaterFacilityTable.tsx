@@ -125,7 +125,7 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
               <th className="py-3 px-3 min-w-[105px] whitespace-nowrap text-center border-r border-slate-300">最新检定校准时间</th>
               <th className="py-3 px-3 min-w-[110px] whitespace-nowrap text-center border-r border-slate-300">检定校准有效期限</th>
               <th className="py-3 px-3 min-w-[100px] whitespace-nowrap text-center border-r border-slate-300">是否上报部平台</th>
-              <th className="py-3 px-4 min-w-[140px] text-center sticky right-0 bg-slate-100/95 border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-20">
+              <th className="py-3 px-4 min-w-[170px] text-center sticky right-0 bg-slate-100 border-l border-slate-300 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.1)] z-30">
                 操作
               </th>
             </tr>
@@ -139,13 +139,14 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                 const isFault = facility.status === '故障';
                 const isDisabled = facility.status === '停用';
                 const isMoreOpen = activeMoreMenuId === facility.id;
+                const isNearBottom = index >= Math.max(0, facilities.length - 3) && facilities.length > 3;
 
                 return (
                   <tr
                     key={facility.id}
                     className={`transition-colors hover:bg-blue-50/40 ${
                       isSelected ? 'bg-blue-50/70' : index % 2 === 1 ? 'bg-slate-50/40' : 'bg-white'
-                    }`}
+                    } ${isMoreOpen ? 'relative z-50' : 'relative'}`}
                   >
                     {/* Select Checkbox */}
                     <td className="py-2.5 px-3 text-center border-r border-slate-200">
@@ -293,13 +294,23 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                     </td>
 
                     {/* 操作 (编辑, 详情, 更多 ▾) Sticky Right Column */}
-                    <td className="py-2.5 px-3 text-center sticky right-0 bg-white/95 group-hover:bg-blue-50/40 border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-20">
-                      <div className="flex items-center justify-center gap-1.5 text-xs">
+                    <td
+                      className={`py-2.5 px-3 min-w-[175px] whitespace-nowrap text-center sticky right-0 border-l border-slate-300 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.08)] ${
+                        isMoreOpen
+                          ? 'bg-blue-50/90 z-50'
+                          : isSelected
+                          ? 'bg-blue-50/90 z-20'
+                          : index % 2 === 1
+                          ? 'bg-[#f8fafc] group-hover:bg-[#eef4ff] z-20'
+                          : 'bg-white group-hover:bg-[#eef4ff] z-20'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-2.5 text-xs whitespace-nowrap">
                         {/* 编辑 */}
                         <button
                           type="button"
                           onClick={() => onEdit(facility)}
-                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium px-1 py-0.5 rounded transition"
+                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium px-1 py-0.5 rounded transition cursor-pointer whitespace-nowrap"
                         >
                           编辑
                         </button>
@@ -308,22 +319,22 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                         <button
                           type="button"
                           onClick={() => onViewDetail(facility)}
-                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium px-1 py-0.5 rounded transition"
+                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium px-1 py-0.5 rounded transition cursor-pointer whitespace-nowrap"
                         >
                           详情
                         </button>
 
                         {/* 更多 ▾ */}
-                        <div className="relative">
+                        <div className="relative inline-block">
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               setActiveMoreMenuId(isMoreOpen ? null : facility.id);
                             }}
-                            className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded font-medium transition ${
+                            className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded font-medium transition cursor-pointer whitespace-nowrap ${
                               isMoreOpen
-                                ? 'bg-blue-100 text-blue-800'
+                                ? 'bg-blue-100 text-blue-800 font-semibold'
                                 : 'text-blue-600 hover:text-blue-800 hover:bg-slate-100'
                             }`}
                           >
@@ -335,7 +346,9 @@ export const WaterFacilityTable: React.FC<WaterFacilityTableProps> = ({
                           {isMoreOpen && (
                             <div
                               onClick={(e) => e.stopPropagation()}
-                              className="absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-xl border border-slate-300 py-1.5 z-50 text-xs text-left animate-in fade-in zoom-in-95 duration-100"
+                              className={`absolute right-0 ${
+                                isNearBottom ? 'bottom-full mb-1.5' : 'top-full mt-1'
+                              } w-32 bg-white rounded-xl shadow-2xl border border-slate-300 py-1.5 z-[100] text-xs text-left animate-in fade-in zoom-in-95 duration-100`}
                             >
                               {/* 启用 */}
                               <button

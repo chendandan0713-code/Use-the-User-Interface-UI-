@@ -49,7 +49,7 @@ export const WaterDetailDrawer: React.FC<WaterDetailDrawerProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-5xl bg-white max-h-[92vh] rounded-xl shadow-2xl flex flex-col border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-150 relative text-slate-800"
+        className="w-full max-w-5xl bg-white h-[85vh] max-h-[85vh] rounded-xl shadow-2xl flex flex-col border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-150 relative text-slate-800"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header matching Screenshot: "详情" on the left, "X" on the right */}

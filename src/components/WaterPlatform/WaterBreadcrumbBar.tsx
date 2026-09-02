@@ -109,12 +109,6 @@ export const WaterBreadcrumbBar: React.FC<WaterBreadcrumbBarProps> = ({
             </button>
           )}
         </div>
-
-        {/* Current Scope Badge */}
-        <div className="hidden md:flex items-center gap-1.5 ml-2 text-[11px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span>当前辖区: <strong className="text-slate-700">{selectedDistrict}</strong> ({totalFacilitiesCount} 条{activeMenu === 'fault' ? '故障记录' : '设施点位'})</span>
-        </div>
       </div>
 
       {/* Right Area: Fast Switch & Actions */}

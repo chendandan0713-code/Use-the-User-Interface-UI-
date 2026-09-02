@@ -29,9 +29,6 @@ export const WaterDistrictTree: React.FC<WaterDistrictTreeProps> = ({
           <MapPin className="w-3.5 h-3.5 text-blue-600" />
           <span>行政区划</span>
         </div>
-        <span className="text-[10px] text-slate-400 font-normal">
-          共 {districts.count} 个点位
-        </span>
       </div>
 
       {/* Search Input */}

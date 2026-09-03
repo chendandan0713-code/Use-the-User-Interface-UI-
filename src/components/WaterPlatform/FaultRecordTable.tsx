@@ -125,9 +125,8 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
                       type="button"
                       onClick={() =>
                         onViewMedia(
-                          `故障图片材料 - ${record.facilityName}`,
-                          record.faultImages || ['现场水表故障照片.jpg'],
-                          record.faultDesc
+                          '附件查看',
+                          record.faultImages || ['现场水表故障照片.jpg']
                         )
                       }
                       className="text-blue-600 hover:text-blue-800 hover:underline font-medium cursor-pointer"
@@ -163,9 +162,8 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
                         type="button"
                         onClick={() =>
                           onViewMedia(
-                            `解除证明材料 - ${record.facilityName}`,
-                            record.resolvedFiles || [],
-                            record.resolvedDesc
+                            '附件查看',
+                            record.resolvedFiles || []
                           )
                         }
                         className="text-blue-600 hover:text-blue-800 hover:underline font-medium cursor-pointer"
@@ -177,9 +175,8 @@ export const FaultRecordTable: React.FC<FaultRecordTableProps> = ({
                         type="button"
                         onClick={() =>
                           onViewMedia(
-                            `解除证明材料 - ${record.facilityName}`,
-                            ['解除修复工单.pdf'],
-                            record.resolvedDesc || '正在组织修复处理中'
+                            '附件查看',
+                            ['解除修复工单.pdf']
                           )
                         }
                         className="text-blue-600 hover:text-blue-800 hover:underline font-medium cursor-pointer"

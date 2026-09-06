@@ -70,8 +70,8 @@ export const MesWorkOrderTable: React.FC<MesWorkOrderTableProps> = ({
       <div className="overflow-auto flex-1 min-h-0 custom-scrollbar border-b border-slate-300">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="bg-[#ebf3fb] text-slate-800 border-b border-slate-300 font-semibold sticky top-0 z-10 select-none">
-              <th className="py-3 px-2 w-16 min-w-[64px] text-center border-r border-slate-300">
+            <tr className="bg-[#ebf3fb] text-slate-800 border-b border-slate-300 font-semibold sticky top-0 z-20 select-none">
+              <th className="py-3 px-2 w-16 min-w-[64px] text-center border-r border-slate-300 sticky top-0 left-0 bg-[#ebf3fb] shadow-[2px_0_6px_-2px_rgba(0,0,0,0.08)] z-30">
                 <div className="flex items-center justify-center gap-1.5">
                   <input
                     type="checkbox"
@@ -82,19 +82,19 @@ export const MesWorkOrderTable: React.FC<MesWorkOrderTableProps> = ({
                   <span className="font-semibold text-slate-700">序号</span>
                 </div>
               </th>
-              <th className="py-3 px-3 min-w-[140px] whitespace-nowrap border-r border-slate-300">工单编号</th>
-              <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300">工单标识</th>
-              <th className="py-3 px-3 min-w-[180px] whitespace-nowrap border-r border-slate-300">产品名称</th>
-              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300">产品编号</th>
-              <th className="py-3 px-3 min-w-[140px] whitespace-nowrap border-r border-slate-300">规格</th>
-              <th className="py-3 px-3 min-w-[60px] whitespace-nowrap text-center border-r border-slate-300">单位</th>
-              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300">材料牌号</th>
-              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300">零件图号</th>
-              <th className="py-3 px-3 min-w-[120px] whitespace-nowrap border-r border-slate-300">生产批次</th>
-              <th className="py-3 px-3 min-w-[70px] whitespace-nowrap text-center border-r border-slate-300">类型</th>
-              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300">生产计划</th>
-              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300">进度与状态</th>
-              <th className="py-3 px-3 min-w-[140px] text-center sticky right-0 bg-[#ebf3fb] border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-20">
+              <th className="py-3 px-3 min-w-[140px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">工单编号</th>
+              <th className="py-3 px-3 min-w-[90px] whitespace-nowrap text-center border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">工单标识</th>
+              <th className="py-3 px-3 min-w-[180px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">产品名称</th>
+              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">产品编号</th>
+              <th className="py-3 px-3 min-w-[140px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">规格</th>
+              <th className="py-3 px-3 min-w-[60px] whitespace-nowrap text-center border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">单位</th>
+              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">材料牌号</th>
+              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">零件图号</th>
+              <th className="py-3 px-3 min-w-[120px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">生产批次</th>
+              <th className="py-3 px-3 min-w-[70px] whitespace-nowrap text-center border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">类型</th>
+              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">生产计划</th>
+              <th className="py-3 px-3 min-w-[130px] whitespace-nowrap border-r border-slate-300 sticky top-0 bg-[#ebf3fb]">进度与状态</th>
+              <th className="py-3 px-3 min-w-[140px] text-center sticky top-0 right-0 bg-[#ebf3fb] border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-30">
                 <div className="flex items-center justify-between px-2">
                   <span>操作</span>
                   {/* Settings Cog Icon matching Image 2 */}
@@ -120,12 +120,16 @@ export const MesWorkOrderTable: React.FC<MesWorkOrderTableProps> = ({
                 return (
                   <tr
                     key={order.id}
-                    className={`transition-colors hover:bg-blue-50/40 ${
+                    className={`group transition-colors hover:bg-blue-50/40 ${
                       isSelected ? 'bg-blue-50/70' : idx % 2 === 1 ? 'bg-slate-50/30' : 'bg-white'
                     }`}
                   >
-                    {/* Checkbox & 序号 */}
-                    <td className="py-2.5 px-2 text-center border-r border-slate-200 select-none whitespace-nowrap">
+                    {/* Checkbox & 序号 (固定在最左侧) */}
+                    <td
+                      className={`py-2.5 px-2 text-center border-r border-slate-200 select-none whitespace-nowrap sticky left-0 z-10 shadow-[2px_0_6px_-2px_rgba(0,0,0,0.08)] ${
+                        isSelected ? 'bg-blue-50' : idx % 2 === 1 ? 'bg-[#fcfdfd] group-hover:bg-blue-50/40' : 'bg-white group-hover:bg-blue-50/40'
+                      }`}
+                    >
                       <div className="flex items-center justify-center gap-1.5">
                         <input
                           type="checkbox"
@@ -268,8 +272,10 @@ export const MesWorkOrderTable: React.FC<MesWorkOrderTableProps> = ({
                       </div>
                     </td>
 
-                    {/* 操作 (派工, 报工, 详情, 编辑) */}
-                    <td className="py-2.5 px-3 text-center sticky right-0 bg-white/95 group-hover:bg-blue-50/40 border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-20">
+                    {/* 操作 (派工, 报工, 详情, 编辑，固定在最右侧) */}
+                    <td className={`py-2.5 px-3 text-center sticky right-0 ${
+                      isSelected ? 'bg-blue-50' : idx % 2 === 1 ? 'bg-[#fcfdfd] group-hover:bg-blue-50/40' : 'bg-white group-hover:bg-blue-50/40'
+                    } border-l border-slate-300 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] z-10`}>
                       <div className="flex items-center justify-center gap-2 text-xs">
                         <button
                           type="button"

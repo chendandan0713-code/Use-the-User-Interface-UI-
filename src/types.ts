@@ -45,6 +45,23 @@ export interface WaterFacility {
   meteringMethod: MeteringMethod; // 计量方式
   dataSource: string; // 数据来源
   address: string; // 取水地址
+  maintainUnit?: string; // 运维单位
+  maintainPerson?: string; // 运维负责人及电话
+  maintainExpiryDate?: string; // 运维截止日期
+  manageUnit?: string; // 管理单位
+  builderUnit?: string; // 承建单位
+  pipeDiameter?: string; // 管径大小
+  maxDailyWater?: string; // 日最大取水量
+  installType?: string; // 安装类型
+  installForm?: string; // 安装形式
+  waterIntake?: string; // 取水口
+  stationName?: string; // 监测站名称
+  meteringDimension?: string; // 一次性计量纲
+  measuringRange?: string; // 测量范围
+  coordinates?: string; // 经纬度
+  installDate?: string; // 安装时间
+  dataSourceType?: string; // 数据来源类型
+  nextCalibrationDate?: string; // 下次检定日期
   flowRate?: number; // 瞬时流量 m³/h
   accumulatedFlow?: number; // 累计流量 m³
   batteryLevel?: number; // 电池电量 %
@@ -187,4 +204,96 @@ export interface FaultFilterParams {
   status: string;
   selectedDistrict: string;
 }
+
+// 计划用水管理 - 填报审批类型定义
+export type WaterPlanUserType = 'all' | 'permit' | 'public_supply';
+export type WaterPlanStatus = 
+  | '全部'
+  | '县级待审核'
+  | '市级待审核'
+  | '省级待审核'
+  | '审核通过'
+  | '审核驳回'
+  | '已下达计划'
+  | '报备中'
+  | '计划重新下达';
+
+export type WaterPlanItemType = '首次填报' | '年计划调整' | '月计划调整';
+
+export interface WaterPlanAuditLog {
+  stepName: string;
+  operator: string;
+  department: string;
+  action: string;
+  time: string;
+  opinion: string;
+  status: 'passed' | 'rejected' | 'pending';
+}
+
+export interface WaterPlanRecord {
+  id: string;
+  city: string; // 市(州): 西宁市
+  district: string; // 县(区): 大通县, 城东区, 城西区等
+  unitName: string; // 用水单位名称
+  creditCode: string; // 统一社会信用代码
+  industryType: string; // 行业类型: 4.有色, 制造, 冶金, 采矿等
+  isPublicPipeNetwork: '是' | '否'; // 是否公共管网取水
+  isSelfWaterSource: '是' | '否'; // 自备水源取水
+  isAboveDesignatedSize: '是' | '否'; // 是否规上
+  keyType: '重点' | '非重点'; // 重点类型
+  directManageType: '流域管理机构' | '省级' | '市级' | '县级'; // 直管类型
+  waterIntakeType: '水资源配置类' | '河道内生产类' | '基础设施或公用事业类' | '自备水源类'; // 取水类型
+  itemType: WaterPlanItemType; // 事项类型: 首次填报 / 年计划调整 / 月计划调整
+  status: WaterPlanStatus; // 状态
+  permitVolume: number; // 许可水量 (万m³)
+  planVolume: number; // 计划水量 (万m³)
+  surfaceWater: number; // 地表水 (万m³)
+  groundwater: number; // 地下水 (万m³)
+  unconventionalTotal: number; // 非常规水总计 (万m³)
+  recycledWater?: number; // 再生水 (万m³)
+  mineWater?: number; // 矿坑(井)水 (万m³)
+  rainWater?: number; // 集蓄雨水 (万m³)
+  brackishWater?: number; // 微咸水 (万m³)
+  year: string; // 查询年份: 2025, 2026
+  userType: WaterPlanUserType; // 计划用水户类型
+  permitNumber?: string; // 取水许可证编号
+  supervisorUnit?: string; // 上级主管部门
+  applyDate?: string; // 填报申请日期
+  auditor?: string; // 审核人
+  auditDate?: string; // 审核日期
+  auditOpinion?: string; // 审批意见
+  approvedVolume?: number; // 核准计划水量 (万m³)
+  approvedSurfaceWater?: number; // 核准地表水
+  approvedGroundwater?: number; // 核准地下水
+  approvedUnconventionalWater?: number; // 核准非常规水
+  auditHistory?: WaterPlanAuditLog[]; // 审批流程历史
+}
+
+export interface WaterPlanFilterParams {
+  userType: WaterPlanUserType; // 计划用水户类型: 全部 / 取水许可 / 公共供水
+  status: string; // 状态
+  itemType: string; // 事项类型
+  year: string; // 查询年份
+  industryType: string; // 行业类型
+  isSelfWaterSource: string; // 是否自备水源取水 (不限 / 是 / 否)
+  waterIntakeType: string; // 取水类型
+  supervisorUnit: string; // 上级主管部门
+  waterUserName: string; // 取用水户名称
+  permitNumber: string; // 取水许可编号
+  keySupervisionUnit: string; // 重点监督单位
+  directManageType: string; // 直管类型
+  isAboveDesignatedSize: string; // 是否规上
+  // 水量筛选
+  permitVolumeFilter: string;
+  planVolumeFilter: string;
+  surfaceWaterFilter: string;
+  groundwaterFilter: string;
+  unconventionalFilter: string;
+  recycledWaterFilter: string;
+  mineWaterFilter: string;
+  rainWaterFilter: string;
+  brackishWaterFilter: string;
+  selectedDistrict: string; // 选中区县
+}
+
 

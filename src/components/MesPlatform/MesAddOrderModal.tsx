@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Layers, Package, Calendar, User, Clock } from 'lucide-react';
 import { WorkOrder, PriorityLevel, WorkOrderStatus, WorkOrderType } from '../../types';
+import { CustomSelect } from './CustomSelect';
 
 interface MesAddOrderModalProps {
   isOpen: boolean;
@@ -212,47 +213,53 @@ export const MesAddOrderModal: React.FC<MesAddOrderModalProps> = ({
             {/* 类型 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">工单类型</label>
-              <select
+              <CustomSelect
                 value={formData.type || '自制'}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as WorkOrderType })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="自制">自制</option>
-                <option value="委外">委外</option>
-                <option value="返工">返工</option>
-                <option value="试制">试制</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, type: val as WorkOrderType })}
+                options={[
+                  { value: '自制', label: '自制' },
+                  { value: '委外', label: '委外' },
+                  { value: '返工', label: '返工' },
+                  { value: '试制', label: '试制' },
+                ]}
+                clearable={false}
+                placeholder="请选择工单类型"
+              />
             </div>
 
             {/* 优先级 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">优先级</label>
-              <select
+              <CustomSelect
                 value={formData.priority || '中'}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value as PriorityLevel })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="特急">特急 (P0)</option>
-                <option value="高">高 (P1)</option>
-                <option value="中">中 (P2)</option>
-                <option value="低">低 (P3)</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, priority: val as PriorityLevel })}
+                options={[
+                  { value: '特急', label: '特急 (P0)', badge: 'true', badgeColor: 'bg-rose-500' },
+                  { value: '高', label: '高 (P1)', badge: 'true', badgeColor: 'bg-amber-500' },
+                  { value: '中', label: '中 (P2)', badge: 'true', badgeColor: 'bg-blue-500' },
+                  { value: '低', label: '低 (P3)', badge: 'true', badgeColor: 'bg-slate-400' },
+                ]}
+                clearable={false}
+                placeholder="请选择优先级"
+              />
             </div>
 
             {/* 工单状态 */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1">工单状态</label>
-              <select
+              <CustomSelect
                 value={formData.status || '待排产'}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as WorkOrderStatus })}
-                className="w-full h-8 px-3 rounded-lg border border-slate-300 focus:border-blue-500 outline-none bg-white"
-              >
-                <option value="待排产">待排产</option>
-                <option value="生产中">生产中</option>
-                <option value="质检中">质检中</option>
-                <option value="已完工">已完工</option>
-                <option value="暂停">暂停</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, status: val as WorkOrderStatus })}
+                options={[
+                  { value: '待排产', label: '待排产', badge: 'true', badgeColor: 'bg-amber-500' },
+                  { value: '生产中', label: '生产中', badge: 'true', badgeColor: 'bg-blue-500' },
+                  { value: '质检中', label: '质检中', badge: 'true', badgeColor: 'bg-purple-500' },
+                  { value: '已完工', label: '已完工', badge: 'true', badgeColor: 'bg-emerald-500' },
+                  { value: '暂停', label: '暂停', badge: 'true', badgeColor: 'bg-rose-500' },
+                ]}
+                clearable={false}
+                placeholder="请选择工单状态"
+              />
             </div>
 
             {/* 计划数量 */}

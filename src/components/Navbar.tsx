@@ -26,6 +26,7 @@ interface NavbarProps {
   onNotify: (title: string, message?: string, type?: 'success' | 'warning' | 'error' | 'info') => void;
   onLogout?: () => void;
   currentUser?: string;
+  onGoHome?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -37,7 +38,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSearchChange,
   onNotify,
   onLogout,
-  currentUser = '管理员(88018)'
+  currentUser = '管理员(88018)',
+  onGoHome,
 }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
@@ -71,8 +73,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             title="返回系统首页"
-            onClick={() => onNotify('已返回首页看板', '系统数据实时同步正常', 'info')}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all text-white/90 hover:text-white"
+            onClick={() => {
+              if (onGoHome) {
+                onGoHome();
+              }
+              onNotify('已返回首页看板', '青海省取水许可审批监管全景数据已更新', 'info');
+            }}
+            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 transition-all text-white/90 hover:text-white cursor-pointer"
           >
             <Home className="w-4 h-4" />
           </button>

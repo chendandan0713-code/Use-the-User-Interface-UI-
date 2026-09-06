@@ -39,7 +39,7 @@ export const MesHeaderTabs: React.FC<MesHeaderTabsProps> = ({
   };
 
   return (
-    <div className="bg-white border-b border-slate-200 px-4 flex items-center gap-1 overflow-x-auto select-none custom-scrollbar">
+    <div className="bg-white border-b border-slate-200 px-4 flex items-center gap-1 overflow-x-auto select-none no-scrollbar">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
         return (

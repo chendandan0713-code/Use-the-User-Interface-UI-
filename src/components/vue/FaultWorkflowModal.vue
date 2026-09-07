@@ -5,18 +5,18 @@
     width="640px"
     :footer="null"
   >
-    <div v-if="record" class="space-y-4 text-xs select-none py-1">
-      <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+    <div v-if="record" class="space-y-2 text-xs select-none py-0.5">
+      <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200">
         <div class="flex items-center justify-between">
           <span class="font-bold text-slate-800 text-sm">{{ record.facilityName }}</span>
           <t-tag theme="warning" variant="light">{{ record.status }}</t-tag>
         </div>
-        <div class="text-slate-500 font-mono mt-1">器具编号: {{ record.facilityCode }} · 取水权人: {{ record.waterOwner }}</div>
+        <div class="text-slate-500 font-mono mt-0.5">器具编号: {{ record.facilityCode }} · 取水权人: {{ record.waterOwner }}</div>
       </div>
 
       <!-- Audit timeline using TDesign Timeline -->
-      <div class="p-4 bg-white rounded-xl border border-slate-200">
-        <div class="text-xs font-bold text-slate-800 mb-3">多级审批流转时序</div>
+      <div class="p-3 bg-white rounded-xl border border-slate-200">
+        <div class="text-xs font-bold text-slate-800 mb-2">多级审批流转时序</div>
         <t-timeline layout="vertical">
           <t-timeline-item dot-color="primary">
             <template #label>
@@ -52,7 +52,7 @@
         </t-timeline>
       </div>
 
-      <div class="flex justify-end pt-2">
+      <div class="flex justify-end pt-1">
         <t-button theme="primary" size="small" @click="visible = false">
           关闭
         </t-button>

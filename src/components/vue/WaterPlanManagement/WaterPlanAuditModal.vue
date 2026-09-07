@@ -32,23 +32,122 @@
                 {{ form.permitNumber }}
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-              申报单位: {{ form.waterOwner || record.unitName }} · 申报年度: {{ form.year || 2026 }}年 · 行政区划: {{ form.detailedAddress || record.district }}
-            </p>
           </div>
         </div>
 
-        <button
-          type="button"
-          @click="handleClose"
-          class="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition cursor-pointer p-1.5 rounded-lg -mr-1"
-          title="关闭"
-        >
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+        <!-- Header 右侧工具区：附件查看 (同计量设施档案列表查看一致) 与关闭按钮 -->
+        <div class="flex items-center gap-2.5">
+          <t-popup trigger="click" placement="bottom-end" show-arrow :overlay-inner-style="{ padding: '0px' }">
+            <button
+              type="button"
+              class="px-2.5 py-1 rounded bg-[#eef4fe] text-[#1677ff] hover:bg-blue-100 font-normal text-xs transition cursor-pointer flex items-center gap-1.5 border border-blue-200"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+              </svg>
+              <span>佐证材料 ({{ attachments.length }})</span>
+            </button>
+
+            <!-- 附件弹出卡片 (完全与计量设施档案列表查看样式一致) -->
+            <template #content>
+              <div class="w-[320px] p-3 bg-white rounded-xl shadow-xl border border-gray-200 text-left select-none">
+                <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-gray-200">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-medium text-gray-900 text-xs">计划申报佐证附件</span>
+                    <span class="text-gray-400 text-xs">({{ attachments.length }})</span>
+                  </div>
+                  <span class="text-[11px] text-gray-400">计划核验材料</span>
+                </div>
+
+                <div class="space-y-2">
+                  <div
+                    v-for="(att, aIdx) in attachments"
+                    :key="aIdx"
+                    class="flex items-center justify-between p-2 rounded-lg border border-[#c4d8ee] bg-[#f9fbfe] hover:bg-[#f0f5fd] transition gap-2"
+                  >
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                      <!-- 1. 图片图标 (蓝底相机) -->
+                      <div
+                        v-if="att.type === 'image'"
+                        class="w-6 h-6 rounded bg-[#e6f1fc] text-[#1677ff] flex items-center justify-center shrink-0"
+                      >
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                      </div>
+
+                      <!-- 2. Word 图标 (蓝紫色底 W) -->
+                      <div
+                        v-else-if="att.type === 'word'"
+                        class="w-6 h-6 rounded bg-[#eef0fe] text-[#2f54eb] flex items-center justify-center shrink-0 font-bold text-[11px]"
+                      >
+                        W
+                      </div>
+
+                      <!-- 3. PDF 图标 (红底文档) -->
+                      <div
+                        v-else
+                        class="w-6 h-6 rounded bg-[#feebee] text-[#f5222d] flex items-center justify-center shrink-0"
+                      >
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                      </div>
+
+                      <span class="text-xs text-gray-800 truncate font-normal" :title="att.name">
+                        {{ att.name }}
+                      </span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 shrink-0 text-gray-400">
+                      <button
+                        v-if="att.type === 'image' || att.type === 'pdf'"
+                        type="button"
+                        @click.stop="openPreview(att)"
+                        class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
+                        title="预览附件"
+                      >
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        @click.stop="downloadAttachment(att)"
+                        class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
+                        title="下载附件"
+                      >
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7 10 12 15 17 10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </t-popup>
+
+          <button
+            type="button"
+            @click="handleClose"
+            class="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition cursor-pointer p-1.5 rounded-lg -mr-1"
+            title="关闭"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- 2. 主体左右分栏布局 (左边可编辑修改，右边完整表单展示)，统一浅色背景与卡片系统 -->
@@ -66,10 +165,10 @@
           </div>
 
           <!-- 左侧滚动卡片表单区域 -->
-          <div class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+          <div class="flex-1 overflow-y-auto p-3.5 space-y-2.5 custom-scrollbar">
             
             <!-- 卡片 1: 申报单位基础信息 (同计量设施管理编辑弹窗卡片规范) -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3.5">
+            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div class="flex items-center gap-2">
                   <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -202,7 +301,7 @@
             </div>
 
             <!-- 卡片 2: 生活用水申报项 -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3.5">
+            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div class="flex items-center gap-2">
                   <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -331,7 +430,7 @@
             </div>
 
             <!-- 卡片 3: 工业用水申报项 -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3.5">
+            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div class="flex items-center gap-2">
                   <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -459,7 +558,7 @@
             </div>
 
             <!-- 卡片 4: 审核批注与核定结论 -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-2.5">
+            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-1.5">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -500,13 +599,13 @@
           </div>
 
           <!-- 右侧内容滚动区域 -->
-          <div class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+          <div class="flex-1 overflow-y-auto p-3.5 space-y-2.5 custom-scrollbar">
             
             <!-- Tab 1: 计划申请填报表 (完整预览卡片) -->
             <div v-if="activeRightTab === 'plan_application'" class="space-y-4">
               
               <!-- 基础信息只读网格卡片 -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3">
+              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <div class="flex items-center gap-2">
                     <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -566,7 +665,7 @@
               </div>
 
               <!-- 生活用水表格 (只读卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3">
+              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <div class="flex items-center gap-2">
                     <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -606,7 +705,7 @@
               </div>
 
               <!-- 工业用水表格 (只读多级表头卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3">
+              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <div class="flex items-center gap-2">
                     <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -681,7 +780,7 @@
               </div>
 
               <!-- 农业用水表格 (只读卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3">
+              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <div class="flex items-center gap-2">
                     <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -725,7 +824,7 @@
               </div>
 
               <!-- 发电用水表格 (只读卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-4.5 shadow-2xs space-y-3">
+              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <div class="flex items-center gap-2">
                     <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -857,13 +956,106 @@
               </div>
             </div>
 
+            <!-- Tab 5: 申报材料与佐证附件 (完全与计量设施档案列表查看附件样式一致) -->
+            <div v-else-if="activeRightTab === 'attachments'" class="space-y-4">
+              <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-3.5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
+                    <span class="text-[13px] font-bold text-slate-800">申报佐证附件材料列表</span>
+                    <span class="text-xs text-gray-400 font-mono">({{ attachments.length }} 个文件)</span>
+                  </div>
+                  <span class="text-[11px] text-gray-400">水利核验佐证凭据</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div
+                    v-for="(att, aIdx) in attachments"
+                    :key="aIdx"
+                    class="flex items-center justify-between p-2.5 rounded-lg border border-[#c4d8ee] bg-[#f9fbfe] hover:bg-[#f0f5fd] transition gap-2.5"
+                  >
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                      <!-- 1. 图片图标 (蓝底相机) -->
+                      <div
+                        v-if="att.type === 'image'"
+                        class="w-7 h-7 rounded bg-[#e6f1fc] text-[#1677ff] flex items-center justify-center shrink-0"
+                      >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                      </div>
+
+                      <!-- 2. Word 图标 (蓝紫色底 W) -->
+                      <div
+                        v-else-if="att.type === 'word'"
+                        class="w-7 h-7 rounded bg-[#eef0fe] text-[#2f54eb] flex items-center justify-center shrink-0 font-bold text-xs"
+                      >
+                        W
+                      </div>
+
+                      <!-- 3. PDF 图标 (红底文档) -->
+                      <div
+                        v-else
+                        class="w-7 h-7 rounded bg-[#feebee] text-[#f5222d] flex items-center justify-center shrink-0"
+                      >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                      </div>
+
+                      <div class="truncate">
+                        <span class="text-xs text-gray-800 font-medium truncate block" :title="att.name">
+                          {{ att.name }}
+                        </span>
+                        <span class="text-[10.5px] text-gray-400 font-mono block">
+                          {{ att.size }} · 计划申请佐证文件
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 shrink-0 text-gray-400">
+                      <button
+                        v-if="att.type === 'image' || att.type === 'pdf'"
+                        type="button"
+                        @click.stop="openPreview(att)"
+                        class="hover:text-[#1677ff] p-1.5 cursor-pointer rounded transition"
+                        title="预览附件"
+                      >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        @click.stop="downloadAttachment(att)"
+                        class="hover:text-[#1677ff] p-1.5 cursor-pointer rounded transition"
+                        title="下载附件"
+                      >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7 10 12 15 17 10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
       </div>
 
       <!-- 3. 全局底部操作栏 (完全同计量设施管理编辑/详情弹窗，左侧信息、右侧取消/驳回/通过按钮) -->
-      <div class="px-6 py-3.5 bg-white border-t border-slate-200/80 flex items-center justify-between shrink-0">
+      <div class="px-5 py-2.5 bg-white border-t border-slate-200/80 flex items-center justify-between shrink-0">
         <!-- 左侧状态与计算统计信息 -->
         <div class="flex items-center gap-3 text-xs text-slate-500">
           <span class="flex items-center gap-1.5">
@@ -912,11 +1104,48 @@
         </div>
       </div>
     </div>
+
+    <!-- 附件在线预览弹窗 (与计量设施档案列表查看完全一致) -->
+    <t-dialog
+      v-model:visible="previewVisible"
+      :header="previewTitle"
+      width="600px"
+      :footer="false"
+    >
+      <div class="p-2 space-y-3">
+        <div v-if="previewType === 'image'" class="flex flex-col items-center">
+          <div class="w-full max-h-[360px] overflow-hidden rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center p-2">
+            <img
+              src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
+              :alt="previewTitle"
+              class="max-h-[340px] object-contain rounded"
+            />
+          </div>
+          <div class="mt-2 text-xs text-gray-500 flex items-center justify-between w-full px-1">
+            <span>现场核验附件：{{ previewTitle }}</span>
+            <span>核验时间：2026-03-05 10:24</span>
+          </div>
+        </div>
+        <div v-else-if="previewType === 'pdf'" class="p-4 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600 space-y-2">
+          <div class="flex items-center gap-2 font-medium text-gray-900 border-b pb-2">
+            <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>{{ previewTitle }}</span>
+          </div>
+          <p>检验依据：JJG 162-2019 《冷水水表检定规程》、西宁市水务局年度用水计划核定实施办法</p>
+          <p>申报核验结论：符合青海省节约用水评价及取水许可刚性指标要求，附件材料有效合规。</p>
+          <div class="pt-2 text-right text-gray-400 font-mono">西宁市水资源管理委员会办公室</div>
+        </div>
+      </div>
+    </t-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { MessagePlugin } from 'tdesign-vue-next';
 import type { WaterPlanRecord } from '../../../types';
 
 const props = defineProps<{
@@ -934,10 +1163,33 @@ const rightTabs = [
   { key: 'summary', label: '取水总结填报表' },
   { key: 'electronic_license', label: '电子证照信息' },
   { key: 'water_quota', label: '用水定额及参考' },
+  { key: 'attachments', label: '佐证材料与附件' },
 ];
 
-const activeRightTab = ref<'summary' | 'plan_application' | 'electronic_license' | 'water_quota'>('plan_application');
+const activeRightTab = ref<'summary' | 'plan_application' | 'electronic_license' | 'water_quota' | 'attachments'>('plan_application');
 const auditOpinion = ref('经审查，该单位用水计划指标符合西宁市刚性约束管控方案与行业定额，予以审核通过。');
+
+// 附件列表与在线预览 (与计量设施档案列表查看一致)
+const attachments = ref([
+  { name: '2026年度用水计划申请核定申报书(盖章扫描件).pdf', type: 'pdf', size: '3.2 MB' },
+  { name: '青海亚洲硅业水平衡测试与节水评价报告.docx', type: 'word', size: '5.8 MB' },
+  { name: '进水口DN150超声波水表铭牌与现场工况照片.jpg', type: 'image', size: '1.9 MB' },
+  { name: '西宁市水资源刚性约束管控落实承诺书(签署版).pdf', type: 'pdf', size: '2.1 MB' },
+]);
+
+const previewVisible = ref(false);
+const previewTitle = ref('');
+const previewType = ref<'image' | 'pdf'>('image');
+
+const openPreview = (att: { name: string; type: string }) => {
+  previewTitle.value = att.name;
+  previewType.value = (att.type === 'pdf' ? 'pdf' : 'image') as 'image' | 'pdf';
+  previewVisible.value = true;
+};
+
+const downloadAttachment = (att: { name: string }) => {
+  MessagePlugin.success(`已开始下载附件：${att.name}`);
+};
 
 // 可编辑表单核心数据模型
 const form = ref({

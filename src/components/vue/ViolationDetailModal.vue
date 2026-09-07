@@ -30,7 +30,6 @@
                 {{ item.status }}
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 font-mono mt-0.5">业务编号: {{ item.id }} · 取水权人: {{ item.waterOwner }}</p>
           </div>
         </div>
 
@@ -48,10 +47,10 @@
       </div>
 
       <!-- 2. 内容主体：两块区域（问题详情、问题排查流程） -->
-      <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-800 custom-scrollbar flex-1 bg-white">
+      <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs text-slate-800 custom-scrollbar flex-1 bg-white">
         <!-- 2.1 问题详情卡片 -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">问题详情</span>
@@ -62,7 +61,7 @@
           </div>
 
           <!-- 两列网格结构，排版舒展大方，标签与值层级分明 -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 text-[12.5px]">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-[12.5px]">
             <!-- 问题排查单位 -->
             <div class="flex items-baseline">
               <span class="w-32 shrink-0 text-slate-400 font-normal">问题排查单位</span>
@@ -143,8 +142,8 @@
         </div>
 
         <!-- 2.2 问题排查流程卡片 (高端企业级多阶段时序轴，视觉精致、信息层次清晰) -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">问题排查流转流程</span>
@@ -305,7 +304,7 @@
       </div>
 
       <!-- 3. 底部操作栏 (Light Footer)：提供状态提示与操作按钮 -->
-      <div class="px-6 py-3 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-between shrink-0">
+      <div class="px-5 py-2.5 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-between shrink-0">
         <div class="text-xs text-slate-500 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-[#1677ff]"></span>
           <span>提示：该记录已进入排查核实阶段，排查单位需在处置时限要求内提交现场核实卷宗与整改记录。</span>

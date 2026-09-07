@@ -10,7 +10,7 @@
       class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-[940px] my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col h-[650px] max-h-[92vh]"
     >
       <!-- 弹窗 Header -->
-      <div class="px-6 py-4 flex items-center justify-between border-b border-slate-100 bg-[#f8fafc] shrink-0">
+      <div class="px-5 py-3 flex items-center justify-between border-b border-slate-100 bg-[#f8fafc] shrink-0">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#1677ff]">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -24,9 +24,6 @@
             <h3 class="text-[15px] font-bold text-slate-800 tracking-tight">
               设置运维单位与人员
             </h3>
-            <p class="text-[11px] text-slate-400 mt-0.5">
-              左侧选择或创建运维保障单位，右侧设置对应的专业运维负责人
-            </p>
           </div>
         </div>
 
@@ -44,10 +41,10 @@
       </div>
 
       <!-- Main Body: 左右双分栏容器 (左边运维单位，右边运维人员，布局统一) -->
-      <div class="p-5 grid grid-cols-1 md:grid-cols-12 gap-4 flex-1 overflow-hidden bg-slate-50/50">
+      <div class="p-3.5 grid grid-cols-1 md:grid-cols-12 gap-3 flex-1 overflow-hidden bg-slate-50/50">
         
         <!-- 左侧面板：设置运维单位 (占 5 列) -->
-        <div class="md:col-span-5 rounded-xl border border-slate-200 bg-white p-4 flex flex-col shadow-2xs overflow-hidden">
+        <div class="md:col-span-5 rounded-xl border border-slate-200 bg-white p-3 flex flex-col shadow-2xs overflow-hidden">
           <!-- 1. 顶部标题栏 + 创建单位按钮 (与右侧创建人员完全对称) -->
           <div class="flex items-center justify-between mb-3 shrink-0 pb-2.5 border-b border-slate-100">
             <div class="flex items-center gap-2">
@@ -178,7 +175,7 @@
         </div>
 
         <!-- 右侧面板：设置运维人员 (占 7 列) -->
-        <div class="md:col-span-7 rounded-xl border border-slate-200 bg-white p-4 flex flex-col shadow-2xs overflow-hidden">
+        <div class="md:col-span-7 rounded-xl border border-slate-200 bg-white p-3 flex flex-col shadow-2xs overflow-hidden">
           <!-- 1. 顶部标题栏 + 创建人员按钮 (与左侧创建单位完全对称) -->
           <div class="flex items-center justify-between mb-3 shrink-0 pb-2.5 border-b border-slate-100">
             <div class="flex items-center gap-2">
@@ -318,7 +315,7 @@
       </div>
 
       <!-- Footer: 右侧确认与取消按钮 -->
-      <div class="px-6 py-3.5 bg-white border-t border-slate-200/80 flex items-center justify-end gap-3 shrink-0">
+      <div class="px-5 py-2.5 bg-white border-t border-slate-200/80 flex items-center justify-end gap-3 shrink-0">
         <button
           type="button"
           @click="handleClose"
@@ -365,7 +362,7 @@
         </div>
 
         <!-- 统一表单区域 -->
-        <div class="p-5 space-y-3.5 text-xs">
+        <div class="p-3.5 space-y-2.5 text-xs">
           <!-- 上级类别 -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">
@@ -469,7 +466,7 @@
         </div>
 
         <!-- 统一表单区域 -->
-        <div class="p-5 space-y-3.5 text-xs">
+        <div class="p-3.5 space-y-2.5 text-xs">
           <!-- 所属单位 (自动绑定并可确认) -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">

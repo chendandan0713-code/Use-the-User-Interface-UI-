@@ -20,9 +20,6 @@
             <h3 class="text-[15px] font-semibold text-slate-800 tracking-wide">
               {{ isEdit ? '修改计划用水申报' : '新增计划用水申报填报' }}
             </h3>
-            <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-              依照《西宁市计划用水管理实施细则》，严格落实水资源刚性约束管控指标填报
-            </p>
           </div>
         </div>
 
@@ -40,11 +37,11 @@
       </div>
 
       <!-- 2. 内容滚动区：严格三列栅格表单与详情页结构完全统一 -->
-      <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/40">
+      <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/40">
         
         <!-- 卡片 1: 申报主体基本信息 (3-column grid) -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">申报单位及取水基本信息</span>
@@ -52,7 +49,7 @@
             <span class="text-slate-400 text-[11px]"><span class="text-rose-500 font-bold">*</span> 为必填项</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3.5">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-2">
             <!-- 用水单位全称 -->
             <div class="space-y-1">
               <label class="font-medium text-slate-700 flex items-center gap-0.5">
@@ -246,8 +243,8 @@
         </div>
 
         <!-- 卡片 2: 填报事项与申报年份 -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-purple-500 rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">申报事项类别与申请年度</span>
@@ -305,8 +302,8 @@
         </div>
 
         <!-- 卡片 3: 水量指标申报明细 (单位: 万m³) -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-emerald-500 rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">水量指标填报 (单位: 万m³)</span>
@@ -429,7 +426,7 @@
         </div>
 
         <!-- 卡片 4: 填报依据与补充说明 -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-2">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-1.5">
           <label class="font-medium text-slate-700">计划指标编制依据与工艺说明</label>
           <textarea
             v-model="form.remark"
@@ -442,7 +439,7 @@
       </div>
 
       <!-- 3. 底部操作按钮栏 -->
-      <div class="px-6 py-3 bg-white border-t border-slate-200/90 flex items-center justify-between shrink-0">
+      <div class="px-5 py-2 bg-white border-t border-slate-200/90 flex items-center justify-between shrink-0">
         <span class="text-slate-400 text-xs">
           点击【提交申报】后将流转至 {{ form.district }} 水务局初审
         </span>

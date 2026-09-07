@@ -36,9 +36,6 @@
                 {{ facility.code }}
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-              设施名称: {{ facility.name }} · 取水权人: {{ facility.waterOwner }} · 所属区县: {{ facility.district }}
-            </p>
           </div>
         </div>
 
@@ -82,13 +79,13 @@
       </div>
 
       <!-- 3. 内容滚动区：样式同违规问题处理详情卡片 -->
-      <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
+      <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
         
         <!-- Tab 1: 基本信息 -->
-        <div v-if="activeTab === 'basic'" class="space-y-4 animate-in fade-in duration-150">
+        <div v-if="activeTab === 'basic'" class="space-y-2.5 animate-in fade-in duration-150">
           <!-- 1.1 计量设施基本参数及安装位置 (合并卡片) -->
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">计量设施基本参数及安装位置</span>
@@ -106,7 +103,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3.5 text-[12.5px]">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-[12.5px]">
               <!-- 1. 行政区划 -->
               <div class="flex items-baseline">
                 <span class="w-32 shrink-0 text-slate-400 font-normal">行政区划</span>
@@ -262,8 +259,8 @@
           </div>
 
           <!-- 1.2 管理及运维单位 -->
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">管理及运维单位</span>
@@ -271,7 +268,7 @@
               <span class="text-[11px] text-slate-400 font-mono">中央资金年份：{{ facility.fundingYear }} 年</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3.5 text-[12.5px]">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-[12.5px]">
               <!-- 管理单位 -->
               <div class="flex items-baseline">
                 <span class="w-32 shrink-0 text-slate-400 font-normal">管理单位</span>
@@ -324,9 +321,9 @@
         </div>
 
         <!-- Tab 2: 取水工程 -->
-        <div v-else-if="activeTab === 'project'" class="space-y-4 animate-in fade-in duration-150">
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div v-else-if="activeTab === 'project'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">关联取水工程基本信息</span>
@@ -336,7 +333,7 @@
               </span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 text-[12.5px]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-[12.5px]">
               <div class="flex items-baseline">
                 <span class="w-32 shrink-0 text-slate-400 font-normal">取水工程名称</span>
                 <span class="text-slate-800 font-medium">{{ facility.name }}配套取水泵站工程</span>
@@ -373,8 +370,8 @@
           </div>
 
           <!-- 机电与管网配置 -->
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">提水水泵及管线设施</span>
@@ -382,7 +379,7 @@
               <span class="text-[11px] text-slate-400">运行工况平稳</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3.5 text-[12.5px]">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-[12.5px]">
               <div class="flex items-baseline">
                 <span class="w-32 shrink-0 text-slate-400 font-normal">主抽水泵组</span>
                 <span class="text-slate-800 font-mono">2用1备 (共3台, 单机 45kW)</span>
@@ -412,9 +409,9 @@
         </div>
 
         <!-- Tab 3: 所属证照 -->
-        <div v-else-if="activeTab === 'permit'" class="space-y-4 animate-in fade-in duration-150">
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div v-else-if="activeTab === 'permit'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">取水许可证信息</span>
@@ -425,7 +422,7 @@
               </span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 text-[12.5px]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-[12.5px]">
               <div class="flex items-baseline">
                 <span class="w-32 shrink-0 text-slate-400 font-normal">取水许可证编号</span>
                 <span class="text-slate-800 font-medium font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60">
@@ -460,8 +457,8 @@
           </div>
 
           <!-- 水量控制指标与额度执行 -->
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">年许可控制指标与执行进度</span>
@@ -494,7 +491,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 text-[12.5px] pt-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-[12.5px] pt-2">
               <div class="flex items-baseline">
                 <span class="w-32 shrink-0 text-slate-400 font-normal">取水用途类别</span>
                 <span class="text-slate-800 font-medium">{{ facility.waterUsage }}</span>
@@ -508,9 +505,9 @@
         </div>
 
         <!-- Tab 4: 故障记录 -->
-        <div v-else-if="activeTab === 'fault'" class="space-y-4 animate-in fade-in duration-150">
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div v-else-if="activeTab === 'fault'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">历史故障与报修记录台账</span>
@@ -575,9 +572,9 @@
         </div>
 
         <!-- Tab 5: 停用启用 -->
-        <div v-else-if="activeTab === 'toggle'" class="space-y-4 animate-in fade-in duration-150">
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div v-else-if="activeTab === 'toggle'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">当前启用状态与控制</span>
@@ -670,9 +667,9 @@
         </div>
 
         <!-- Tab 6: 检定记录 -->
-        <div v-else-if="activeTab === 'calibration'" class="space-y-4 animate-in fade-in duration-150">
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div v-else-if="activeTab === 'calibration'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">计量器具法定周期检定档案</span>
@@ -773,9 +770,9 @@
         </div>
 
         <!-- Tab 7: 换表记录 -->
-        <div v-else-if="activeTab === 'replace'" class="space-y-4 animate-in fade-in duration-150">
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div v-else-if="activeTab === 'replace'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">水表轮换与新旧交接台账</span>
@@ -830,7 +827,7 @@
       </div>
 
       <!-- 4. 浅色底部操作栏 (Light Footer)：提示说明与操作按钮，样式与违规详情完全一致 -->
-      <div class="px-6 py-3 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-between shrink-0">
+      <div class="px-5 py-2.5 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-between shrink-0">
         <div class="text-xs text-slate-500 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-[#1677ff]"></span>
           <span>提示：该计量设施已接入西宁市水资源遥测专网，并向全国取水许可监管系统实时核验到报。</span>

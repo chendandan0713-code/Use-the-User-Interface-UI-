@@ -31,9 +31,6 @@
                 {{ formData.code }}
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-              {{ isEdit ? '更新计量设施铭牌、运行参数、运维责任单位与佐证附件档案' : '录入新装计量设施、关联取水许可证、指派运维单位并归档现场材料' }}
-            </p>
           </div>
         </div>
 
@@ -51,11 +48,11 @@
       </div>
 
       <!-- 2. 内容滚动区：与详情页基本信息卡片及 3 列布局完全一致 -->
-      <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
+      <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
         
         <!-- 卡片 1：计量设施基本参数及安装位置 (同详情页 Tab 1 第一张大卡片完全同构) -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">计量设施基本参数及安装位置</span>
@@ -72,7 +69,7 @@
           </div>
 
           <!-- 3 列网格布局，与详情页完全一致 -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3.5 text-[12.5px]">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-2 text-[12.5px]">
             
             <!-- 1. 行政区划 -->
             <div class="flex items-center">
@@ -424,8 +421,8 @@
         </div>
 
         <!-- 卡片 2：管理及运维单位 (同详情页 Tab 1 第二张大卡片完全同构) -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">管理及运维单位</span>
@@ -436,7 +433,7 @@
           </div>
 
           <!-- 3 列网格布局，与详情页完全一致 -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3.5 text-[12.5px]">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-2 text-[12.5px]">
             <!-- 1. 管理单位 -->
             <div class="flex items-center">
               <span class="w-32 shrink-0 text-slate-500 font-normal">管理单位</span>
@@ -541,8 +538,8 @@
         </div>
 
         <!-- 卡片 3：佐证材料与凭证附件 -->
-        <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
               <span class="text-[14px] font-bold text-slate-800">佐证材料与凭证附件</span>
@@ -552,7 +549,7 @@
             </span>
           </div>
 
-          <div class="space-y-3">
+          <div class="space-y-2.5">
             <!-- 上传按钮 & 格式说明 -->
             <div class="flex items-center gap-3">
               <label class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium cursor-pointer shadow-2xs transition">
@@ -569,42 +566,93 @@
               </span>
             </div>
 
-            <!-- 已上传附件列表卡片 -->
+            <!-- 已上传附件列表卡片 (与计量设施档案列表查看附件样式完全一致) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1">
               <div
                 v-for="(file, fIdx) in uploadedFiles"
                 :key="fIdx"
-                class="flex items-center justify-between p-2.5 rounded-lg border border-slate-200/80 bg-[#f8fafc] hover:bg-[#f1f5f9] transition"
+                class="flex items-center justify-between p-2 rounded-lg border border-[#c4d8ee] bg-[#f9fbfe] hover:bg-[#f0f5fd] transition gap-2"
               >
-                <div class="flex items-center gap-2.5 min-w-0">
-                  <div class="w-7 h-7 rounded-md bg-blue-50 border border-blue-100 text-[#1677ff] flex items-center justify-center shrink-0">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                  <!-- 1. 图片图标 (蓝底相机) -->
+                  <div
+                    v-if="getFileType(file.name) === 'image'"
+                    class="w-6 h-6 rounded bg-[#e6f1fc] text-[#1677ff] flex items-center justify-center shrink-0"
+                  >
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                       <circle cx="8.5" cy="8.5" r="1.5"></circle>
                       <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                   </div>
+
+                  <!-- 2. Word 图标 (蓝紫色底 W) -->
+                  <div
+                    v-else-if="getFileType(file.name) === 'word'"
+                    class="w-6 h-6 rounded bg-[#eef0fe] text-[#2f54eb] flex items-center justify-center shrink-0 font-bold text-[11px]"
+                  >
+                    W
+                  </div>
+
+                  <!-- 3. PDF 图标 (红底文档) -->
+                  <div
+                    v-else
+                    class="w-6 h-6 rounded bg-[#feebee] text-[#f5222d] flex items-center justify-center shrink-0"
+                  >
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                  </div>
+
+                  <!-- 文件名与大小 -->
                   <div class="truncate">
-                    <p class="text-xs text-slate-800 font-medium truncate">{{ file.name }}</p>
-                    <p class="text-[10.5px] text-slate-400 font-mono">{{ file.size }}</p>
+                    <span class="text-xs text-gray-800 truncate font-normal block" :title="file.name">
+                      {{ file.name }}
+                    </span>
+                    <span class="text-[10px] text-gray-400 font-mono block">
+                      {{ file.size }}
+                    </span>
                   </div>
                 </div>
 
-                <!-- 动作：预览 & 删除 -->
-                <div class="flex items-center gap-2.5 shrink-0 text-xs ml-2">
+                <!-- 动作图标 (眼睛预览 / 箭头下载 / 垃圾桶删除) -->
+                <div class="flex items-center gap-1.5 shrink-0 text-gray-400">
                   <button
                     type="button"
-                    @click="previewFile(file)"
-                    class="text-[#1677ff] hover:underline cursor-pointer"
+                    @click.stop="previewFile(file)"
+                    class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
+                    title="预览附件"
                   >
-                    <span>预览</span>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
                   </button>
                   <button
                     type="button"
-                    @click="removeFile(fIdx)"
-                    class="inline-flex items-center gap-1 text-rose-600 hover:underline cursor-pointer"
+                    @click.stop="downloadFile(file)"
+                    class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
+                    title="下载附件"
                   >
-                    <span>删除</span>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    @click.stop="removeFile(fIdx)"
+                    class="hover:text-rose-500 p-1 cursor-pointer rounded transition"
+                    title="删除附件"
+                  >
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -613,7 +661,7 @@
         </div>
 
         <!-- 卡片 4：说明通知卡片 -->
-        <div class="p-3.5 rounded-xl bg-[#f0f7ff] border border-[#bae0ff] text-xs space-y-1.5">
+        <div class="p-2.5 rounded-xl bg-[#f0f7ff] border border-[#bae0ff] text-xs space-y-1">
           <div class="flex items-center gap-1.5 text-[#1677ff] font-semibold">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <circle cx="12" cy="12" r="10"></circle>
@@ -622,7 +670,7 @@
             </svg>
             <span>填报规范与说明</span>
           </div>
-          <ol class="list-decimal list-inside text-slate-600 space-y-1 leading-relaxed pl-1 text-[11.5px]">
+          <ol class="list-decimal list-inside text-slate-600 space-y-0.5 leading-relaxed pl-1 text-[11px]">
             <li>计量器具编号须与现场表盘铭牌实拍出厂编号严格一致，作为水资源监控接入唯一核验标识。</li>
             <li>佐证材料建议包含水表表盘读数特写、铭牌信息及现场工况照片，支持上传 JPG、PNG、PDF 格式。</li>
             <li>档案提交后将即时流转至西宁市水利水务监管部门审核，核验通过后正式录入全市水资源台账。</li>
@@ -632,7 +680,7 @@
       </div>
 
       <!-- 3. 浅色底部操作栏 (Light Footer)：提示说明与操作按钮，样式与详情弹窗完全一致 -->
-      <div class="px-6 py-3 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-between shrink-0">
+      <div class="px-5 py-2.5 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-between shrink-0">
         <div class="text-xs text-slate-500 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-[#1677ff]"></span>
           <span>提示：标注 <span class="text-red-500 font-medium">*</span> 为必填项，提交申报后将自动同步至西宁市水资源监管台账。</span>
@@ -672,13 +720,27 @@
             ✕
           </button>
         </div>
-        <div class="rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center min-h-[260px] p-2">
+        <div v-if="getFileType(previewFileName) === 'image'" class="rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center min-h-[260px] p-2">
           <img
             src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
             :alt="previewFileName"
             class="max-h-[360px] w-auto object-contain rounded"
             referrerpolicy="no-referrer"
           />
+        </div>
+        <div v-else class="p-4 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600 space-y-2">
+          <div class="flex items-center gap-2 font-medium text-gray-900 border-b pb-2">
+            <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>{{ previewFileName }}</span>
+          </div>
+          <p>核验规程：JJG 162-2019 《冷水水表检定规程》、SL 426-2008 《水资源监控设备技术条件》</p>
+          <p>检验结论：合格，符合取水计量国家一级标准与省水资源综合监控接入技术规范。</p>
+          <div class="pt-2 text-right text-gray-400 font-mono">西宁市水资源监管核验中心（电子回执）</div>
         </div>
         <div class="flex items-center justify-between pt-1">
           <div class="text-xs text-slate-400 font-mono">
@@ -804,6 +866,17 @@ watch(
   },
   { immediate: true }
 );
+
+const getFileType = (fileName: string) => {
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.png') || lower.endsWith('.webp')) return 'image';
+  if (lower.endsWith('.doc') || lower.endsWith('.docx')) return 'word';
+  return 'pdf';
+};
+
+const downloadFile = (file: { name: string }) => {
+  MessagePlugin.success(`已开始下载材料附件：${file.name}`);
+};
 
 const handleFileUpload = (e: Event) => {
   const target = e.target as HTMLInputElement;

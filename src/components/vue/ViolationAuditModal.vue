@@ -8,7 +8,7 @@
       class="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-[620px] my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]"
     >
       <!-- Header -->
-      <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-[#f8fafc] shrink-0">
+      <div class="px-5 py-3 flex items-center justify-between border-b border-gray-100 bg-[#f8fafc] shrink-0">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -18,7 +18,6 @@
           </div>
           <div>
             <h3 class="text-sm font-bold text-gray-900">省级审核复核认定</h3>
-            <p class="text-[11px] text-gray-500 font-mono">{{ item.waterOwner }}</p>
           </div>
         </div>
         <button
@@ -34,8 +33,8 @@
       </div>
 
       <!-- 表单内容 -->
-      <div class="p-6 overflow-y-auto space-y-4 text-xs text-gray-700 flex-1">
-        <div class="p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl text-amber-800 text-xs">
+      <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs text-gray-700 flex-1">
+        <div class="p-2.5 bg-amber-50/70 border border-amber-200/70 rounded-xl text-amber-800 text-xs">
           基层排查单位 <strong>{{ item.handleUnit }}</strong> 已提交现场核实卷宗，请省级水资源主管部门完成认定审批。
         </div>
 
@@ -87,7 +86,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-6 py-3.5 border-t border-gray-100 bg-[#f8fafc] flex items-center justify-end gap-2.5 shrink-0">
+      <div class="px-5 py-2.5 border-t border-gray-100 bg-[#f8fafc] flex items-center justify-end gap-2.5 shrink-0">
         <button
           type="button"
           @click="handleClose"

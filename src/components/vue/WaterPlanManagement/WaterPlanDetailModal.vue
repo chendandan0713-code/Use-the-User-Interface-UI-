@@ -41,9 +41,6 @@
                 {{ record.year }}年度
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-              单位名称: {{ record.unitName }} · 统一信用代码: {{ record.creditCode }} · 行政区划: {{ record.city }} · {{ record.district }}
-            </p>
           </div>
         </div>
 
@@ -80,7 +77,7 @@
         <button
           type="button"
           @click="activeTab = 'info'"
-          class="py-3 px-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5"
+          class="py-2 px-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5"
           :class="activeTab === 'info' ? 'border-[#1677ff] text-[#1677ff] font-semibold' : 'border-transparent text-slate-600 hover:text-slate-900'"
         >
           <span>基本信息与配额核对</span>
@@ -88,7 +85,7 @@
         <button
           type="button"
           @click="activeTab = 'audit'"
-          class="py-3 px-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5"
+          class="py-2 px-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5"
           :class="activeTab === 'audit' ? 'border-[#1677ff] text-[#1677ff] font-semibold' : 'border-transparent text-slate-600 hover:text-slate-900'"
         >
           <span>全流程审批履历</span>
@@ -99,21 +96,32 @@
         <button
           type="button"
           @click="activeTab = 'document'"
-          class="py-3 px-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5"
+          class="py-2 px-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5"
           :class="activeTab === 'document' ? 'border-[#1677ff] text-[#1677ff] font-semibold' : 'border-transparent text-slate-600 hover:text-slate-900'"
         >
           <span>计划用水核定书（凭证）</span>
         </button>
+        <button
+          type="button"
+          @click="activeTab = 'attachments'"
+          class="py-2 px-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5"
+          :class="activeTab === 'attachments' ? 'border-[#1677ff] text-[#1677ff] font-semibold' : 'border-transparent text-slate-600 hover:text-slate-900'"
+        >
+          <span>佐证材料与附件</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-50 text-blue-600 font-mono">
+            3
+          </span>
+        </button>
       </div>
 
       <!-- 3. 内容滚动区 -->
-      <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
+      <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
         
         <!-- Tab 1: 基本信息与配额核对 -->
-        <div v-if="activeTab === 'info'" class="space-y-4 animate-in fade-in duration-150">
+        <div v-if="activeTab === 'info'" class="space-y-2.5 animate-in fade-in duration-150">
           <!-- 卡片 1.1: 基础登记参数 -->
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">申报单位及取水基本信息</span>
@@ -123,7 +131,7 @@
               </span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3.5 text-[12.5px]">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-[12.5px]">
               <div class="flex items-baseline">
                 <span class="w-32 shrink-0 text-slate-400 font-normal">用水单位全称</span>
                 <span class="text-slate-800 font-medium leading-relaxed truncate" :title="record.unitName">{{ record.unitName }}</span>
@@ -183,8 +191,8 @@
           </div>
 
           <!-- 卡片 1.2: 水量指标申报与核定批复对照 -->
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-emerald-500 rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">水量指标申报与核定批复对照 (万m³)</span>
@@ -255,9 +263,9 @@
         </div>
 
         <!-- Tab 2: 全流程审批履历 -->
-        <div v-else-if="activeTab === 'audit'" class="space-y-4 animate-in fade-in duration-150">
-          <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div v-else-if="activeTab === 'audit'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-blue-600 rounded-full"></span>
                 <span class="text-[14px] font-bold text-slate-800">审批流程轨迹跟踪</span>
@@ -300,7 +308,7 @@
         </div>
 
         <!-- Tab 3: 计划用水核定告知书凭证 (模版) -->
-        <div v-else-if="activeTab === 'document'" class="space-y-4 animate-in fade-in duration-150">
+        <div v-else-if="activeTab === 'document'" class="space-y-2.5 animate-in fade-in duration-150">
           <div class="bg-white rounded-lg border border-slate-200/90 p-8 shadow-sm max-w-[800px] mx-auto text-slate-800 space-y-6 relative overflow-hidden">
             <!-- 红色官方公章水印模拟 -->
             <div class="absolute right-12 bottom-16 pointer-events-none opacity-85 select-none rotate-[-12deg]">
@@ -360,10 +368,103 @@
           </div>
         </div>
 
+        <!-- Tab 4: 申报佐证附件材料 (完全同计量设施档案列表查看与审核弹窗保持一致) -->
+        <div v-else-if="activeTab === 'attachments'" class="space-y-2.5 animate-in fade-in duration-150">
+          <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
+                <span class="text-[13px] font-bold text-slate-800">申报佐证附件材料列表</span>
+                <span class="text-xs text-gray-400 font-mono">({{ attachments.length }} 个文件)</span>
+              </div>
+              <span class="text-[11px] text-gray-400">水利核验佐证凭据</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div
+                v-for="(att, aIdx) in attachments"
+                :key="aIdx"
+                class="flex items-center justify-between p-2.5 rounded-lg border border-[#c4d8ee] bg-[#f9fbfe] hover:bg-[#f0f5fd] transition gap-2.5"
+              >
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  <!-- 1. 图片图标 (蓝底相机) -->
+                  <div
+                    v-if="att.type === 'image'"
+                    class="w-7 h-7 rounded bg-[#e6f1fc] text-[#1677ff] flex items-center justify-center shrink-0"
+                  >
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  </div>
+
+                  <!-- 2. Word 图标 (蓝紫色底 W) -->
+                  <div
+                    v-else-if="att.type === 'word'"
+                    class="w-7 h-7 rounded bg-[#eef0fe] text-[#2f54eb] flex items-center justify-center shrink-0 font-bold text-xs"
+                  >
+                    W
+                  </div>
+
+                  <!-- 3. PDF 图标 (红底文档) -->
+                  <div
+                    v-else
+                    class="w-7 h-7 rounded bg-[#feebee] text-[#f5222d] flex items-center justify-center shrink-0"
+                  >
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                  </div>
+
+                  <div class="truncate">
+                    <span class="text-xs text-gray-800 font-medium truncate block" :title="att.name">
+                      {{ att.name }}
+                    </span>
+                    <span class="text-[10.5px] text-gray-400 font-mono block">
+                      {{ att.size }} · 计划申报佐证材料
+                    </span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0 text-gray-400">
+                  <button
+                    v-if="att.type === 'image' || att.type === 'pdf'"
+                    type="button"
+                    @click.stop="openPreview(att)"
+                    class="hover:text-[#1677ff] p-1.5 cursor-pointer rounded transition"
+                    title="预览附件"
+                  >
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    @click.stop="downloadAttachment(att)"
+                    class="hover:text-[#1677ff] p-1.5 cursor-pointer rounded transition"
+                    title="下载附件"
+                  >
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- 4. 底部关闭按钮 -->
-      <div class="px-6 py-3 bg-white border-t border-slate-200/90 flex items-center justify-end shrink-0">
+      <div class="px-5 py-2 bg-white border-t border-slate-200/90 flex items-center justify-end shrink-0">
         <button
           type="button"
           @click="handleClose"
@@ -373,11 +474,47 @@
         </button>
       </div>
     </div>
+
+    <!-- 附件在线预览弹窗 (完全与计量设施档案列表查看一致) -->
+    <t-dialog
+      v-model:visible="previewVisible"
+      :header="previewTitle"
+      width="600px"
+      :footer="false"
+    >
+      <div class="p-2 space-y-3 select-none">
+        <div v-if="previewType === 'image'" class="flex flex-col items-center">
+          <div class="w-full max-h-[360px] overflow-hidden rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center p-2">
+            <img
+              src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
+              alt="现场设备照片"
+              class="max-h-[340px] object-contain rounded"
+            />
+          </div>
+          <div class="mt-2 text-xs text-gray-500 flex items-center justify-between w-full px-1">
+            <span>核验照片：{{ previewTitle }}</span>
+            <span>拍摄时间：2026-03-05 10:24</span>
+          </div>
+        </div>
+        <div v-else-if="previewType === 'pdf'" class="p-4 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600 space-y-2">
+          <div class="flex items-center gap-2 font-medium text-gray-900 border-b pb-2">
+            <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>{{ previewTitle }}</span>
+          </div>
+          <p>核验结论：经审核，该佐证材料符合西宁市计划用水管理实施细则规范标准，印章齐全。</p>
+          <div class="pt-2 text-right text-gray-400 font-mono">西宁市水资源管理委员会办公室</div>
+        </div>
+      </div>
+    </t-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { MessagePlugin } from 'tdesign-vue-next';
 import type { WaterPlanRecord } from '../../../types';
 
 const props = defineProps<{
@@ -389,7 +526,39 @@ const emit = defineEmits<{
   (e: 'update:visible', val: boolean): void;
 }>();
 
-const activeTab = ref<'info' | 'audit' | 'document'>('info');
+const activeTab = ref<'info' | 'audit' | 'document' | 'attachments'>('info');
+
+const attachments = ref([
+  {
+    name: '2026年度计划用水申报书(盖章件).pdf',
+    type: 'pdf',
+    size: '2.4 MB'
+  },
+  {
+    name: '企业水平衡测试与节水评价报告.docx',
+    type: 'word',
+    size: '5.8 MB'
+  },
+  {
+    name: '取水口超声水表工况现场照片.jpg',
+    type: 'image',
+    size: '1.2 MB'
+  }
+]);
+
+const previewVisible = ref(false);
+const previewTitle = ref('');
+const previewType = ref<'image' | 'pdf'>('image');
+
+const openPreview = (att: { name: string; type: string }) => {
+  previewTitle.value = att.name;
+  previewType.value = att.type === 'image' ? 'image' : 'pdf';
+  previewVisible.value = true;
+};
+
+const downloadAttachment = (att: { name: string }) => {
+  MessagePlugin.success(`开始下载佐证附件：${att.name}`);
+};
 
 const handleClose = () => {
   emit('update:visible', false);

@@ -9,7 +9,7 @@
       class="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-[760px] my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[92vh]"
     >
       <!-- Header: 发起故障申报 标题与 X 关闭按钮 -->
-      <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100 shrink-0">
+      <div class="px-5 py-3 flex items-center justify-between border-b border-gray-100 shrink-0">
         <h3 class="text-[17px] font-bold text-gray-900 tracking-tight">
           发起故障申报
         </h3>
@@ -27,7 +27,7 @@
       </div>
 
       <!-- Body: 表单内容 -->
-      <div class="p-6 overflow-y-auto space-y-4 text-xs flex-1 custom-scrollbar">
+      <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs flex-1 custom-scrollbar">
         <!-- 1. 计量设施 (全宽行，下拉带清空与箭头) -->
         <div class="flex items-center gap-3">
           <label class="w-[96px] text-right font-normal text-gray-700 shrink-0">
@@ -60,7 +60,7 @@
         </div>
 
         <!-- 2. 双列：器具编号 & 取水权人 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <!-- 器具编号 (只读深色灰底) -->
           <div class="flex items-center gap-3">
             <label class="w-[96px] text-right font-normal text-gray-700 shrink-0">
@@ -89,7 +89,7 @@
         </div>
 
         <!-- 3. 双列：故障底数(m³) & 故障时间 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <!-- 故障底数(m³) -->
           <div class="flex items-center gap-3">
             <label class="w-[96px] text-right font-normal text-gray-700 shrink-0">
@@ -126,7 +126,7 @@
         </div>
 
         <!-- 4. 双列：上报人员 & 所属区县 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <!-- 上报人员 -->
           <div class="flex items-center gap-3">
             <label class="w-[96px] text-right font-normal text-gray-700 shrink-0">
@@ -240,7 +240,7 @@
         </div>
 
         <!-- 7. 说明通知区域 (浅蓝底色 + 细蓝框 + 圆角，完全还原截图 1、2、3 条) -->
-        <div class="p-3.5 rounded-xl bg-[#f0f7ff] border border-[#bae0ff] text-xs space-y-1.5">
+        <div class="p-2.5 rounded-xl bg-[#f0f7ff] border border-[#bae0ff] text-xs space-y-1">
           <div class="flex items-center gap-1.5 text-[#1677ff] font-semibold">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <circle cx="12" cy="12" r="10"></circle>
@@ -258,7 +258,7 @@
       </div>
 
       <!-- Footer: 取消与确认提交申报按钮 -->
-      <div class="px-6 py-3.5 bg-white border-t border-gray-100 flex items-center justify-end gap-3 shrink-0">
+      <div class="px-5 py-2.5 bg-white border-t border-gray-100 flex items-center justify-end gap-3 shrink-0">
         <button
           type="button"
           @click="handleClose"

@@ -323,6 +323,18 @@
             督促催办
           </button>
           <button
+            v-if="item.status === '排查-省级待审核' || item.checkStatus === '省级待审核'"
+            type="button"
+            @click="handleAudit"
+            class="px-3.5 py-1.5 rounded-md text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 transition shadow-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            省级审核
+          </button>
+          <button
             type="button"
             @click="handleClose"
             class="px-4 py-1.5 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-800 transition cursor-pointer"
@@ -347,6 +359,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:visible', val: boolean): void;
   (e: 'urged', item: ViolationItem): void;
+  (e: 'audit', item: ViolationItem): void;
 }>();
 
 const handleClose = () => {
@@ -356,6 +369,13 @@ const handleClose = () => {
 const handleUrge = () => {
   if (props.item) {
     emit('urged', props.item);
+  }
+};
+
+const handleAudit = () => {
+  if (props.item) {
+    emit('update:visible', false);
+    emit('audit', props.item);
   }
 };
 

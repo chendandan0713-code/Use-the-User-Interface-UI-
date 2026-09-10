@@ -85,20 +85,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* Center: Portal Sub-Tabs (第三方登录 / 取水户端 / 管理端) */}
+        {/* Center: Portal Sub-Tabs (取水户端 / 管理端) */}
         {currentPlatform === 'water' && (
           <div className="hidden lg:flex items-center space-x-1 bg-blue-800/40 p-1 rounded-lg border border-blue-400/30">
-            <button
-              type="button"
-              onClick={() => onSubTabChange('third_party')}
-              className={`px-3 py-1 rounded text-xs font-medium transition-all ${
-                subTab === 'third_party'
-                  ? 'bg-white text-blue-900 shadow-sm font-semibold'
-                  : 'text-blue-100 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              第三方登录
-            </button>
             <button
               type="button"
               onClick={() => onSubTabChange('user_client')}

@@ -1,4 +1,4 @@
-import { WaterPlanRecord } from '../types';
+import { WaterPlanRecord, FormQuotaData, WaterPlanDocumentIssue } from '../types';
 
 export const initialWaterPlanRecords: WaterPlanRecord[] = [
   {
@@ -562,3 +562,279 @@ export const initialWaterPlanRecords: WaterPlanRecord[] = [
     ]
   }
 ];
+
+// 生成单条记录对应的“本年度实际用水表”数据
+export function createActualWaterQuotaForRecord(record?: WaterPlanRecord | null): FormQuotaData {
+  if (record?.actualWaterQuota) {
+    return JSON.parse(JSON.stringify(record.actualWaterQuota));
+  }
+
+  const surface = record?.surfaceWater ?? 12.34;
+  const ground = record?.groundwater ?? 23.45;
+  const unconv = record?.unconventionalTotal ?? 34.56;
+  const recycled = record?.recycledWater ?? 20.0;
+  const rain = record?.rainWater ?? 5.0;
+  const mine = record?.mineWater ?? 0.0;
+  const brackish = record?.brackishWater ?? 0.0;
+
+  return {
+    livingWaterRows: [
+      {
+        type: '厂区办公生活用水',
+        quota: 28.5,
+        population: 260,
+        surfaceWater: Number((surface * 0.25).toFixed(2)),
+        groundwater: Number((ground * 0.2).toFixed(2))
+      }
+    ],
+    industryWaterRows: [
+      {
+        productName: record?.industryType?.includes('光伏') || record?.industryType?.includes('硅') ? '高纯多晶硅' : '核心工艺主产品',
+        quota: 14.5,
+        output: '2.2万吨',
+        productVolume: '31.90',
+        surfaceWater: Number((surface * 0.5).toFixed(2)),
+        groundwater: Number((ground * 0.5).toFixed(2)),
+        recycledWater: Number((recycled * 0.7).toFixed(2)),
+        rainWater: Number((rain * 0.6).toFixed(2)),
+        mineWater: Number((mine * 0.5).toFixed(2)),
+        brackishWater: Number((brackish * 0.5).toFixed(2))
+      },
+      {
+        productName: '副产品及冷却水循网',
+        quota: 7.8,
+        output: '0.9万吨',
+        productVolume: '7.02',
+        surfaceWater: Number((surface * 0.25).toFixed(2)),
+        groundwater: Number((ground * 0.3).toFixed(2)),
+        recycledWater: Number((recycled * 0.3).toFixed(2)),
+        rainWater: Number((rain * 0.4).toFixed(2)),
+        mineWater: Number((mine * 0.5).toFixed(2)),
+        brackishWater: Number((brackish * 0.5).toFixed(2))
+      }
+    ],
+    agricultureWaterRows: [
+      {
+        area: 12000.0,
+        times: 3,
+        quota: 90,
+        crops: '厂区绿化防风林',
+        method: '微喷滴灌',
+        surfaceWater: 0.12,
+        groundwater: 0.15,
+        total: 10.8
+      }
+    ],
+    powerWaterRows: [
+      {
+        units: 1,
+        capacity: '300MW',
+        generation: '15.6亿',
+        hours: 5200,
+        surfaceWater: 6.5,
+        groundwater: 0.0,
+        hydroMinFlow: 0.0,
+        thermalMaxHourly: 95.0,
+        total: 6.5
+      }
+    ],
+    monthlySummaryRows: [
+      { month: '1月', surfaceWater: 15.2, groundwater: 14.8, recycledWater: 1.0, rainWater: 0.1, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '2月', surfaceWater: 14.8, groundwater: 14.2, recycledWater: 0.95, rainWater: 0.15, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '3月', surfaceWater: 16.5, groundwater: 15.6, recycledWater: 1.1, rainWater: 0.3, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '4月', surfaceWater: 17.2, groundwater: 16.0, recycledWater: 1.15, rainWater: 0.5, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '5月', surfaceWater: 18.0, groundwater: 17.2, recycledWater: 1.2, rainWater: 1.0, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '6月', surfaceWater: 19.5, groundwater: 18.1, recycledWater: 1.25, rainWater: 1.6, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '7月', surfaceWater: 20.2, groundwater: 18.8, recycledWater: 1.3, rainWater: 2.3, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '8月', surfaceWater: 19.8, groundwater: 18.5, recycledWater: 1.25, rainWater: 2.2, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '9月', surfaceWater: 18.4, groundwater: 17.0, recycledWater: 1.2, rainWater: 1.4, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '10月', surfaceWater: 17.6, groundwater: 16.2, recycledWater: 1.15, rainWater: 0.7, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '11月', surfaceWater: 16.2, groundwater: 15.0, recycledWater: 1.05, rainWater: 0.25, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '12月', surfaceWater: 15.5, groundwater: 14.5, recycledWater: 1.0, rainWater: 0.15, mineWater: 0.0, brackishWater: 0.0 }
+    ]
+  };
+}
+
+// 生成单条记录对应的“下年度计划用水表”数据
+export function createPlanWaterQuotaForRecord(record?: WaterPlanRecord | null): FormQuotaData {
+  if (record?.planWaterQuota) {
+    return JSON.parse(JSON.stringify(record.planWaterQuota));
+  }
+
+  const surface = (record?.surfaceWater ?? 12.34) * 1.05;
+  const ground = (record?.groundwater ?? 23.45) * 1.03;
+  const unconv = (record?.unconventionalTotal ?? 34.56) * 1.1;
+  const recycled = (record?.recycledWater ?? 20.0) * 1.1;
+  const rain = (record?.rainWater ?? 5.0) * 1.08;
+  const mine = record?.mineWater ?? 0.0;
+  const brackish = record?.brackishWater ?? 0.0;
+
+  return {
+    livingWaterRows: [
+      {
+        type: '厂区办公生活用水',
+        quota: 30.0,
+        population: 280,
+        surfaceWater: Number((surface * 0.25).toFixed(2)),
+        groundwater: Number((ground * 0.2).toFixed(2))
+      }
+    ],
+    industryWaterRows: [
+      {
+        productName: record?.industryType?.includes('光伏') || record?.industryType?.includes('硅') ? '高纯多晶硅' : '核心工艺主产品',
+        quota: 14.5,
+        output: '2.5万吨',
+        productVolume: '36.25',
+        surfaceWater: Number((surface * 0.5).toFixed(2)),
+        groundwater: Number((ground * 0.5).toFixed(2)),
+        recycledWater: Number((recycled * 0.7).toFixed(2)),
+        rainWater: Number((rain * 0.6).toFixed(2)),
+        mineWater: Number((mine * 0.5).toFixed(2)),
+        brackishWater: Number((brackish * 0.5).toFixed(2))
+      },
+      {
+        productName: '副产品及冷却水循网',
+        quota: 7.8,
+        output: '1.2万吨',
+        productVolume: '9.36',
+        surfaceWater: Number((surface * 0.25).toFixed(2)),
+        groundwater: Number((ground * 0.3).toFixed(2)),
+        recycledWater: Number((recycled * 0.3).toFixed(2)),
+        rainWater: Number((rain * 0.4).toFixed(2)),
+        mineWater: Number((mine * 0.5).toFixed(2)),
+        brackishWater: Number((brackish * 0.5).toFixed(2))
+      }
+    ],
+    agricultureWaterRows: [
+      {
+        area: 12000.0,
+        times: 3,
+        quota: 88,
+        crops: '厂区绿化防风林',
+        method: '节水型智能滴灌',
+        surfaceWater: 0.11,
+        groundwater: 0.14,
+        total: 10.2
+      }
+    ],
+    powerWaterRows: [
+      {
+        units: 1,
+        capacity: '300MW',
+        generation: '16.2亿',
+        hours: 5400,
+        surfaceWater: 6.8,
+        groundwater: 0.0,
+        hydroMinFlow: 0.0,
+        thermalMaxHourly: 98.0,
+        total: 6.8
+      }
+    ],
+    monthlySummaryRows: [
+      { month: '1月', surfaceWater: 16.0, groundwater: 15.2, recycledWater: 1.1, rainWater: 0.12, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '2月', surfaceWater: 15.5, groundwater: 14.8, recycledWater: 1.05, rainWater: 0.18, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '3月', surfaceWater: 17.5, groundwater: 16.2, recycledWater: 1.2, rainWater: 0.35, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '4月', surfaceWater: 18.2, groundwater: 16.8, recycledWater: 1.25, rainWater: 0.55, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '5月', surfaceWater: 19.0, groundwater: 18.0, recycledWater: 1.3, rainWater: 1.1, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '6月', surfaceWater: 20.8, groundwater: 19.0, recycledWater: 1.35, rainWater: 1.8, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '7月', surfaceWater: 21.5, groundwater: 19.6, recycledWater: 1.4, rainWater: 2.5, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '8月', surfaceWater: 21.0, groundwater: 19.2, recycledWater: 1.35, rainWater: 2.4, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '9月', surfaceWater: 19.5, groundwater: 17.8, recycledWater: 1.3, rainWater: 1.55, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '10月', surfaceWater: 18.6, groundwater: 17.0, recycledWater: 1.25, rainWater: 0.8, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '11月', surfaceWater: 17.2, groundwater: 15.8, recycledWater: 1.15, rainWater: 0.3, mineWater: 0.0, brackishWater: 0.0 },
+      { month: '12月', surfaceWater: 16.4, groundwater: 15.1, recycledWater: 1.1, rainWater: 0.2, mineWater: 0.0, brackishWater: 0.0 }
+    ]
+  };
+}
+
+// 获取/生成用水计划文件下发列表（包含多次下发）
+export function createDocumentIssuesForRecord(record?: WaterPlanRecord | null): WaterPlanDocumentIssue[] {
+  if (record?.documentIssues && record.documentIssues.length > 0) {
+    return JSON.parse(JSON.stringify(record.documentIssues));
+  }
+
+  const year = record?.year || '2025';
+  const unitName = record?.unitName || '重点用水企业';
+  const district = record?.district || '大通县';
+  const issuer = record?.supervisorUnit || `${district}水务局水资源管理办公室`;
+  const approvedVol = record?.approvedVolume || record?.planVolume || 123.45;
+
+  return [
+    {
+      id: `${record?.id || 'WP'}-issue-01`,
+      title: `关于下达${unitName} ${year}年度计划用水指标的正式通知`,
+      noticeType: '正式用水计划通知',
+      issuerUnit: issuer,
+      issueTime: `${year}-01-22 09:30:00`,
+      issueEvent: `${year}年度用水计划指标初次正式下达`,
+      docNumber: `宁水资计〔${year}〕第 0428 号`,
+      approvedTotalVolume: approvedVol,
+      remarks: `依据《西宁市节约用水条例》，严格执行定额管理制度。贵单位应按月度分解指标合理取水，不得擅自超定额、超计划取水。`,
+      files: [
+        {
+          id: 'file-01-01',
+          name: `${year}年度计划用水指标正式核定通知书(红头盖章件).pdf`,
+          type: 'pdf',
+          size: '3.8 MB',
+          uploadTime: `${year}-01-22 09:31:12`
+        },
+        {
+          id: 'file-01-02',
+          name: `${unitName}用水定额分水源核算明细表.xlsx`,
+          type: 'excel',
+          size: '1.5 MB',
+          uploadTime: `${year}-01-22 09:31:45`
+        },
+        {
+          id: 'file-01-03',
+          name: `节约用水管理告知承诺书与回执备案单.docx`,
+          type: 'word',
+          size: '680 KB',
+          uploadTime: `${year}-01-22 09:32:00`
+        },
+        {
+          id: 'file-01-04',
+          name: `水资源管理专用章电子凭证及现场核验原件扫描.image`,
+          type: 'image',
+          size: '2.4 MB',
+          uploadTime: `${year}-01-22 09:35:10`
+        }
+      ]
+    },
+    {
+      id: `${record?.id || 'WP'}-issue-02`,
+      title: `关于调整下达${unitName} ${year}年度中后期计划用水指标的通知`,
+      noticeType: '调整用水计划通知',
+      issuerUnit: '西宁市水务局水资源管理处',
+      issueTime: `${year}-06-18 15:20:00`,
+      issueEvent: `年中根据规上重点企业扩产增效水平衡评估调整指标下达`,
+      docNumber: `宁水资调〔${year}〕第 0115 号`,
+      approvedTotalVolume: Number((approvedVol * 1.08).toFixed(2)),
+      remarks: `同意核增夏季高温期及三期技改项目的非常规再生水循环利用指标，常规地表水严格维持刚性约束红线不变。`,
+      files: [
+        {
+          id: 'file-02-01',
+          name: `${year}年度用水计划指标追加调整批复函(西水发〔${year}〕68号).pdf`,
+          type: 'pdf',
+          size: '4.2 MB',
+          uploadTime: `${year}-06-18 15:21:30`
+        },
+        {
+          id: 'file-02-02',
+          name: `企业扩产水平衡测试复核评估与非常规水置换论证报告.pdf`,
+          type: 'pdf',
+          size: '7.6 MB',
+          uploadTime: `${year}-06-18 15:22:15`
+        },
+        {
+          id: 'file-02-03',
+          name: `调整后1至12月月度取水进度控制表.xlsx`,
+          type: 'excel',
+          size: '1.8 MB',
+          uploadTime: `${year}-06-18 15:23:00`
+        }
+      ]
+    }
+  ];
+}
+

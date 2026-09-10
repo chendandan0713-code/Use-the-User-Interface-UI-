@@ -123,7 +123,7 @@
 
                 <!-- 审核 (当为 省级待审核 时出现) -->
                 <button
-                  v-if="item.status === '排查-省级待审核'"
+                  v-if="item.status === '排查-省级待审核' || item.checkStatus === '省级待审核'"
                   type="button"
                   @click="emit('audit', item)"
                   class="text-[#0d9488] hover:text-teal-700 font-medium transition cursor-pointer"

@@ -28,9 +28,6 @@
               >
                 {{ record.status }}
               </span>
-              <span v-if="form.permitNumber" class="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 text-slate-600 border border-slate-200">
-                {{ form.permitNumber }}
-              </span>
             </div>
           </div>
         </div>
@@ -161,7 +158,6 @@
               <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
               <span class="text-[13px] font-bold text-slate-800">申报指标核定与修改</span>
             </div>
-            <span class="text-[11px] text-slate-400 font-mono">支持核实修正并自动计算联动</span>
           </div>
 
           <!-- 左侧滚动卡片表单区域 -->
@@ -174,14 +170,13 @@
                   <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
                   <span class="text-[13px] font-bold text-slate-800">申报主体基础信息</span>
                 </div>
-                <span class="text-[11px] text-slate-400 font-mono">可修改</span>
               </div>
 
-              <!-- 基础信息输入栅格 (2列自适应) -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3 text-[12px]">
-                <!-- 取水权人名称 -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">取水权人名称</label>
+              <!-- 基础信息输入栅格 (采用规整对齐的3列栅格布局) -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2.5 text-xs">
+                <!-- 第一行：取水权人 (跨2列) + 取水许可编号 (1列) -->
+                <div class="col-span-1 md:col-span-2 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">取水权人</label>
                   <input
                     type="text"
                     v-model="form.waterOwner"
@@ -190,9 +185,8 @@
                   />
                 </div>
 
-                <!-- 取水许可编号 -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">取水许可编号</label>
+                <div class="col-span-1 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">许可证号</label>
                   <input
                     type="text"
                     v-model="form.permitNumber"
@@ -201,33 +195,58 @@
                   />
                 </div>
 
-                <!-- 取水许可量 -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">许可水量(万m³)</label>
+                <!-- 第二行：许可水量 + 年产值 + 邮政编码 -->
+                <div class="col-span-1 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">许可水量</label>
+                  <div class="relative flex-1">
+                    <input
+                      type="number"
+                      step="0.01"
+                      v-model.number="form.permitVolume"
+                      class="w-full h-8 pl-2.5 pr-12 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                    />
+                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-sans pointer-events-none">万m³</span>
+                  </div>
+                </div>
+
+                <div class="col-span-1 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">年产值</label>
+                  <div class="relative flex-1">
+                    <input
+                      type="number"
+                      step="1"
+                      v-model.number="form.annualOutputValue"
+                      class="w-full h-8 pl-2.5 pr-11 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                    />
+                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-sans pointer-events-none">万元</span>
+                  </div>
+                </div>
+
+                <div class="col-span-1 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">邮政编码</label>
                   <input
-                    type="number"
-                    step="0.01"
-                    v-model.number="form.permitVolume"
+                    type="text"
+                    v-model="form.postalCode"
+                    placeholder="6位邮编"
                     class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
                   />
                 </div>
 
-                <!-- 联系人 -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">
+                <!-- 第三行：联系人 + 联系电话 + 电子邮箱 -->
+                <div class="col-span-1 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
                     <span class="text-rose-500 mr-0.5">*</span>联系人
                   </label>
                   <input
                     type="text"
                     v-model="form.contactPerson"
-                    placeholder="填报经办人"
+                    placeholder="填报联系人"
                     class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
                   />
                 </div>
 
-                <!-- 联系电话 -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">
+                <div class="col-span-1 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
                     <span class="text-rose-500 mr-0.5">*</span>联系电话
                   </label>
                   <input
@@ -238,20 +257,8 @@
                   />
                 </div>
 
-                <!-- 邮政编码 -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">邮政编码</label>
-                  <input
-                    type="text"
-                    v-model="form.postalCode"
-                    placeholder="6位邮编"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
-                </div>
-
-                <!-- 电子邮箱 -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">电子邮箱</label>
+                <div class="col-span-1 flex items-center">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">电子邮箱</label>
                   <input
                     type="email"
                     v-model="form.email"
@@ -260,34 +267,9 @@
                   />
                 </div>
 
-                <!-- 年产值(万元) -->
-                <div class="flex items-center">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2 flex items-center justify-end gap-1">
-                    <span>年产值(万元)</span>
-                    <span
-                      class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-600 text-[10px] cursor-help"
-                      title="年产值大于2000万为规上企业"
-                    >?</span>
-                  </label>
-                  <div class="relative flex-1">
-                    <input
-                      type="number"
-                      step="1"
-                      v-model.number="form.annualOutputValue"
-                      class="w-full h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                    />
-                    <span
-                      v-if="form.annualOutputValue >= 2000"
-                      class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-600 font-medium border border-emerald-200 pointer-events-none"
-                    >
-                      规上企业
-                    </span>
-                  </div>
-                </div>
-
-                <!-- 详细地址 (整行跨列) -->
-                <div class="flex items-center col-span-1 md:col-span-2">
-                  <label class="w-24 shrink-0 text-slate-500 font-normal text-right pr-2">
+                <!-- 第四行：详细地址 (跨3列) -->
+                <div class="col-span-1 md:col-span-3 flex items-center pt-0.5">
+                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
                     <span class="text-rose-500 mr-0.5">*</span>详细地址
                   </label>
                   <input
@@ -300,271 +282,94 @@
               </div>
             </div>
 
-            <!-- 卡片 2: 生活用水申报项 -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <!-- 两个表单的切换按钮 (仅展示填报年度和名称) -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <!-- 表单 1: 本年实际用水填报表 -->
+              <button
+                type="button"
+                @click="activeFormTab = 'actual'"
+                class="py-2.5 px-3.5 rounded-lg border transition cursor-pointer flex items-center justify-between"
+                :class="[
+                  activeFormTab === 'actual'
+                    ? 'bg-blue-50 border-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs'
+                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                ]"
+              >
                 <div class="flex items-center gap-2">
-                  <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                  <span class="text-[13px] font-bold text-slate-800">生活用水核定</span>
+                  <span
+                    class="w-2 h-2 rounded-full"
+                    :class="activeFormTab === 'actual' ? 'bg-[#1677ff]' : 'bg-slate-400'"
+                  ></span>
+                  <span
+                    class="font-bold text-xs"
+                    :class="activeFormTab === 'actual' ? 'text-blue-900' : 'text-slate-700'"
+                  >
+                    本年实际用水填报表
+                  </span>
                 </div>
-                <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
-              </div>
-
-              <div class="overflow-x-auto custom-scrollbar border border-slate-200/90 rounded-md bg-white shadow-2xs">
-                <table class="w-full text-xs text-left border-collapse">
-                  <thead class="bg-[#f8fafc] text-slate-700 font-medium border-b border-slate-200">
-                    <tr class="divide-x divide-slate-200 text-center">
-                      <th class="px-2 py-2 min-w-[110px] text-blue-600 font-semibold">供水类型</th>
-                      <th class="px-2 py-2 min-w-[80px]">人均定额</th>
-                      <th class="px-2 py-2 min-w-[80px]">供水人口</th>
-                      <th class="px-2 py-2 min-w-[75px]">地表水</th>
-                      <th class="px-2 py-2 min-w-[75px]">地下水</th>
-                      <th class="px-2 py-2 min-w-[80px]">总计</th>
-                      <th class="px-2 py-2 w-12">操作</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    <tr
-                      v-for="(row, idx) in form.livingWaterRows"
-                      :key="idx"
-                      class="divide-x divide-slate-100 text-center hover:bg-slate-50/70 transition-colors"
-                    >
-                      <!-- 供水类型 -->
-                      <td class="p-1">
-                        <div class="relative">
-                          <input
-                            type="text"
-                            v-model="row.type"
-                            class="w-full h-7 pl-2 pr-6 bg-white border border-[#dce6f5] rounded text-xs focus:outline-none focus:border-[#1677ff]"
-                          />
-                          <svg class="w-3.5 h-3.5 text-slate-400 absolute right-1.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                          </svg>
-                        </div>
-                      </td>
-                      <!-- 人均用水定额 -->
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          step="0.01"
-                          v-model.number="row.quota"
-                          class="w-full h-7 px-1.5 bg-white border border-[#dce6f5] rounded text-center text-xs font-mono focus:outline-none focus:border-[#1677ff]"
-                        />
-                      </td>
-                      <!-- 供水人口 -->
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          step="1"
-                          v-model.number="row.population"
-                          class="w-full h-7 px-1.5 bg-white border border-[#dce6f5] rounded text-center text-xs font-mono focus:outline-none focus:border-[#1677ff]"
-                        />
-                      </td>
-                      <!-- 地表水 -->
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          step="0.01"
-                          v-model.number="row.surfaceWater"
-                          class="w-full h-7 px-1.5 bg-white border border-[#dce6f5] rounded text-center text-xs font-mono focus:outline-none focus:border-[#1677ff]"
-                        />
-                      </td>
-                      <!-- 地下水 -->
-                      <td class="p-1">
-                        <input
-                          type="number"
-                          step="0.01"
-                          v-model.number="row.groundwater"
-                          class="w-full h-7 px-1.5 bg-white border border-[#dce6f5] rounded text-center text-xs font-mono focus:outline-none focus:border-[#1677ff]"
-                        />
-                      </td>
-                      <!-- 总计 (自动计算) -->
-                      <td class="px-2 py-1 font-mono font-semibold text-slate-800 text-center">
-                        {{ ((row.surfaceWater || 0) + (row.groundwater || 0)).toFixed(2) }}
-                      </td>
-                      <!-- 删除操作 -->
-                      <td class="p-1 text-center">
-                        <button
-                          type="button"
-                          @click="deleteLivingRow(idx)"
-                          class="text-slate-400 hover:text-rose-500 p-1 cursor-pointer transition"
-                          title="删除行"
-                        >
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-
-                    <!-- 合计行 -->
-                    <tr class="bg-blue-50/50 font-semibold divide-x divide-slate-200 text-center text-slate-800">
-                      <td class="px-2 py-1.5">合计</td>
-                      <td></td>
-                      <td></td>
-                      <td class="px-2 py-1.5 font-mono">{{ livingSurfaceTotal.toFixed(2) }}</td>
-                      <td class="px-2 py-1.5 font-mono">{{ livingGroundTotal.toFixed(2) }}</td>
-                      <td class="px-2 py-1.5 font-mono text-[#1677ff] font-bold">{{ (livingSurfaceTotal + livingGroundTotal).toFixed(2) }}</td>
-                      <td></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- 新增一行链接 -->
-              <div class="pt-0.5">
-                <button
-                  type="button"
-                  @click="addLivingRow"
-                  class="text-[#1677ff] hover:text-blue-700 font-medium inline-flex items-center gap-1 cursor-pointer text-xs"
+                <span
+                  class="px-2 py-0.5 rounded text-[11px] font-medium font-mono"
+                  :class="activeFormTab === 'actual' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'"
                 >
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  <span>新增一行生活用水</span>
-                </button>
-              </div>
+                  {{ currentYear }}年度
+                </span>
+              </button>
+
+              <!-- 表单 2: 下年度计划用水填报表 -->
+              <button
+                type="button"
+                @click="activeFormTab = 'plan'"
+                class="py-2.5 px-3.5 rounded-lg border transition cursor-pointer flex items-center justify-between"
+                :class="[
+                  activeFormTab === 'plan'
+                    ? 'bg-blue-50 border-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs'
+                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                ]"
+              >
+                <div class="flex items-center gap-2">
+                  <span
+                    class="w-2 h-2 rounded-full"
+                    :class="activeFormTab === 'plan' ? 'bg-[#1677ff]' : 'bg-slate-400'"
+                  ></span>
+                  <span
+                    class="font-bold text-xs"
+                    :class="activeFormTab === 'plan' ? 'text-blue-900' : 'text-slate-700'"
+                  >
+                    下年度计划用水填报表
+                  </span>
+                </div>
+                <span
+                  class="px-2 py-0.5 rounded text-[11px] font-medium font-mono"
+                  :class="activeFormTab === 'plan' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'"
+                >
+                  {{ nextYear }}年度
+                </span>
+              </button>
             </div>
 
-            <!-- 卡片 3: 工业用水申报项 -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                <div class="flex items-center gap-2">
-                  <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                  <span class="text-[13px] font-bold text-slate-800">工业用水核定</span>
-                </div>
-                <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
-              </div>
+            <!-- 表单 1：本年实际用水填报表 (包含生活、工业、农业、发电四项核定) -->
+            <WaterQuotaAuditForm
+              v-show="activeFormTab === 'actual'"
+              title="表单一：本年实际用水填报表"
+              theme="blue"
+              v-model="actualQuotaForm"
+            />
 
-              <div class="overflow-x-auto custom-scrollbar border border-slate-200/90 rounded-md bg-white shadow-2xs">
-                <table class="w-full text-xs text-left border-collapse min-w-[720px]">
-                  <thead class="bg-[#f8fafc] text-slate-700 font-medium border-b border-slate-200 text-center">
-                    <tr class="divide-x divide-slate-200">
-                      <th rowspan="2" class="px-1.5 py-1.5 min-w-[70px]">主要产品</th>
-                      <th rowspan="2" class="px-1.5 py-1.5 min-w-[70px]">产品定额</th>
-                      <th rowspan="2" class="px-1.5 py-1.5 min-w-[60px]">年产量</th>
-                      <th rowspan="2" class="px-1.5 py-1.5 min-w-[60px]">产品水量</th>
-                      <th rowspan="2" class="px-1.5 py-1.5 min-w-[60px]">地表水</th>
-                      <th rowspan="2" class="px-1.5 py-1.5 min-w-[60px]">地下水</th>
-                      <th colspan="5" class="px-2 py-1 border-b border-slate-200">非常规水</th>
-                      <th rowspan="2" class="px-2 py-1.5 min-w-[65px]">总计</th>
-                      <th rowspan="2" class="px-1.5 py-1.5 w-10">操作</th>
-                    </tr>
-                    <tr class="divide-x divide-slate-200 text-[10.5px]">
-                      <th class="px-1 py-1 min-w-[50px]">再生水</th>
-                      <th class="px-1 py-1 min-w-[50px]">雨水</th>
-                      <th class="px-1 py-1 min-w-[50px]">矿井水</th>
-                      <th class="px-1 py-1 min-w-[50px]">微咸水</th>
-                      <th class="px-1.5 py-1 text-emerald-700 min-w-[65px]">非常规计</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100 text-center font-mono">
-                    <tr
-                      v-for="(row, idx) in form.industryWaterRows"
-                      :key="idx"
-                      class="divide-x divide-slate-100 hover:bg-slate-50/70 transition-colors"
-                    >
-                      <td class="p-1">
-                        <input type="text" v-model="row.productName" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="number" step="0.01" v-model.number="row.quota" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="text" v-model="row.output" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="text" v-model="row.productVolume" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="number" step="0.01" v-model.number="row.surfaceWater" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="number" step="0.01" v-model.number="row.groundwater" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="number" step="0.01" v-model.number="row.recycledWater" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="number" step="0.01" v-model.number="row.rainWater" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="number" step="0.01" v-model.number="row.mineWater" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <td class="p-1">
-                        <input type="number" step="0.01" v-model.number="row.brackishWater" class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs focus:outline-none focus:border-[#1677ff]" />
-                      </td>
-                      <!-- 非常规水小计 -->
-                      <td class="px-1.5 py-1 text-emerald-700 font-semibold">
-                        {{ ((row.recycledWater || 0) + (row.rainWater || 0) + (row.mineWater || 0) + (row.brackishWater || 0)).toFixed(2) }}
-                      </td>
-                      <!-- 地表水+地下水总计 -->
-                      <td class="px-1.5 py-1 text-slate-800 font-semibold">
-                        {{ ((row.surfaceWater || 0) + (row.groundwater || 0)).toFixed(2) }}
-                      </td>
-                      <!-- 删除操作 -->
-                      <td class="p-1 text-center">
-                        <button
-                          type="button"
-                          @click="deleteIndustryRow(idx)"
-                          class="text-slate-400 hover:text-rose-500 p-1 cursor-pointer transition"
-                          title="删除"
-                        >
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-
-                    <!-- 合计行 -->
-                    <tr class="bg-blue-50/50 font-semibold divide-x divide-slate-200 text-center text-slate-800">
-                      <td class="px-1.5 py-1.5 font-sans">合计</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td class="px-1 py-1.5 font-mono">{{ industrySurfaceTotal.toFixed(2) }}</td>
-                      <td class="px-1 py-1.5 font-mono">{{ industryGroundTotal.toFixed(2) }}</td>
-                      <td class="px-1 py-1.5 font-mono">{{ industryRecycledTotal.toFixed(2) }}</td>
-                      <td class="px-1 py-1.5 font-mono">{{ industryRainTotal.toFixed(2) }}</td>
-                      <td class="px-1 py-1.5 font-mono">{{ industryMineTotal.toFixed(2) }}</td>
-                      <td class="px-1 py-1.5 font-mono">{{ industryBrackishTotal.toFixed(2) }}</td>
-                      <td class="px-1.5 py-1.5 font-mono text-emerald-700 font-bold">{{ industryUnconventionalTotal.toFixed(2) }}</td>
-                      <td class="px-1.5 py-1.5 font-mono text-[#1677ff] font-bold">{{ (industrySurfaceTotal + industryGroundTotal).toFixed(2) }}</td>
-                      <td></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- 新增一行链接 -->
-              <div class="pt-0.5">
-                <button
-                  type="button"
-                  @click="addIndustryRow"
-                  class="text-[#1677ff] hover:text-blue-700 font-medium inline-flex items-center gap-1 cursor-pointer text-xs"
-                >
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  <span>新增一行工业用水</span>
-                </button>
-              </div>
-            </div>
+            <!-- 表单 2：下年度计划用水填报表 (包含生活、工业、农业、发电四项核定) -->
+            <WaterQuotaAuditForm
+              v-show="activeFormTab === 'plan'"
+              title="表单二：下年度计划用水填报表"
+              theme="blue"
+              v-model="planQuotaForm"
+            />
 
             <!-- 卡片 4: 审核批注与核定结论 -->
             <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-1.5">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                  <span class="text-[13px] font-bold text-slate-800">审批核实意见与批注</span>
+                  <span class="text-[13px] font-bold text-slate-800">审批意见</span>
                 </div>
-                <span class="text-[11px] text-slate-400">核定结论将记入审批历史</span>
               </div>
               <textarea
                 v-model="auditOpinion"
@@ -616,49 +421,53 @@
                   </span>
                 </div>
 
-                <div class="grid grid-cols-3 gap-x-4 gap-y-2.5 text-xs">
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">取水权人：</span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2.5 text-xs">
+                  <!-- 第一行：取水权人 (跨2列) + 许可证号 (1列) -->
+                  <div class="col-span-1 md:col-span-2 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">取水权人：</span>
                     <span class="font-medium text-slate-800 truncate" :title="form.waterOwner">{{ form.waterOwner }}</span>
                   </div>
 
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">取水许可编号：</span>
+                  <div class="col-span-1 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">许可证号：</span>
                     <span class="font-mono text-slate-800">{{ form.permitNumber }}</span>
                   </div>
 
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">许可水量：</span>
-                    <span class="font-mono font-semibold text-slate-800">{{ form.permitVolume.toFixed(2) }} 万m³</span>
+                  <!-- 第二行：许可水量 + 年产值 + 邮政编码 -->
+                  <div class="col-span-1 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">许可水量：</span>
+                    <span class="font-mono font-medium text-slate-800">{{ (form.permitVolume ?? 0).toFixed(2) }} <span class="text-slate-500 font-sans text-[11px]">万m³</span></span>
                   </div>
 
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">填报联系人：</span>
-                    <span class="text-slate-800">{{ form.contactPerson }}</span>
+                  <div class="col-span-1 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">年产值：</span>
+                    <span class="font-mono font-medium text-slate-800">{{ form.annualOutputValue }} <span class="text-slate-500 font-sans text-[11px]">万元</span></span>
                   </div>
 
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">联系电话：</span>
-                    <span class="font-mono text-slate-800">{{ form.contactPhone }}</span>
-                  </div>
-
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">邮政编码：</span>
+                  <div class="col-span-1 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">邮政编码：</span>
                     <span class="font-mono text-slate-800">{{ form.postalCode }}</span>
                   </div>
 
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">电子邮箱：</span>
+                  <!-- 第三行：联系人 + 联系电话 + 电子邮箱 -->
+                  <div class="col-span-1 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">联系人：</span>
+                    <span class="text-slate-800">{{ form.contactPerson }}</span>
+                  </div>
+
+                  <div class="col-span-1 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">联系电话：</span>
+                    <span class="font-mono text-slate-800">{{ form.contactPhone }}</span>
+                  </div>
+
+                  <div class="col-span-1 flex items-center">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">电子邮箱：</span>
                     <span class="text-slate-800">{{ form.email }}</span>
                   </div>
 
-                  <div class="flex items-baseline">
-                    <span class="w-24 text-slate-400 shrink-0">年产值：</span>
-                    <span class="font-mono text-slate-800">{{ form.annualOutputValue }} 万元</span>
-                  </div>
-
-                  <div class="flex items-baseline col-span-3 pt-1 border-t border-slate-50">
-                    <span class="w-24 text-slate-400 shrink-0">详细地址：</span>
+                  <!-- 第四行：详细地址 (跨3列) -->
+                  <div class="col-span-1 md:col-span-3 flex items-center pt-1 border-t border-slate-100">
+                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">详细地址：</span>
                     <span class="text-slate-800">{{ form.detailedAddress }}</span>
                   </div>
                 </div>
@@ -674,29 +483,29 @@
                   <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
                 </div>
 
-                <div class="border border-slate-200/90 rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
+                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
                   <table class="w-full text-xs text-center border-collapse">
-                    <thead class="bg-[#f8fafc] text-slate-700 font-medium border-b border-slate-200">
-                      <tr class="divide-x divide-slate-200">
-                        <th class="py-2 px-3">供水人口(人)</th>
-                        <th class="py-2 px-3">人均定额(L/人·天)</th>
-                        <th class="py-2 px-3">地表水</th>
-                        <th class="py-2 px-3">地下水</th>
+                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
+                      <tr class="divide-x divide-[#b8cde6]">
+                        <th class="py-2 px-3 border-r border-[#b8cde6]">供水人口(人)</th>
+                        <th class="py-2 px-3 border-r border-[#b8cde6]">人均定额(L/人·天)</th>
+                        <th class="py-2 px-3 border-r border-[#b8cde6]">地表水</th>
+                        <th class="py-2 px-3 border-r border-[#b8cde6]">地下水</th>
                         <th class="py-2 px-3 font-semibold text-slate-800">总计</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 font-mono">
+                    <tbody class="divide-y divide-[#b8cde6] font-mono text-slate-800">
                       <tr
-                        v-for="(row, idx) in form.livingWaterRows"
+                        v-for="(row, idx) in declaredLivingRows"
                         :key="idx"
-                        class="divide-x divide-slate-100 hover:bg-slate-50/50"
+                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
                       >
-                        <td class="py-2 px-3 text-slate-700">{{ row.population }}</td>
-                        <td class="py-2 px-3 text-slate-700">{{ row.quota.toFixed(2) }}</td>
-                        <td class="py-2 px-3 text-slate-700">{{ row.surfaceWater.toFixed(2) }}</td>
-                        <td class="py-2 px-3 text-slate-700">{{ row.groundwater.toFixed(2) }}</td>
-                        <td class="py-2 px-3 font-semibold text-[#1677ff]">
-                          {{ ((row.surfaceWater || 0) + (row.groundwater || 0)).toFixed(2) }}
+                        <td class="py-2 px-3 text-slate-800">{{ row.population }}</td>
+                        <td class="py-2 px-3 text-slate-800">{{ (row.quota ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-3 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-3 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-3 font-semibold text-slate-800">
+                          {{ ((Number(row.surfaceWater) || 0) + (Number(row.groundwater) || 0)).toFixed(2) }}
                         </td>
                       </tr>
                     </tbody>
@@ -714,65 +523,65 @@
                   <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
                 </div>
 
-                <div class="border border-slate-200/90 rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
+                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
                   <table class="w-full text-xs text-center border-collapse min-w-[700px]">
-                    <thead class="bg-[#f8fafc] text-slate-700 font-medium border-b border-slate-200">
-                      <tr class="divide-x divide-slate-200">
-                        <th rowspan="2" class="py-1.5 px-2">主要产品</th>
-                        <th rowspan="2" class="py-1.5 px-2">产品定额</th>
-                        <th rowspan="2" class="py-1.5 px-2">年产量</th>
-                        <th rowspan="2" class="py-1.5 px-2">产品水量</th>
-                        <th rowspan="2" class="py-1.5 px-2">地表水</th>
-                        <th rowspan="2" class="py-1.5 px-2">地下水</th>
-                        <th colspan="5" class="py-1 px-2 border-b border-slate-200">非常规水</th>
-                        <th rowspan="2" class="py-1.5 px-2 font-semibold">总计</th>
+                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
+                      <tr class="divide-x divide-[#b8cde6]">
+                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">主要产品</th>
+                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">产品定额</th>
+                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">年产量</th>
+                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">产品水量</th>
+                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">地表水</th>
+                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">地下水</th>
+                        <th colspan="5" class="py-1 px-2 border-b border-r border-[#b8cde6]">非常规水</th>
+                        <th rowspan="2" class="py-2 px-2 font-semibold text-slate-800">总计</th>
                       </tr>
-                      <tr class="divide-x divide-slate-200 text-[10.5px]">
-                        <th class="py-1 px-1.5">再生水</th>
-                        <th class="py-1 px-1.5">雨水</th>
-                        <th class="py-1 px-1.5">矿井水</th>
-                        <th class="py-1 px-1.5">微咸水</th>
-                        <th class="py-1 px-1.5 text-emerald-700 font-semibold">非常规计</th>
+                      <tr class="divide-x divide-[#b8cde6] text-[11px]">
+                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">再生水</th>
+                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">雨水</th>
+                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">矿井水</th>
+                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">微咸水</th>
+                        <th class="py-1 px-1.5 font-semibold border-r border-[#b8cde6] text-slate-800">非常规计</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 font-mono text-[11.5px]">
+                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
                       <tr
-                        v-for="(row, idx) in form.industryWaterRows"
+                        v-for="(row, idx) in declaredIndustryRows"
                         :key="idx"
-                        class="divide-x divide-slate-100 hover:bg-slate-50/50"
+                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
                       >
-                        <td class="py-1.5 px-2">{{ row.productName }}</td>
-                        <td class="py-1.5 px-2">{{ row.quota.toFixed(2) }}</td>
-                        <td class="py-1.5 px-2">{{ row.output }}</td>
-                        <td class="py-1.5 px-2">{{ row.productVolume }}</td>
-                        <td class="py-1.5 px-2">{{ row.surfaceWater.toFixed(2) }}</td>
-                        <td class="py-1.5 px-2">{{ row.groundwater.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ row.recycledWater.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ row.rainWater.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ row.mineWater.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ row.brackishWater.toFixed(2) }}</td>
-                        <td class="py-1.5 px-2 font-semibold text-emerald-700">
-                          {{ ((row.recycledWater || 0) + (row.rainWater || 0) + (row.mineWater || 0) + (row.brackishWater || 0)).toFixed(2) }}
+                        <td class="py-2 px-2 text-slate-800">{{ row.productName }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.quota ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.output }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.productVolume }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (row.recycledWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (row.rainWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (row.mineWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (row.brackishWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 font-semibold text-slate-800">
+                          {{ ((Number(row.recycledWater) || 0) + (Number(row.rainWater) || 0) + (Number(row.mineWater) || 0) + (Number(row.brackishWater) || 0)).toFixed(2) }}
                         </td>
-                        <td class="py-1.5 px-2 font-semibold text-[#1677ff]">
-                          {{ ((row.surfaceWater || 0) + (row.groundwater || 0)).toFixed(2) }}
+                        <td class="py-2 px-2 font-semibold text-slate-800">
+                          {{ ((Number(row.surfaceWater) || 0) + (Number(row.groundwater) || 0)).toFixed(2) }}
                         </td>
                       </tr>
 
                       <!-- 合计行 -->
-                      <tr class="bg-blue-50/40 font-semibold divide-x divide-slate-200">
-                        <td class="py-1.5 px-2 font-sans">合计</td>
+                      <tr class="bg-[#f0f5fc] font-semibold divide-x divide-[#b8cde6] text-slate-800">
+                        <td class="py-2 px-2 font-sans text-slate-800">合计</td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="py-1.5 px-2">{{ industrySurfaceTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-2">{{ industryGroundTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ industryRecycledTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ industryRainTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ industryMineTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5">{{ industryBrackishTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-2 text-emerald-700">{{ industryUnconventionalTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-2 text-[#1677ff] font-bold">{{ (industrySurfaceTotal + industryGroundTotal).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (declaredIndustrySurfaceTotal ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (declaredIndustryGroundTotal ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryRecycledTotal ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryRainTotal ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryMineTotal ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryBrackishTotal ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800 font-bold">{{ (declaredIndustryUnconventionalTotal ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800 font-bold">{{ ((declaredIndustrySurfaceTotal || 0) + (declaredIndustryGroundTotal || 0)).toFixed(2) }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -789,34 +598,34 @@
                   <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
                 </div>
 
-                <div class="border border-slate-200/90 rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
+                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
                   <table class="w-full text-xs text-center border-collapse">
-                    <thead class="bg-[#f8fafc] text-slate-700 font-medium border-b border-slate-200 text-[11px]">
-                      <tr class="divide-x divide-slate-200">
-                        <th class="py-1.5 px-2">实际灌溉面积(亩)</th>
-                        <th class="py-1.5 px-2">年内灌溉次数</th>
-                        <th class="py-1.5 px-2">定额(m³/亩·次)</th>
-                        <th class="py-1.5 px-2">主要作物</th>
-                        <th class="py-1.5 px-2">灌溉方式</th>
-                        <th class="py-1.5 px-2">地表水</th>
-                        <th class="py-1.5 px-2">地下水</th>
-                        <th class="py-1.5 px-2 font-semibold">总计</th>
+                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6] text-[11px]">
+                      <tr class="divide-x divide-[#b8cde6]">
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">实际灌溉面积(亩)</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">年内灌溉次数</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">定额(m³/亩·次)</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">主要作物</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">灌溉方式</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">地表水</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">地下水</th>
+                        <th class="py-2 px-2 font-semibold text-slate-800">总计</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 font-mono text-[11.5px]">
+                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
                       <tr
-                        v-for="(row, idx) in form.agricultureWaterRows"
+                        v-for="(row, idx) in declaredAgriRows"
                         :key="idx"
-                        class="divide-x divide-slate-100 hover:bg-slate-50/50"
+                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
                       >
-                        <td class="py-2 px-2 text-slate-700">{{ row.area.toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.times }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.quota }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.area ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.times }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.quota }}</td>
                         <td class="py-2 px-2 font-sans text-slate-800">{{ row.crops }}</td>
-                        <td class="py-2 px-2 font-sans text-slate-700">{{ row.method }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.surfaceWater.toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.groundwater.toFixed(2) }}</td>
-                        <td class="py-2 px-2 font-semibold text-[#1677ff]">{{ row.total.toFixed(2) }}</td>
+                        <td class="py-2 px-2 font-sans text-slate-800">{{ row.method }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 font-semibold text-slate-800">{{ ((row.total ?? ((row.surfaceWater || 0) + (row.groundwater || 0)))).toFixed(2) }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -833,36 +642,95 @@
                   <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
                 </div>
 
-                <div class="border border-slate-200/90 rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
+                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
                   <table class="w-full text-xs text-center border-collapse">
-                    <thead class="bg-[#f8fafc] text-slate-700 font-medium border-b border-slate-200 text-[11px]">
-                      <tr class="divide-x divide-slate-200">
-                        <th class="py-1.5 px-2">机组台数</th>
-                        <th class="py-1.5 px-2">降级容量</th>
-                        <th class="py-1.5 px-2">年发电量</th>
-                        <th class="py-1.5 px-2">年利用小时</th>
-                        <th class="py-1.5 px-2">地表水</th>
-                        <th class="py-1.5 px-2">地下水</th>
-                        <th class="py-1.5 px-2">水电最小机组流量</th>
-                        <th class="py-1.5 px-2">火电最高小时用水</th>
-                        <th class="py-1.5 px-2 font-semibold">总计</th>
+                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6] text-[11px]">
+                      <tr class="divide-x divide-[#b8cde6]">
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">机组台数</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">降级容量</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">年发电量</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">年利用小时</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">地表水</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">地下水</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">水电最小机组流量</th>
+                        <th class="py-2 px-2 border-r border-[#b8cde6]">火电最高小时用水</th>
+                        <th class="py-2 px-2 font-semibold text-slate-800">总计</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 font-mono text-[11.5px]">
+                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
                       <tr
-                        v-for="(row, idx) in form.powerWaterRows"
+                        v-for="(row, idx) in declaredPowerRows"
                         :key="idx"
-                        class="divide-x divide-slate-100 hover:bg-slate-50/50"
+                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
                       >
-                        <td class="py-2 px-2 text-slate-700">{{ row.units }}台</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.capacity }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.generation }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.hours }}h</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.surfaceWater.toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.groundwater.toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.hydroMinFlow.toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-700">{{ row.thermalMaxHourly.toFixed(2) }}</td>
-                        <td class="py-2 px-2 font-semibold text-[#1677ff]">{{ row.total.toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.units }}台</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.capacity }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.generation }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ row.hours }}h</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.hydroMinFlow ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 text-slate-800">{{ (row.thermalMaxHourly ?? 0).toFixed(2) }}</td>
+                        <td class="py-2 px-2 font-semibold text-slate-800">{{ ((row.total ?? ((row.surfaceWater || 0) + (row.groundwater || 0)))).toFixed(2) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- 5. 申报1至12月用水总结表 -->
+              <div class="bg-white p-4 rounded-lg border border-[#b8cde6] shadow-2xs space-y-2">
+                <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
+                    <span class="font-bold text-slate-800 text-xs">5. 用水总结表（1至12月）</span>
+                  </div>
+                  <span class="text-[11px] font-mono text-slate-500">单位: 万m³</span>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar border border-[#b8cde6] rounded-md">
+                  <table class="w-full text-xs text-center border-collapse min-w-[720px]">
+                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
+                      <tr class="divide-x divide-[#b8cde6]">
+                        <th rowspan="2" class="py-1.5 px-2 w-14 border-r border-[#b8cde6]">月份</th>
+                        <th rowspan="2" class="py-1.5 px-2 min-w-[65px] border-r border-[#b8cde6]">地表水</th>
+                        <th rowspan="2" class="py-1.5 px-2 min-w-[65px] border-r border-[#b8cde6]">地下水</th>
+                        <th colspan="5" class="py-1 px-2 border-b border-r border-[#b8cde6]">非常规水</th>
+                        <th rowspan="2" class="py-1.5 px-2 min-w-[70px] font-semibold text-slate-800">总计</th>
+                      </tr>
+                      <tr class="divide-x divide-[#b8cde6] text-[11px]">
+                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">再生水</th>
+                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">雨水</th>
+                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">矿井水</th>
+                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">微咸水</th>
+                        <th class="py-1 px-1.5 min-w-[65px] font-semibold border-r border-[#b8cde6] text-slate-800">非常规计</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
+                      <tr
+                        v-for="(row, idx) in declaredMonthlyRows"
+                        :key="idx"
+                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
+                      >
+                        <td class="py-1 px-2 font-sans font-medium text-slate-800 bg-slate-50/50">{{ row.month }}</td>
+                        <td class="py-1 px-2 text-slate-800">{{ Number(row.surfaceWater || 0).toFixed(2) }}</td>
+                        <td class="py-1 px-2 text-slate-800">{{ Number(row.groundwater || 0).toFixed(2) }}</td>
+                        <td class="py-1 px-2 text-slate-800">{{ Number(row.recycledWater || 0).toFixed(2) }}</td>
+                        <td class="py-1 px-2 text-slate-800">{{ Number(row.rainWater || 0).toFixed(2) }}</td>
+                        <td class="py-1 px-2 text-slate-800">{{ Number(row.mineWater || 0).toFixed(2) }}</td>
+                        <td class="py-1 px-2 text-slate-800">{{ Number(row.brackishWater || 0).toFixed(2) }}</td>
+                        <td class="py-1 px-2 text-slate-800 font-semibold">{{ ((Number(row.recycledWater) || 0) + (Number(row.rainWater) || 0) + (Number(row.mineWater) || 0) + (Number(row.brackishWater) || 0)).toFixed(2) }}</td>
+                        <td class="py-1 px-2 font-semibold text-slate-800">{{ ((Number(row.surfaceWater) || 0) + (Number(row.groundwater) || 0) + (Number(row.recycledWater) || 0) + (Number(row.rainWater) || 0) + (Number(row.mineWater) || 0) + (Number(row.brackishWater) || 0)).toFixed(2) }}</td>
+                      </tr>
+                      <tr class="bg-[#f0f5fc] font-semibold divide-x divide-[#b8cde6] text-slate-800">
+                        <td class="py-1.5 px-2 font-sans text-slate-800">合计</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlySurfaceTotal.toFixed(2) }}</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyGroundTotal.toFixed(2) }}</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyRecycledTotal.toFixed(2) }}</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyRainTotal.toFixed(2) }}</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyMineTotal.toFixed(2) }}</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyBrackishTotal.toFixed(2) }}</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800 font-bold">{{ declaredMonthlyUnconvTotal.toFixed(2) }}</td>
+                        <td class="py-1.5 px-1.5 font-mono text-slate-800 font-bold">{{ declaredMonthlyGrandTotal.toFixed(2) }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -885,19 +753,19 @@
                 <div class="grid grid-cols-3 gap-3.5">
                   <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200/90">
                     <span class="text-slate-500 text-[11px] block mb-1">取水许可证年许可量</span>
-                    <span class="text-base font-bold font-mono text-slate-800">{{ form.permitVolume.toFixed(2) }}</span>
+                    <span class="text-base font-bold font-mono text-slate-800">{{ (form.permitVolume ?? 0).toFixed(2) }}</span>
                   </div>
 
                   <div class="p-3.5 bg-blue-50/50 rounded-lg border border-blue-200">
                     <span class="text-blue-600 text-[11px] font-medium block mb-1">申报核定计划总用水量</span>
                     <span class="text-base font-bold font-mono text-[#1677ff]">
-                      {{ (livingSurfaceTotal + livingGroundTotal + industrySurfaceTotal + industryGroundTotal).toFixed(2) }}
+                      {{ (planTotalVolume ?? 0).toFixed(2) }}
                     </span>
                   </div>
 
                   <div class="p-3.5 bg-emerald-50/50 rounded-lg border border-emerald-200">
                     <span class="text-emerald-700 text-[11px] font-medium block mb-1">非常规水源综合利用量</span>
-                    <span class="text-base font-bold font-mono text-emerald-600">{{ industryUnconventionalTotal.toFixed(2) }}</span>
+                    <span class="text-base font-bold font-mono text-emerald-600">{{ (planUnconventionalVolume ?? 0).toFixed(2) }}</span>
                   </div>
                 </div>
 
@@ -932,28 +800,219 @@
               </div>
             </div>
 
-            <!-- Tab 4: 用水定额及参考 -->
+            <!-- Tab 4: 用水定额标签页 (根据最新标准要求高保真重构) -->
             <div v-else-if="activeRightTab === 'water_quota'" class="space-y-4">
-              <div class="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs space-y-3.5">
-                <div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">
-                  <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                  <span class="font-bold text-slate-800 text-xs">青海省工业及城镇用水定额标准参考（西宁市现行实施版）</span>
+              
+              <!-- 模块 1: 近三年用水计划 -->
+              <div class="space-y-2">
+                <h4 class="text-sm font-bold text-slate-800 tracking-tight">近三年用水计划</h4>
+                
+                <div class="border border-[#b8cde6] rounded-md overflow-hidden bg-white shadow-2xs">
+                  <table class="w-full text-xs text-center border-collapse">
+                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
+                      <tr class="divide-x divide-[#b8cde6] text-xs">
+                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">年份</th>
+                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">地表水</th>
+                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">地下水</th>
+                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">再生水</th>
+                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">集蓄雨水</th>
+                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">矿坑（井）水</th>
+                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">微咸水</th>
+                        <th class="py-2.5 px-3 font-semibold text-slate-800">总计</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#b8cde6] font-mono text-xs">
+                      <tr
+                        v-for="row in recentThreeYearsPlan"
+                        :key="row.year"
+                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
+                      >
+                        <td class="py-2.5 px-3 text-slate-800 font-sans font-medium">{{ row.year }}</td>
+                        <td class="py-2.5 px-3 text-slate-800">{{ row.surfaceWater }}</td>
+                        <td class="py-2.5 px-3 text-slate-800">{{ row.groundwater }}</td>
+                        <td class="py-2.5 px-3 text-slate-800">{{ row.recycledWater }}</td>
+                        <td class="py-2.5 px-3 text-slate-800">{{ row.rainWater }}</td>
+                        <td class="py-2.5 px-3 text-slate-800">{{ row.mineWater }}</td>
+                        <td class="py-2.5 px-3 text-slate-800">{{ row.brackishWater }}</td>
+                        <td class="py-2.5 px-3 text-slate-800 font-semibold">{{ row.total }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <div class="space-y-2.5 text-xs text-slate-700">
-                  <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80">
-                    <strong class="text-slate-800 block mb-1">多晶硅与高纯半导体材料制造：</strong>
-                    <span class="text-slate-600">单位产品取水定额：≤ 18.5 m³/t，超纯水回收率要求 ≥ 80%。</span>
+              </div>
+
+              <!-- 模块 2: 用水定额工具栏与定额卡片列表 -->
+              <div class="space-y-3 pt-1">
+                <!-- 工具栏：用水定额标题 + 填报说明按钮 + 筛选项 -->
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <!-- 左侧标题与填报说明按钮 -->
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-sm font-bold text-slate-800">用水定额</span>
+                    <button
+                      type="button"
+                      @click="quotaGuideModalVisible = true"
+                      class="px-2.5 py-0.5 rounded bg-[#1677ff] hover:bg-blue-600 text-white text-xs font-medium transition cursor-pointer shadow-2xs"
+                    >
+                      填报说明
+                    </button>
                   </div>
-                  <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80">
-                    <strong class="text-slate-800 block mb-1">有色金属冶炼（电解铝）：</strong>
-                    <span class="text-slate-600">单位产品取水定额：≤ 4.20 m³/t，循环利用率要求 ≥ 95%。</span>
+
+                  <!-- 右侧检索筛选区 (与截图 100% 对应) -->
+                  <div class="flex items-center gap-2">
+                    <!-- 灌溉方式 -->
+                    <div class="relative w-28">
+                      <select
+                        v-model="quotaFilter.method"
+                        class="w-full h-7 pl-2.5 pr-6 bg-white border border-slate-300 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
+                      >
+                        <option value="全部">全部方式</option>
+                        <option value="常规灌溉">常规灌溉</option>
+                        <option value="喷灌">喷灌</option>
+                        <option value="微灌">微灌</option>
+                        <option value="滴灌">滴灌</option>
+                      </select>
+                      <svg class="w-3.5 h-3.5 absolute right-2 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
+
+                    <!-- 效率值 -->
+                    <div class="relative w-24">
+                      <select
+                        v-model="quotaFilter.efficiency"
+                        class="w-full h-7 pl-2.5 pr-6 bg-white border border-slate-300 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
+                      >
+                        <option value="全部">全部效率</option>
+                        <option value="50%">50%</option>
+                        <option value="60%">60%</option>
+                        <option value="70%">70%</option>
+                      </select>
+                      <svg class="w-3.5 h-3.5 absolute right-2 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
+
+                    <!-- 产品名称输入框 -->
+                    <div class="relative w-36">
+                      <input
+                        type="text"
+                        v-model="quotaFilter.keyword"
+                        placeholder="产品名称"
+                        class="w-full h-7 pl-2.5 pr-7 bg-white border border-slate-300 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] transition"
+                      />
+                      <svg class="w-3.5 h-3.5 absolute right-2 top-1.5 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                    </div>
                   </div>
-                  <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80">
-                    <strong class="text-slate-800 block mb-1">城镇综合生活居民人均定额：</strong>
-                    <span class="text-slate-600">城镇居民生活用水综合定额标准：120 - 150 L/(人·天)。</span>
+                </div>
+
+                <!-- 定额卡片列表 (与截图排版完全一致) -->
+                <div class="space-y-2.5">
+                  <div
+                    v-for="item in displayedQuotaList"
+                    :key="item.id"
+                    class="bg-[#f8fafc]/50 rounded-xl border border-slate-200/90 p-3.5 space-y-2.5 transition-all hover:border-[#bfdbfe] hover:bg-white shadow-2xs"
+                  >
+                    <!-- 顶部标题与浅绿药丸标签 -->
+                    <div class="flex flex-wrap items-center gap-2.5">
+                      <span class="font-normal text-slate-800 text-xs tracking-tight">
+                        {{ item.code }}【{{ item.category }}】：{{ item.productName }}
+                      </span>
+                      
+                      <!-- 标签组 -->
+                      <div v-if="item.efficiency || item.topography || item.altitude" class="flex items-center gap-2">
+                        <span
+                          v-if="item.efficiency"
+                          class="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] font-normal text-[11px]"
+                        >
+                          效率值: {{ item.efficiency }}
+                        </span>
+                        <span
+                          v-if="item.topography"
+                          class="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] font-normal text-[11px]"
+                        >
+                          地貌分区: {{ item.topography }}
+                        </span>
+                        <span
+                          v-if="item.altitude"
+                          class="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] font-normal text-[11px]"
+                        >
+                          海拔: {{ item.altitude }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- 属性网格：单位用水定额 / 灌溉方式 / 水资源分区 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-400">
+                      <div>
+                        单位用水定额：<span class="text-slate-600 font-mono">{{ item.quotaValue }}</span>
+                      </div>
+                      <div>
+                        灌溉方式：<span class="text-slate-600">{{ item.method }}</span>
+                      </div>
+                      <div>
+                        水资源分区：<span class="text-slate-600">{{ item.waterRegion }}</span>
+                      </div>
+                    </div>
+
+                    <!-- 分区范围 -->
+                    <div class="text-xs text-slate-400">
+                      分区范围：<span class="text-slate-600">{{ item.regionScope }}</span>
+                    </div>
+                  </div>
+
+                  <!-- 空状态 -->
+                  <div v-if="displayedQuotaList.length === 0" class="py-8 text-center text-slate-400 text-xs">
+                    暂无符合筛选条件的用水定额信息
+                  </div>
+                </div>
+
+                <!-- 底部翻页组件 (与截图中的 < 1 [2] 3 4 5 > 样式完全一致) -->
+                <div class="flex items-center justify-end pt-2">
+                  <div class="flex items-center gap-1.5 text-xs text-slate-600 select-none">
+                    <!-- 上一页 -->
+                    <button
+                      type="button"
+                      :disabled="quotaCurrentPage === 1"
+                      @click="quotaCurrentPage > 1 && quotaCurrentPage--"
+                      class="w-7 h-7 rounded border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                      </svg>
+                    </button>
+
+                    <!-- 页码 1 到 5 (第2页高亮选中蓝框) -->
+                    <button
+                      v-for="page in quotaTotalPages"
+                      :key="page"
+                      type="button"
+                      @click="quotaCurrentPage = page"
+                      class="w-7 h-7 rounded border text-xs font-normal transition cursor-pointer flex items-center justify-center"
+                      :class="quotaCurrentPage === page
+                        ? 'border-[#1677ff] text-[#1677ff] bg-white font-medium shadow-2xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
+                    >
+                      {{ page }}
+                    </button>
+
+                    <!-- 下一页 -->
+                    <button
+                      type="button"
+                      :disabled="quotaCurrentPage === quotaTotalPages"
+                      @click="quotaCurrentPage < quotaTotalPages && quotaCurrentPage++"
+                      class="w-7 h-7 rounded border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
+
             </div>
 
             <!-- Tab 5: 申报材料与佐证附件 (完全与计量设施档案列表查看附件样式一致) -->
@@ -1054,20 +1113,8 @@
 
       </div>
 
-      <!-- 3. 全局底部操作栏 (完全同计量设施管理编辑/详情弹窗，左侧信息、右侧取消/驳回/通过按钮) -->
-      <div class="px-5 py-2.5 bg-white border-t border-slate-200/80 flex items-center justify-between shrink-0">
-        <!-- 左侧状态与计算统计信息 -->
-        <div class="flex items-center gap-3 text-xs text-slate-500">
-          <span class="flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-            当前审批节点: <strong class="text-slate-800">{{ record.status }}</strong>
-          </span>
-          <span class="text-slate-300">|</span>
-          <span>核定计划总量: <strong class="text-[#1677ff] font-mono font-bold">{{ (livingSurfaceTotal + livingGroundTotal + industrySurfaceTotal + industryGroundTotal).toFixed(2) }}</strong> 万m³</span>
-          <span class="text-slate-300">|</span>
-          <span>非常规水利用: <strong class="text-emerald-600 font-mono font-bold">{{ industryUnconventionalTotal.toFixed(2) }}</strong> 万m³</span>
-        </div>
-
+      <!-- 3. 全局底部操作栏 (右侧取消/驳回/通过按钮) -->
+      <div class="px-5 py-2.5 bg-white border-t border-slate-200/80 flex items-center justify-end shrink-0">
         <!-- 右侧操作按钮组 -->
         <div class="flex items-center gap-2.5">
           <button
@@ -1104,6 +1151,47 @@
         </div>
       </div>
     </div>
+
+    <!-- 填报说明弹窗 -->
+    <t-dialog
+      v-model:visible="quotaGuideModalVisible"
+      header="用水定额填报与审核说明"
+      width="560px"
+      :footer="false"
+    >
+      <div class="p-3 text-xs text-slate-700 space-y-3">
+        <div class="p-3 bg-blue-50/60 rounded-lg border border-blue-100 space-y-1">
+          <div class="font-semibold text-[#1677ff] flex items-center gap-1.5">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>定额执行标准依据</span>
+          </div>
+          <p class="text-slate-600 leading-relaxed pl-5.5">
+            依据青海省水利厅现行《青海省主要工业及农业用水定额标准》、《西宁市实行最严格水资源管理制度考核实施方案》，对辖区内重点用水户实施刚性定额约束管控。
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <h5 class="font-semibold text-slate-800">一、农作物与经济作物定额说明</h5>
+          <p class="text-slate-600 leading-relaxed">
+            1. <strong>灌溉方式划分：</strong>常规灌溉定额标准基准值按 50% 效率设定，采用喷灌、微灌、滴灌等高效节水灌溉技术时，相应定额核减 15%~30%。
+          </p>
+          <p class="text-slate-600 leading-relaxed">
+            2. <strong>地貌与海拔修正：</strong>浅山、脑山、川水等不同分区由于降雨蒸发差异，定额区间按流域分区标准严格核验。
+          </p>
+        </div>
+
+        <div class="space-y-2 pt-1 border-t border-slate-100">
+          <h5 class="font-semibold text-slate-800">二、近三年用水计划比对规则</h5>
+          <p class="text-slate-600 leading-relaxed">
+            审批人员需根据申请主体近三年实际用水台账、历史结余指标及节水型载体创建情况，综合核定本年度水源结构配比。
+          </p>
+        </div>
+      </div>
+    </t-dialog>
 
     <!-- 附件在线预览弹窗 (与计量设施档案列表查看完全一致) -->
     <t-dialog
@@ -1144,9 +1232,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
-import type { WaterPlanRecord } from '../../../types';
+import type { WaterPlanRecord, FormQuotaData, MonthlySummaryRow } from '../../../types';
+import WaterQuotaAuditForm from './WaterQuotaAuditForm.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -1162,12 +1251,136 @@ const rightTabs = [
   { key: 'plan_application', label: '计划申请填报表' },
   { key: 'summary', label: '取水总结填报表' },
   { key: 'electronic_license', label: '电子证照信息' },
-  { key: 'water_quota', label: '用水定额及参考' },
+  { key: 'water_quota', label: '用水定额' },
   { key: 'attachments', label: '佐证材料与附件' },
 ];
 
 const activeRightTab = ref<'summary' | 'plan_application' | 'electronic_license' | 'water_quota' | 'attachments'>('plan_application');
 const auditOpinion = ref('经审查，该单位用水计划指标符合西宁市刚性约束管控方案与行业定额，予以审核通过。');
+
+// 近三年用水计划数据 (与截图完全一致)
+const recentThreeYearsPlan = ref([
+  { year: '2025', surfaceWater: '0.00', groundwater: '0.01', recycledWater: '0.02', rainWater: '0.00', mineWater: '0.01', brackishWater: '0.00', total: '0.01' },
+  { year: '2024', surfaceWater: '0.03', groundwater: '0.04', recycledWater: '0.05', rainWater: '0.03', mineWater: '0.04', brackishWater: '0.03', total: '0.04' },
+  { year: '2023', surfaceWater: '0.06', groundwater: '0.07', recycledWater: '0.08', rainWater: '0.06', mineWater: '0.07', brackishWater: '0.06', total: '0.07' },
+]);
+
+// 填报说明弹窗
+const quotaGuideModalVisible = ref(false);
+
+// 用水定额卡片数据项接口
+interface QuotaCardItem {
+  id: string;
+  code: string;
+  category: string;
+  productName: string;
+  efficiency?: string;
+  topography?: string;
+  altitude?: string;
+  quotaValue: string;
+  method: string;
+  waterRegion: string;
+  regionScope: string;
+}
+
+// 用水定额筛选条件
+const quotaFilter = reactive({
+  method: '常规灌溉',
+  efficiency: '50%',
+  keyword: '',
+});
+
+// 当前激活页码 (第2页高亮选中，与截图一致)
+const quotaCurrentPage = ref(2);
+const quotaTotalPages = 5;
+
+// 用水定额卡片基础数据 (与截图 100% 对应)
+const allQuotaList = ref<QuotaCardItem[]>([
+  {
+    id: 'q-1',
+    code: 'A019283',
+    category: '小麦种植类',
+    productName: '小麦',
+    efficiency: '50%',
+    topography: '浅山',
+    altitude: '高',
+    quotaValue: '<=280L/(人·d))',
+    method: '常规灌溉',
+    waterRegion: '湟水',
+    regionScope: '湟源、西宁、大通、湟中、互助、平安、乐都、民和(川口地区)',
+  },
+  {
+    id: 'q-2',
+    code: 'A019283',
+    category: '小麦种植类',
+    productName: '小麦',
+    efficiency: '50%',
+    topography: '浅山',
+    altitude: '高',
+    quotaValue: '<=280L/(人·d))',
+    method: '常规灌溉',
+    waterRegion: '玛曲龙羊峡',
+    regionScope: '湟源、西宁、大通、湟中、互助、平安、乐都、民和(川口地区)',
+  },
+  {
+    id: 'q-3',
+    code: 'A019283',
+    category: '小麦种植类',
+    productName: '小麦',
+    quotaValue: '<=280L/(人·d))',
+    method: '常规灌溉',
+    waterRegion: '柴达木盆地',
+    regionScope: '湟源、西宁、大通、湟中、互助、平安、乐都、民和(川口地区)',
+  },
+  {
+    id: 'q-4',
+    code: 'A019284',
+    category: '小麦种植类',
+    productName: '冬小麦',
+    efficiency: '50%',
+    topography: '川水',
+    altitude: '中',
+    quotaValue: '<=260L/(人·d))',
+    method: '常规灌溉',
+    waterRegion: '湟水',
+    regionScope: '西宁、大通、湟中、互助、平安',
+  },
+  {
+    id: 'q-5',
+    code: 'A019285',
+    category: '杂粮种植类',
+    productName: '高原青稞',
+    efficiency: '60%',
+    topography: '脑山',
+    altitude: '高',
+    quotaValue: '<=220L/(人·d))',
+    method: '喷灌',
+    waterRegion: '玛曲龙羊峡',
+    regionScope: '湟源、大通、湟中',
+  },
+]);
+
+// 过滤后的定额列表
+const displayedQuotaList = computed(() => {
+  return allQuotaList.value.filter((item) => {
+    if (quotaFilter.method !== '全部' && item.method !== quotaFilter.method) {
+      return false;
+    }
+    if (quotaFilter.efficiency !== '全部' && item.efficiency && item.efficiency !== quotaFilter.efficiency) {
+      return false;
+    }
+    if (quotaFilter.keyword.trim()) {
+      const kw = quotaFilter.keyword.trim();
+      return (
+        item.productName.includes(kw) ||
+        item.category.includes(kw) ||
+        item.code.includes(kw) ||
+        item.waterRegion.includes(kw)
+      );
+    }
+    return true;
+  });
+});
 
 // 附件列表与在线预览 (与计量设施档案列表查看一致)
 const attachments = ref([
@@ -1191,7 +1404,11 @@ const downloadAttachment = (att: { name: string }) => {
   MessagePlugin.success(`已开始下载附件：${att.name}`);
 };
 
-// 可编辑表单核心数据模型
+// 视图模式与双表单切换
+const formsViewMode = ref<'tab' | 'stacked'>('tab');
+const activeFormTab = ref<'actual' | 'plan'>('actual');
+
+// 可编辑表单核心数据模型（基础信息）
 const form = ref({
   waterOwner: '青海亚洲硅业高纯材料有限公司',
   permitNumber: 'B630121G2026-0055',
@@ -1202,9 +1419,98 @@ const form = ref({
   email: 'water_plan@asia-silicon.com',
   annualOutputValue: 2800,
   detailedAddress: '青海省西宁市东川工业园区金牛路18号',
-  year: '2026',
+  year: '2026'
+});
 
-  // 生活用水行
+const currentYear = computed(() => {
+  const y = Number(form.value.year) || 2026;
+  return `${y - 1}`;
+});
+
+const nextYear = computed(() => {
+  return form.value.year || '2026';
+});
+
+// 表单一：本年实际用水填报数据工厂 (生活、工业、农业、发电)
+const createInitialActualData = (): FormQuotaData => ({
+  livingWaterRows: [
+    {
+      type: '城镇居民生活',
+      quota: 30.0,
+      population: 320,
+      surfaceWater: 210.5,
+      groundwater: 205.2
+    }
+  ],
+  industryWaterRows: [
+    {
+      productName: '高纯多晶硅',
+      quota: 14.5,
+      output: '2.4万吨',
+      productVolume: '34.80',
+      surfaceWater: 7.5,
+      groundwater: 8.6,
+      recycledWater: 9.5,
+      rainWater: 10.2,
+      mineWater: 0.0,
+      brackishWater: 0.0
+    },
+    {
+      productName: '单晶硅拉棒',
+      quota: 8.2,
+      output: '1.1万吨',
+      productVolume: '9.02',
+      surfaceWater: 4.2,
+      groundwater: 3.2,
+      recycledWater: 4.8,
+      rainWater: 1.8,
+      mineWater: 0.0,
+      brackishWater: 0.0
+    }
+  ],
+  agricultureWaterRows: [
+    {
+      area: 21500.0,
+      times: 4,
+      quota: 95,
+      crops: '小麦、青稞',
+      method: '喷灌',
+      surfaceWater: 0.18,
+      groundwater: 0.19,
+      total: 21.85
+    }
+  ],
+  powerWaterRows: [
+    {
+      units: 2,
+      capacity: '600MW',
+      generation: '34.2亿',
+      hours: 5700,
+      surfaceWater: 11.8,
+      groundwater: 0.0,
+      hydroMinFlow: 0.0,
+      thermalMaxHourly: 140.0,
+      total: 11.8
+    }
+  ],
+  monthlySummaryRows: [
+    { month: '1月', surfaceWater: 18.20, groundwater: 16.80, recycledWater: 1.10, rainWater: 0.10, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '2月', surfaceWater: 17.50, groundwater: 16.20, recycledWater: 1.05, rainWater: 0.15, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '3月', surfaceWater: 19.10, groundwater: 17.50, recycledWater: 1.15, rainWater: 0.35, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '4月', surfaceWater: 19.80, groundwater: 18.20, recycledWater: 1.20, rainWater: 0.60, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '5月', surfaceWater: 20.50, groundwater: 19.10, recycledWater: 1.25, rainWater: 1.10, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '6月', surfaceWater: 21.20, groundwater: 19.80, recycledWater: 1.30, rainWater: 1.80, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '7月', surfaceWater: 21.80, groundwater: 20.10, recycledWater: 1.35, rainWater: 2.60, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '8月', surfaceWater: 21.50, groundwater: 19.90, recycledWater: 1.30, rainWater: 2.50, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '9月', surfaceWater: 20.10, groundwater: 18.60, recycledWater: 1.25, rainWater: 1.50, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '10月', surfaceWater: 19.40, groundwater: 17.80, recycledWater: 1.20, rainWater: 0.80, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '11月', surfaceWater: 18.00, groundwater: 16.90, recycledWater: 1.10, rainWater: 0.30, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '12月', surfaceWater: 17.08, groundwater: 16.29, recycledWater: 1.05, rainWater: 0.20, mineWater: 0.0, brackishWater: 0.0 }
+  ]
+});
+
+// 表单二：下年度计划用水填报数据工厂 (生活、工业、农业、发电、总结表)
+const createInitialPlanData = (): FormQuotaData => ({
   livingWaterRows: [
     {
       type: '城镇居民生活',
@@ -1214,12 +1520,10 @@ const form = ref({
       groundwater: 232.0
     }
   ],
-
-  // 工业用水行
   industryWaterRows: [
     {
       productName: '高纯多晶硅',
-      quota: 14.50,
+      quota: 14.5,
       output: '2.5万吨',
       productVolume: '36.25',
       surfaceWater: 8.0,
@@ -1231,7 +1535,7 @@ const form = ref({
     },
     {
       productName: '单晶硅拉棒',
-      quota: 8.20,
+      quota: 8.2,
       output: '1.2万吨',
       productVolume: '9.84',
       surfaceWater: 4.5,
@@ -1242,8 +1546,6 @@ const form = ref({
       brackishWater: 0.0
     }
   ],
-
-  // 农业用水行
   agricultureWaterRows: [
     {
       area: 23243.87,
@@ -1251,29 +1553,44 @@ const form = ref({
       quota: 98,
       crops: '小麦、青稞、油菜',
       method: '喷灌/滴灌',
-      surfaceWater: 0.20,
+      surfaceWater: 0.2,
       groundwater: 0.21,
       total: 23.66
     }
   ],
-
-  // 发电用水行
   powerWaterRows: [
     {
       units: 2,
       capacity: '600MW',
       generation: '35.4亿',
       hours: 5800,
-      surfaceWater: 12.50,
-      groundwater: 0.00,
-      hydroMinFlow: 0.00,
-      thermalMaxHourly: 145.00,
-      total: 12.50
+      surfaceWater: 12.5,
+      groundwater: 0.0,
+      hydroMinFlow: 0.0,
+      thermalMaxHourly: 145.0,
+      total: 12.5
     }
+  ],
+  monthlySummaryRows: [
+    { month: '1月', surfaceWater: 20.10, groundwater: 19.00, recycledWater: 1.15, rainWater: 0.10, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '2月', surfaceWater: 19.50, groundwater: 18.30, recycledWater: 1.10, rainWater: 0.15, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '3月', surfaceWater: 21.00, groundwater: 19.80, recycledWater: 1.20, rainWater: 0.40, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '4月', surfaceWater: 21.80, groundwater: 20.50, recycledWater: 1.25, rainWater: 0.70, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '5月', surfaceWater: 22.70, groundwater: 21.40, recycledWater: 1.30, rainWater: 1.20, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '6月', surfaceWater: 23.50, groundwater: 22.20, recycledWater: 1.35, rainWater: 1.95, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '7月', surfaceWater: 24.20, groundwater: 22.80, recycledWater: 1.40, rainWater: 2.80, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '8月', surfaceWater: 23.90, groundwater: 22.50, recycledWater: 1.35, rainWater: 2.70, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '9月', surfaceWater: 22.30, groundwater: 21.00, recycledWater: 1.30, rainWater: 1.60, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '10月', surfaceWater: 21.50, groundwater: 20.20, recycledWater: 1.25, rainWater: 0.90, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '11月', surfaceWater: 20.00, groundwater: 18.90, recycledWater: 1.20, rainWater: 0.30, mineWater: 0.0, brackishWater: 0.0 },
+    { month: '12月', surfaceWater: 18.70, groundwater: 18.11, recycledWater: 1.15, rainWater: 0.20, mineWater: 0.0, brackishWater: 0.0 }
   ]
 });
 
-// 监听选中的 record 初始化表单
+const actualQuotaForm = ref<FormQuotaData>(createInitialActualData());
+const planQuotaForm = ref<FormQuotaData>(createInitialPlanData());
+
+// 监听选中的 record 初始化基础信息与双表单
 watch(
   () => props.record,
   (rec) => {
@@ -1285,87 +1602,126 @@ watch(
       form.value.detailedAddress = `青海省西宁市${rec.district}重点产业园区`;
       activeRightTab.value = 'plan_application';
       auditOpinion.value = `经对【${rec.unitName}】${rec.year}年度用水计划进行合规核查，指标测算合理，准予核定通过。`;
+
+      // 重置或自适应数据
+      actualQuotaForm.value = createInitialActualData();
+      planQuotaForm.value = createInitialPlanData();
+      if (rec.planVolume) {
+        // 如果有已有指标，做微调匹配
+        const diffRatio = rec.planVolume > 0 ? rec.planVolume / 500 : 1;
+        if (diffRatio > 0 && Math.abs(diffRatio - 1) > 0.1) {
+          planQuotaForm.value.livingWaterRows[0].surfaceWater = Number((234 * diffRatio * 0.5).toFixed(2));
+          planQuotaForm.value.livingWaterRows[0].groundwater = Number((232 * diffRatio * 0.5).toFixed(2));
+        }
+      }
     }
   },
   { immediate: true }
 );
 
-// 生活用水自动计算合计
-const livingSurfaceTotal = computed(() => {
-  return form.value.livingWaterRows.reduce((acc, row) => acc + (Number(row.surfaceWater) || 0), 0);
-});
+// 统计核算工具函数
+const calcQuotaFormTotals = (formData: FormQuotaData) => {
+  const livingSurface = (formData.livingWaterRows || []).reduce((acc, r) => acc + (Number(r.surfaceWater) || 0), 0);
+  const livingGround = (formData.livingWaterRows || []).reduce((acc, r) => acc + (Number(r.groundwater) || 0), 0);
 
-const livingGroundTotal = computed(() => {
-  return form.value.livingWaterRows.reduce((acc, row) => acc + (Number(row.groundwater) || 0), 0);
-});
+  const industrySurface = (formData.industryWaterRows || []).reduce((acc, r) => acc + (Number(r.surfaceWater) || 0), 0);
+  const industryGround = (formData.industryWaterRows || []).reduce((acc, r) => acc + (Number(r.groundwater) || 0), 0);
+  const industryUnconv = (formData.industryWaterRows || []).reduce(
+    (acc, r) =>
+      acc +
+      (Number(r.recycledWater) || 0) +
+      (Number(r.rainWater) || 0) +
+      (Number(r.mineWater) || 0) +
+      (Number(r.brackishWater) || 0),
+    0
+  );
 
-// 工业用水自动计算合计
-const industrySurfaceTotal = computed(() => {
-  return form.value.industryWaterRows.reduce((acc, row) => acc + (Number(row.surfaceWater) || 0), 0);
-});
+  const agriSurface = (formData.agricultureWaterRows || []).reduce((acc, r) => acc + (Number(r.surfaceWater) || 0), 0);
+  const agriGround = (formData.agricultureWaterRows || []).reduce((acc, r) => acc + (Number(r.groundwater) || 0), 0);
 
-const industryGroundTotal = computed(() => {
-  return form.value.industryWaterRows.reduce((acc, row) => acc + (Number(row.groundwater) || 0), 0);
-});
+  const powerSurface = (formData.powerWaterRows || []).reduce((acc, r) => acc + (Number(r.surfaceWater) || 0), 0);
+  const powerGround = (formData.powerWaterRows || []).reduce((acc, r) => acc + (Number(r.groundwater) || 0), 0);
 
-const industryRecycledTotal = computed(() => {
-  return form.value.industryWaterRows.reduce((acc, row) => acc + (Number(row.recycledWater) || 0), 0);
-});
+  const surfaceTotal = livingSurface + industrySurface + agriSurface + powerSurface;
+  const groundTotal = livingGround + industryGround + agriGround + powerGround;
+  const totalVolume = surfaceTotal + groundTotal;
 
-const industryRainTotal = computed(() => {
-  return form.value.industryWaterRows.reduce((acc, row) => acc + (Number(row.rainWater) || 0), 0);
-});
-
-const industryMineTotal = computed(() => {
-  return form.value.industryWaterRows.reduce((acc, row) => acc + (Number(row.mineWater) || 0), 0);
-});
-
-const industryBrackishTotal = computed(() => {
-  return form.value.industryWaterRows.reduce((acc, row) => acc + (Number(row.brackishWater) || 0), 0);
-});
-
-const industryUnconventionalTotal = computed(() => {
-  return industryRecycledTotal.value + industryRainTotal.value + industryMineTotal.value + industryBrackishTotal.value;
-});
-
-// 操作函数：生活用水增删行
-const addLivingRow = () => {
-  form.value.livingWaterRows.push({
-    type: '综合生活用水',
-    quota: 30.0,
-    population: 100,
-    surfaceWater: 0.0,
-    groundwater: 0.0
-  });
+  return {
+    surfaceTotal,
+    groundTotal,
+    unconventionalTotal: industryUnconv,
+    totalVolume
+  };
 };
 
-const deleteLivingRow = (idx: number) => {
-  if (form.value.livingWaterRows.length > 1) {
-    form.value.livingWaterRows.splice(idx, 1);
-  }
-};
+const actualTotals = computed(() => calcQuotaFormTotals(actualQuotaForm.value));
+const planTotals = computed(() => calcQuotaFormTotals(planQuotaForm.value));
 
-// 操作函数：工业用水增删行
-const addIndustryRow = () => {
-  form.value.industryWaterRows.push({
-    productName: '',
-    quota: 0.0,
-    output: '',
-    productVolume: '',
-    surfaceWater: 0.0,
-    groundwater: 0.0,
-    recycledWater: 0.0,
-    rainWater: 0.0,
-    mineWater: 0.0,
-    brackishWater: 0.0
-  });
-};
+const actualTotalVolume = computed(() => actualTotals.value.totalVolume);
+const planTotalVolume = computed(() => planTotals.value.totalVolume);
+const planUnconventionalVolume = computed(() => planTotals.value.unconventionalTotal);
 
-const deleteIndustryRow = (idx: number) => {
-  if (form.value.industryWaterRows.length > 1) {
-    form.value.industryWaterRows.splice(idx, 1);
-  }
-};
+const declaredLivingRows = computed(() => planQuotaForm.value?.livingWaterRows || []);
+const declaredIndustryRows = computed(() => planQuotaForm.value?.industryWaterRows || []);
+const declaredAgriRows = computed(() => planQuotaForm.value?.agricultureWaterRows || []);
+const declaredPowerRows = computed(() => planQuotaForm.value?.powerWaterRows || []);
+
+const declaredIndustrySurfaceTotal = computed(() =>
+  declaredIndustryRows.value.reduce((acc, r) => acc + (Number(r.surfaceWater) || 0), 0)
+);
+const declaredIndustryGroundTotal = computed(() =>
+  declaredIndustryRows.value.reduce((acc, r) => acc + (Number(r.groundwater) || 0), 0)
+);
+const declaredIndustryRecycledTotal = computed(() =>
+  declaredIndustryRows.value.reduce((acc, r) => acc + (Number(r.recycledWater) || 0), 0)
+);
+const declaredIndustryRainTotal = computed(() =>
+  declaredIndustryRows.value.reduce((acc, r) => acc + (Number(r.rainWater) || 0), 0)
+);
+const declaredIndustryMineTotal = computed(() =>
+  declaredIndustryRows.value.reduce((acc, r) => acc + (Number(r.mineWater) || 0), 0)
+);
+const declaredIndustryBrackishTotal = computed(() =>
+  declaredIndustryRows.value.reduce((acc, r) => acc + (Number(r.brackishWater) || 0), 0)
+);
+const declaredIndustryUnconventionalTotal = computed(() =>
+  declaredIndustryRecycledTotal.value +
+  declaredIndustryRainTotal.value +
+  declaredIndustryMineTotal.value +
+  declaredIndustryBrackishTotal.value
+);
+
+const declaredMonthlyRows = computed(() => planQuotaForm.value?.monthlySummaryRows || []);
+
+const declaredMonthlySurfaceTotal = computed(() =>
+  declaredMonthlyRows.value.reduce((acc, r) => acc + (Number(r.surfaceWater) || 0), 0)
+);
+const declaredMonthlyGroundTotal = computed(() =>
+  declaredMonthlyRows.value.reduce((acc, r) => acc + (Number(r.groundwater) || 0), 0)
+);
+const declaredMonthlyRecycledTotal = computed(() =>
+  declaredMonthlyRows.value.reduce((acc, r) => acc + (Number(r.recycledWater) || 0), 0)
+);
+const declaredMonthlyRainTotal = computed(() =>
+  declaredMonthlyRows.value.reduce((acc, r) => acc + (Number(r.rainWater) || 0), 0)
+);
+const declaredMonthlyMineTotal = computed(() =>
+  declaredMonthlyRows.value.reduce((acc, r) => acc + (Number(r.mineWater) || 0), 0)
+);
+const declaredMonthlyBrackishTotal = computed(() =>
+  declaredMonthlyRows.value.reduce((acc, r) => acc + (Number(r.brackishWater) || 0), 0)
+);
+const declaredMonthlyUnconvTotal = computed(() =>
+  declaredMonthlyRecycledTotal.value +
+  declaredMonthlyRainTotal.value +
+  declaredMonthlyMineTotal.value +
+  declaredMonthlyBrackishTotal.value
+);
+const declaredMonthlyGrandTotal = computed(() =>
+  declaredMonthlySurfaceTotal.value +
+  declaredMonthlyGroundTotal.value +
+  declaredMonthlyUnconvTotal.value
+);
 
 const handleClose = () => {
   emit('update:visible', false);
@@ -1375,9 +1731,7 @@ const handleClose = () => {
 const handleApprove = () => {
   if (!props.record) return;
 
-  const calculatedTotal = Number(
-    (livingSurfaceTotal.value + livingGroundTotal.value + industrySurfaceTotal.value + industryGroundTotal.value).toFixed(2)
-  );
+  const calculatedTotal = Number(planTotals.value.totalVolume.toFixed(2));
 
   const updated: WaterPlanRecord = {
     ...props.record,
@@ -1385,14 +1739,53 @@ const handleApprove = () => {
     permitNumber: form.value.permitNumber,
     permitVolume: form.value.permitVolume,
     planVolume: calculatedTotal > 0 ? calculatedTotal : props.record.planVolume,
-    surfaceWater: Number((livingSurfaceTotal.value + industrySurfaceTotal.value).toFixed(2)),
-    groundwater: Number((livingGroundTotal.value + industryGroundTotal.value).toFixed(2)),
-    unconventionalTotal: Number(industryUnconventionalTotal.value.toFixed(2)),
+    surfaceWater: Number(planTotals.value.surfaceTotal.toFixed(2)),
+    groundwater: Number(planTotals.value.groundTotal.toFixed(2)),
+    unconventionalTotal: Number(planTotals.value.unconventionalTotal.toFixed(2)),
     status: '审核通过',
     auditor: '审核专员（西宁水务局）',
     auditDate: new Date().toISOString().slice(0, 19).replace('T', ' '),
     auditOpinion: auditOpinion.value,
     approvedVolume: calculatedTotal > 0 ? calculatedTotal : props.record.planVolume,
+    actualWaterQuota: JSON.parse(JSON.stringify(actualQuotaForm.value)),
+    planWaterQuota: JSON.parse(JSON.stringify(planQuotaForm.value)),
+    documentIssues: [
+      {
+        id: `issue-${Date.now()}`,
+        title: `关于下达${form.value.waterOwner}${form.value.year}年度计划用水指标核定批复的通知`,
+        noticeType: '正式用水计划通知',
+        issuerUnit: '西宁市水资源管理委员会办公室',
+        issueTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        issueEvent: `${form.value.year}年度计划用水审批核定通过下发`,
+        docNumber: `宁水资审〔${form.value.year}〕第 ${Math.floor(100 + Math.random() * 900)} 号`,
+        approvedTotalVolume: calculatedTotal > 0 ? calculatedTotal : props.record.planVolume,
+        remarks: auditOpinion.value,
+        files: [
+          {
+            id: `f-${Date.now()}-1`,
+            name: `${form.value.year}年度计划用水指标正式核定通知书(红头盖章件).pdf`,
+            type: 'pdf',
+            size: '3.8 MB',
+            uploadTime: new Date().toISOString().slice(0, 16).replace('T', ' ')
+          },
+          {
+            id: `f-${Date.now()}-2`,
+            name: `${form.value.waterOwner}核定用水定额分项明细表.xlsx`,
+            type: 'excel',
+            size: '1.4 MB',
+            uploadTime: new Date().toISOString().slice(0, 16).replace('T', ' ')
+          },
+          {
+            id: `f-${Date.now()}-3`,
+            name: `计划用水监督管理告知承诺回执单.docx`,
+            type: 'word',
+            size: '560 KB',
+            uploadTime: new Date().toISOString().slice(0, 16).replace('T', ' ')
+          }
+        ]
+      },
+      ...(props.record.documentIssues || [])
+    ],
     auditHistory: [
       ...(props.record.auditHistory || []),
       {

@@ -377,25 +377,6 @@
 
         <!-- Submenu items under 数据治理 -->
         <div v-show="isDataGovernanceExpanded" class="pl-3 pr-1 py-1 space-y-1">
-          <!-- 违规问题处理 (新功能页面) -->
-          <button
-            type="button"
-            @click="selectMenu('violation_handling')"
-            :class="[
-              'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition cursor-pointer',
-              activeMenu === 'violation_handling'
-                ? 'bg-white text-[#2563EB] font-bold shadow-sm'
-                : 'text-white/85 hover:bg-white/10 hover:text-white'
-            ]"
-          >
-            <svg class="w-4 h-4 shrink-0" :class="activeMenu === 'violation_handling' ? 'text-[#2563EB]' : 'text-white'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <span class="truncate">违规问题处理</span>
-          </button>
-
           <!-- 证照数据治理 -->
           <button
             type="button"
@@ -450,22 +431,181 @@
         </svg>
       </button>
 
-      <!-- 数据质量控制 -->
-      <button
-        type="button"
-        @click="notifyStub('数据质量控制')"
-        class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white/90 hover:bg-white/10 hover:text-white transition cursor-pointer text-left"
-      >
-        <div class="flex items-center gap-2.5 min-w-0">
-          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      <!-- 数据质量控制 (Expandable Group with 2nd & 3rd submenus) -->
+      <div>
+        <button
+          type="button"
+          @click="isQualityControlExpanded = !isQualityControlExpanded"
+          class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white font-medium hover:bg-white/10 transition cursor-pointer text-left"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 11 12 14 22 4"></polyline>
+            </svg>
+            <span class="truncate">数据质量控制</span>
+          </div>
+          <svg
+            :class="['w-3.5 h-3.5 transition-transform duration-200', isQualityControlExpanded ? 'rotate-180' : '']"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-          <span class="truncate">数据质量控制</span>
+        </button>
+
+        <!-- Submenu items under 数据质量控制 (二级子菜单栏) -->
+        <div v-show="isQualityControlExpanded" class="pl-2 pr-1 py-1 space-y-1">
+          <!-- 1. 告警处置 (二级菜单，含三级菜单) -->
+          <div class="rounded-lg bg-white/5 border border-white/10 p-1">
+            <button
+              type="button"
+              @click="isAlarmExpanded = !isAlarmExpanded"
+              class="w-full flex items-center justify-between px-2 py-1.5 rounded text-white font-medium hover:bg-white/10 transition cursor-pointer text-left text-[11.5px]"
+            >
+              <div class="flex items-center gap-2 min-w-0">
+                <svg class="w-3.5 h-3.5 shrink-0 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="truncate">告警处置</span>
+              </div>
+              <svg
+                :class="['w-3 h-3 transition-transform duration-200 opacity-80', isAlarmExpanded ? 'rotate-180' : '']"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <!-- 三级菜单: 告警工单、告警明细 -->
+            <div v-show="isAlarmExpanded" class="pl-2.5 pr-1 py-1 space-y-0.5 border-l-2 border-white/20 ml-2 mt-0.5">
+              <!-- 告警工单 -->
+              <button
+                type="button"
+                @click="selectMenu('alarm_work_order')"
+                :class="[
+                  'w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left transition cursor-pointer text-[11px]',
+                  activeMenu === 'alarm_work_order'
+                    ? 'bg-white text-blue-600 font-bold shadow-xs'
+                    : 'text-white/85 hover:bg-white/10 hover:text-white'
+                ]"
+              >
+                <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                <span class="truncate">告警工单</span>
+              </button>
+
+              <!-- 告警明细 -->
+              <button
+                type="button"
+                @click="selectMenu('alarm_detail')"
+                :class="[
+                  'w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left transition cursor-pointer text-[11px]',
+                  activeMenu === 'alarm_detail'
+                    ? 'bg-white text-blue-600 font-bold shadow-xs'
+                    : 'text-white/85 hover:bg-white/10 hover:text-white'
+                ]"
+              >
+                <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                <span class="truncate">告警明细</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. 水量数据修订 (二级菜单，直接访问) -->
+          <button
+            type="button"
+            @click="selectMenu('water_data_revision')"
+            :class="[
+              'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition cursor-pointer text-[11.5px] font-medium',
+              activeMenu === 'water_data_revision'
+                ? 'bg-white text-[#2563EB] font-bold shadow-xs'
+                : 'text-white/90 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" :class="activeMenu === 'water_data_revision' ? 'text-[#2563EB]' : 'text-cyan-300'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <span class="truncate">水量数据修订</span>
+          </button>
+
+          <!-- 3. 违规问题排查 (二级菜单，含三级菜单) -->
+          <div class="rounded-lg bg-white/5 border border-white/10 p-1">
+            <button
+              type="button"
+              @click="isViolationExpanded = !isViolationExpanded"
+              class="w-full flex items-center justify-between px-2 py-1.5 rounded text-white font-medium hover:bg-white/10 transition cursor-pointer text-left text-[11.5px]"
+            >
+              <div class="flex items-center gap-2 min-w-0">
+                <svg class="w-3.5 h-3.5 shrink-0 text-rose-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span class="truncate">违规问题排查</span>
+              </div>
+              <svg
+                :class="['w-3 h-3 transition-transform duration-200 opacity-80', isViolationExpanded ? 'rotate-180' : '']"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <!-- 三级菜单: 违规问题处理（全国）、违规问题处理（省级） -->
+            <div v-show="isViolationExpanded" class="pl-2.5 pr-1 py-1 space-y-0.5 border-l-2 border-white/20 ml-2 mt-0.5">
+              <!-- 违规问题处理（全国） -->
+              <button
+                type="button"
+                @click="selectMenu('violation_national')"
+                :class="[
+                  'w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left transition cursor-pointer text-[11px]',
+                  activeMenu === 'violation_national' || activeMenu === 'violation_handling'
+                    ? 'bg-white text-blue-600 font-bold shadow-xs'
+                    : 'text-white/85 hover:bg-white/10 hover:text-white'
+                ]"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></span>
+                <span class="truncate">违规问题处理（全国）</span>
+              </button>
+
+              <!-- 违规问题处理（省级） -->
+              <button
+                type="button"
+                @click="selectMenu('violation_provincial')"
+                :class="[
+                  'w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left transition cursor-pointer text-[11px]',
+                  activeMenu === 'violation_provincial'
+                    ? 'bg-white text-blue-600 font-bold shadow-xs'
+                    : 'text-white/85 hover:bg-white/10 hover:text-white'
+                ]"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                <span class="truncate">违规问题处理（省级）</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <svg class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
+      </div>
 
       <!-- 系统配置 -->
       <button
@@ -489,10 +629,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 
-defineProps<{
+const props = defineProps<{
   activeMenu: string;
 }>();
 
@@ -502,7 +642,26 @@ const emit = defineEmits<{
 
 const isSupervisionExpanded = ref(true);
 const isWaterPlanExpanded = ref(true);
-const isDataGovernanceExpanded = ref(true);
+const isDataGovernanceExpanded = ref(false);
+const isQualityControlExpanded = ref(true);
+const isAlarmExpanded = ref(true);
+const isViolationExpanded = ref(true);
+
+watch(
+  () => props.activeMenu,
+  (menu) => {
+    if (['alarm_work_order', 'alarm_detail', 'water_data_revision', 'violation_national', 'violation_provincial', 'violation_handling'].includes(menu)) {
+      isQualityControlExpanded.value = true;
+      if (['alarm_work_order', 'alarm_detail'].includes(menu)) {
+        isAlarmExpanded.value = true;
+      }
+      if (['violation_national', 'violation_provincial', 'violation_handling'].includes(menu)) {
+        isViolationExpanded.value = true;
+      }
+    }
+  },
+  { immediate: true }
+);
 
 const selectMenu = (menu: string) => {
   emit('select-menu', menu);

@@ -456,27 +456,27 @@
 
             <!-- 16. 许可水量 -->
             <td class="py-3.5 px-2.5 text-right font-mono font-medium text-gray-800 border-r border-b border-[#b8cde6]">
-              {{ record.permitVolume.toFixed(2) }}
+              {{ (record.permitVolume ?? 0).toFixed(2) }}
             </td>
 
             <!-- 17. 计划水量 -->
             <td class="py-3.5 px-2.5 text-right font-mono font-bold text-[#1677ff] border-r border-b border-[#b8cde6]">
-              {{ record.planVolume.toFixed(2) }}
+              {{ (record.planVolume ?? 0).toFixed(2) }}
             </td>
 
             <!-- 18. 地表水 -->
             <td class="py-3.5 px-2.5 text-right font-mono text-gray-700 border-r border-b border-[#b8cde6]">
-              {{ record.surfaceWater.toFixed(2) }}
+              {{ (record.surfaceWater ?? 0).toFixed(2) }}
             </td>
 
             <!-- 19. 地下水 -->
             <td class="py-3.5 px-2.5 text-right font-mono text-gray-700 border-r border-b border-[#b8cde6]">
-              {{ record.groundwater.toFixed(2) }}
+              {{ (record.groundwater ?? 0).toFixed(2) }}
             </td>
 
             <!-- 20. 非常规水总计 -->
             <td class="py-3.5 px-2.5 text-right font-mono font-medium text-emerald-600 border-r border-b border-[#b8cde6]">
-              {{ record.unconventionalTotal.toFixed(2) }}
+              {{ (record.unconventionalTotal ?? 0).toFixed(2) }}
             </td>
 
             <!-- 21. 操作 (固定在最右侧，与计量设施管理风格完全一致) -->

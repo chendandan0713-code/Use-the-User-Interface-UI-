@@ -38,18 +38,6 @@
     <div class="flex items-center bg-blue-900/40 rounded-lg p-0.5 border border-white/10">
       <button
         type="button"
-        @click="currentSegment = 'third_party'"
-        :class="[
-          'px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer',
-          currentSegment === 'third_party'
-            ? 'bg-white text-blue-700 font-semibold shadow-xs'
-            : 'text-white/80 hover:text-white hover:bg-white/10'
-        ]"
-      >
-        第三方登录
-      </button>
-      <button
-        type="button"
         @click="currentSegment = 'client'"
         :class="[
           'px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer',
@@ -135,7 +123,7 @@ defineEmits<{
   (e: 'open-notifications'): void;
 }>();
 
-const currentSegment = ref<'third_party' | 'client' | 'admin'>('admin');
+const currentSegment = ref<'client' | 'admin'>('admin');
 const searchQuery = ref('');
 
 const userOptions = [

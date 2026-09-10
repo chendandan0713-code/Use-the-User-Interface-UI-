@@ -32,6 +32,18 @@ export interface ViolationItem {
   attachmentInfo?: string; // 资料上传
   description?: string; // 问题描述
   disposalDeadline?: string; // 处置时限完整描述
+  // 问题排查详情扩展字段
+  investigationReason?: string; // 排查原因说明
+  investigationUnit?: string; // 排查单位
+  investigator?: string; // 排查经办人
+  investigationDate?: string; // 排查时间
+  evidenceMaterials?: Array<{ id: string; name: string; size: string; type: string; date: string; url?: string }>; // 作证材料
+  // 审核扩展字段
+  auditPassed?: boolean; // 是否审核通过
+  auditOpinion?: string; // 审核意见
+  auditRequirement?: string; // 处置督办要求
+  auditDate?: string; // 审核时间
+  auditor?: string; // 审核人
 }
 
 export const initialViolations: ViolationItem[] = [
@@ -109,6 +121,23 @@ export const initialViolations: ViolationItem[] = [
     handleUnit: '互助土族自治县水利局',
     waterOwner: '互助青稞酒业酿造二分厂',
     permitNumber: '取水[青海东互]字[2021]第00009号',
+    creditCode: '91630223MA752FGH8K',
+    rectificationUnit: '互助土族自治县水利局水政水资源监察大队',
+    approvalAuthority: '海东市水务局',
+    violationType: '超许可取水',
+    attachmentInfo: '已上传核查卷宗4份',
+    description: '县水利局已完成现场排查取证，确认存在扩能新增酿造线未履行水资源论证与许可变更问题，第1季度实际取水量达46.1万m³，超年度许可指标比例31.7%，已完成基层实地勘查并提交省级复核认定。',
+    disposalDeadline: '5个工作日，截止时间为2026年09月12日',
+    investigationReason: '经互助县水利局执法大队会同威远水利站现场勘查，该酒厂因春季启动新酿造车间二期技改项目，未事先向水行政主管部门申请增加取水量指标，擅自增设DN100取水支管，导致智能电磁水表累计数值超出核定许可限量31.7%。现场核验水表铅封完好、计量精度符合国家标准，超量取水事实清楚，证据确凿。',
+    investigationUnit: '互助土族自治县水利局水政水资源股',
+    investigator: '包文海、李正东',
+    investigationDate: '2026-09-02 15:40:22',
+    evidenceMaterials: [
+      { id: 'ev-1', name: '互助县水利局现场勘查取证与水表底数核实单.pdf', size: '2.6 MB', type: 'pdf', date: '2026-09-02 14:15' },
+      { id: 'ev-2', name: '酿造二分厂进水管道与智能电磁流量计现场实拍图.jpg', size: '3.4 MB', type: 'image', date: '2026-09-02 14:30' },
+      { id: 'ev-3', name: '企业2026年第一季度生产日报与取用水台账.pdf', size: '1.8 MB', type: 'pdf', date: '2026-09-02 15:10' },
+      { id: 'ev-4', name: '现场询问笔录(企业法定代表人签字盖章原件).pdf', size: '920 KB', type: 'pdf', date: '2026-09-02 15:35' },
+    ],
     isConfirmedProblem: '是',
     rectificationStatus: '整改中',
     checkStatus: '省级待审核',

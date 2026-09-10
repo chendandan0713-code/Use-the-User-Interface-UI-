@@ -113,9 +113,31 @@
             </div>
           </div>
 
-          <!-- 6. Violation Handling (数据治理 -> 违规问题处理) View -->
+          <!-- 6. 数据质量控制 -> 告警处置 -> 告警工单 -->
+          <AlarmWorkOrderView
+            v-else-if="activeMenu === 'alarm_work_order'"
+          />
+
+          <!-- 7. 数据质量控制 -> 告警处置 -> 告警明细 -->
+          <AlarmDetailView
+            v-else-if="activeMenu === 'alarm_detail'"
+          />
+
+          <!-- 8. 数据质量控制 -> 水量数据修订 -->
+          <WaterDataRevisionView
+            v-else-if="activeMenu === 'water_data_revision'"
+          />
+
+          <!-- 9. 数据质量控制 -> 违规问题排查 -> 违规问题处理（全国） -->
           <ViolationHandlingView
-            v-else-if="activeMenu === 'violation_handling'"
+            v-else-if="activeMenu === 'violation_national' || activeMenu === 'violation_handling'"
+            level="national"
+          />
+
+          <!-- 10. 数据质量控制 -> 违规问题排查 -> 违规问题处理（省级） -->
+          <ViolationHandlingView
+            v-else-if="activeMenu === 'violation_provincial'"
+            level="provincial"
           />
 
           <!-- 7. Water Plan Management (计划用水管理 -> 填报审批) View -->
@@ -237,13 +259,16 @@ import FaultApplyModal from './components/vue/FaultApplyModal.vue';
 import MesPlatformView from './components/vue/MesPlatformView.vue';
 import ViolationHandlingView from './components/vue/ViolationHandlingView.vue';
 import WaterPlanManagementView from './components/vue/WaterPlanManagement/WaterPlanManagementView.vue';
+import AlarmWorkOrderView from './components/vue/AlarmWorkOrderView.vue';
+import AlarmDetailView from './components/vue/AlarmDetailView.vue';
+import WaterDataRevisionView from './components/vue/WaterDataRevisionView.vue';
 
 // Master State
 const savedPlatform = typeof window !== 'undefined' ? (localStorage.getItem('xns_active_platform') as 'water' | 'mes') : null;
 const savedMenu = typeof window !== 'undefined' ? localStorage.getItem('xns_active_menu') : null;
 
 const activePlatform = ref<'water' | 'mes'>(savedPlatform || 'water');
-const activeMenu = ref<string>(savedMenu || 'water_plan');
+const activeMenu = ref<string>(savedMenu || 'alarm_work_order');
 const selectedDistrict = ref<string>('全部');
 
 // Facilities Data

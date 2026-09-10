@@ -267,6 +267,9 @@ export interface WaterPlanRecord {
   approvedGroundwater?: number; // 核准地下水
   approvedUnconventionalWater?: number; // 核准非常规水
   auditHistory?: WaterPlanAuditLog[]; // 审批流程历史
+  actualWaterQuota?: FormQuotaData; // 本年度实际用水表数据
+  planWaterQuota?: FormQuotaData; // 下年度计划用水表数据
+  documentIssues?: WaterPlanDocumentIssue[]; // 用水计划下发文件列表（支持多次下发）
 }
 
 export interface WaterPlanFilterParams {
@@ -295,5 +298,94 @@ export interface WaterPlanFilterParams {
   brackishWaterFilter: string;
   selectedDistrict: string; // 选中区县
 }
+
+export interface LivingWaterRow {
+  type: string;
+  quota: number;
+  population: number;
+  surfaceWater: number;
+  groundwater: number;
+}
+
+export interface IndustryWaterRow {
+  productName: string;
+  quota: number;
+  output: string;
+  productVolume: string;
+  surfaceWater: number;
+  groundwater: number;
+  recycledWater: number;
+  rainWater: number;
+  mineWater: number;
+  brackishWater: number;
+}
+
+export interface AgricultureWaterRow {
+  area: number;
+  times: number;
+  quota: number;
+  crops: string;
+  method: string;
+  surfaceWater: number;
+  groundwater: number;
+  total?: number;
+}
+
+export interface PowerWaterRow {
+  units: number;
+  capacity: string;
+  generation: string;
+  hours: number;
+  surfaceWater: number;
+  groundwater: number;
+  hydroMinFlow: number;
+  thermalMaxHourly: number;
+  total?: number;
+}
+
+export interface MonthlySummaryRow {
+  month: string; // 月份: '1月', '2月', ..., '12月'
+  surfaceWater: number; // 地表水
+  groundwater: number; // 地下水
+  recycledWater: number; // 再生水
+  rainWater: number; // 雨水
+  mineWater: number; // 矿井水
+  brackishWater: number; // 微咸水
+  unconventionalTotal?: number; // 非常规计
+  total?: number; // 总计
+}
+
+export interface FormQuotaData {
+  livingWaterRows: LivingWaterRow[];
+  industryWaterRows: IndustryWaterRow[];
+  agricultureWaterRows: AgricultureWaterRow[];
+  powerWaterRows: PowerWaterRow[];
+  monthlySummaryRows?: MonthlySummaryRow[]; // 1至12月用水总结表
+}
+
+export type WaterPlanNoticeType = '正式用水计划通知' | '调整用水计划通知';
+
+export interface WaterPlanNoticeFile {
+  id: string;
+  name: string;
+  type: 'pdf' | 'word' | 'excel' | 'image';
+  size: string;
+  uploadTime?: string;
+  url?: string;
+}
+
+export interface WaterPlanDocumentIssue {
+  id: string;
+  title: string; // 通知名称
+  noticeType: WaterPlanNoticeType; // 通知类型：正式用水计划通知、调整用水计划通知
+  issuerUnit: string; // 下发单位
+  issueTime: string; // 下发时间
+  issueEvent: string; // 下发事件 (如：2025年度计划用水指标初核下发、年中产能扩产计划用水调整下发)
+  docNumber?: string; // 批复发文字号，如：宁水资计〔2025〕0428号
+  files: WaterPlanNoticeFile[]; // 多个通知文件
+  remarks?: string; // 备注说明
+  approvedTotalVolume?: number; // 批复核定总量 (万m³)
+}
+
 
 

@@ -8,6 +8,32 @@
 
     <!-- 2. 右侧主工作区 -->
     <div class="flex-1 flex flex-col min-w-0 min-h-0 gap-2.5 overflow-hidden">
+      <!-- 监管台账层级指示条 -->
+      <div class="bg-white px-3.5 py-2 rounded-xl border border-slate-200/80 shadow-2xs flex items-center justify-between shrink-0 text-xs">
+        <div class="flex items-center gap-2.5">
+          <span
+            :class="[
+              'px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide flex items-center gap-1.5',
+              level === 'provincial'
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                : 'bg-blue-50 text-blue-700 border border-blue-200'
+            ]"
+          >
+            <span class="w-1.5 h-1.5 rounded-full" :class="level === 'provincial' ? 'bg-emerald-500' : 'bg-blue-500'"></span>
+            {{ level === 'provincial' ? '违规问题处理（省级）' : '违规问题处理（全国）' }}
+          </span>
+          <span class="text-slate-500 text-[11.5px]">
+            {{ level === 'provincial' ? '青海省水利厅本级监控与各市州自查排查闭环整改台账' : '水利部全国取用水监管系统下发青海省违规问题排查与核实台账' }}
+          </span>
+        </div>
+        <div class="flex items-center gap-3 text-[11px] text-slate-500 font-mono">
+          <span>待排查: <b class="text-amber-600">{{ overviewStats.pendingCheck }}</b></span>
+          <span>待审核: <b class="text-blue-600">{{ overviewStats.pendingAudit }}</b></span>
+          <span>整改中: <b class="text-purple-600">{{ overviewStats.rectifying }}</b></span>
+          <span>已完成: <b class="text-emerald-600">{{ overviewStats.completed }}</b></span>
+        </div>
+      </div>
+
       <!-- 2.1 顶部业务标签页 (计量水量超许可 / 直报水量超许可 / 违规新增取水许可 等) -->
       <ViolationFilterTabs
         v-model:active-tab="currentCategory"
@@ -36,6 +62,7 @@
       v-model:visible="detailModalVisible"
       :item="selectedItem"
       @urged="handleUrge"
+      @audit="handleAudit"
     />
 
     <!-- 4. 省级审核弹窗 -->
@@ -71,6 +98,15 @@ import ViolationTable from './ViolationTable.vue';
 import ViolationDetailModal from './ViolationDetailModal.vue';
 import ViolationAuditModal from './ViolationAuditModal.vue';
 import { generateFullViolations, type ViolationItem } from '../../mockViolationData';
+
+const props = withDefaults(
+  defineProps<{
+    level?: 'national' | 'provincial';
+  }>(),
+  {
+    level: 'national',
+  }
+);
 
 // 初始生成完整的 93 条真实对应数据集
 const violationsList = ref<ViolationItem[]>(generateFullViolations());
@@ -125,9 +161,25 @@ const businessTabs = computed(() => [
   },
 ]);
 
+// 统计当前视图关键状态
+const overviewStats = computed(() => {
+  const list = filteredViolations.value;
+  return {
+    pendingCheck: list.filter((v) => v.status === '待排查').length,
+    pendingAudit: list.filter((v) => v.status === '排查-省级待审核' || v.checkStatus === '省级待审核').length,
+    rectifying: list.filter((v) => v.status === '整改中').length,
+    completed: list.filter((v) => v.status === '已完成' || v.rectificationStatus === '已完成').length,
+  };
+});
+
 // 综合联动筛选计算属性
 const filteredViolations = computed(() => {
   return violationsList.value.filter((item) => {
+    // 0. 层级区分 (全国台账包含流域部级监督下发；省级台账重点呈现地方省市县管辖核查)
+    if (props.level === 'provincial' && item.licenseType === '流域') {
+      return false;
+    }
+
     // 1. Tab 类别匹配 (在默认 Tab 下主要展示 meter_exceed，当切换其他 Tab 时展示对应数据)
     if (currentCategory.value && currentCategory.value !== 'all' && item.category !== currentCategory.value) {
       return false;
@@ -259,13 +311,44 @@ const handleAudit = (item: ViolationItem) => {
 };
 
 // 审核完成回调
-const handleAuditComplete = (item: ViolationItem, conclusion: string) => {
+const handleAuditComplete = (
+  item: ViolationItem,
+  conclusion: string,
+  resultData?: {
+    passed: boolean;
+    conclusion: string;
+    opinion: string;
+    isConfirmedProblem: '是' | '否' | '待研判';
+    requirement?: string;
+    investigationReason: string;
+  }
+) => {
   const target = violationsList.value.find((v) => v.id === item.id);
   if (target) {
-    target.status = '整改中';
-    target.stage = '整改落实';
-    target.checkStatus = '已归档';
-    target.isConfirmedProblem = conclusion.includes('属实') ? '是' : '否';
+    if (resultData) {
+      target.isConfirmedProblem = resultData.isConfirmedProblem;
+      target.auditOpinion = resultData.opinion;
+      target.auditPassed = resultData.passed;
+      if (resultData.requirement) {
+        target.auditRequirement = resultData.requirement;
+      }
+      target.investigationReason = resultData.investigationReason;
+      if (resultData.passed) {
+        target.status = '整改中';
+        target.stage = '整改落实';
+        target.checkStatus = '已归档';
+        target.rectificationStatus = '整改中';
+      } else {
+        target.status = '待排查';
+        target.stage = '排查复核';
+        target.checkStatus = '待排查';
+      }
+    } else {
+      target.status = '整改中';
+      target.stage = '整改落实';
+      target.checkStatus = '已归档';
+      target.isConfirmedProblem = conclusion.includes('属实') ? '是' : '否';
+    }
   }
 };
 

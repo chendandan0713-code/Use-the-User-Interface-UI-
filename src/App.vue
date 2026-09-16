@@ -140,6 +140,18 @@
             level="provincial"
           />
 
+          <!-- 11. 数据归集 -> 人工归集 (非在线计量设施人工填报与审核) -->
+          <ManualCollectionPlatformView
+            v-else-if="activeMenu === 'manual_collection'"
+            :selected-district="selectedDistrict"
+            @select-district="handleDistrictSelect"
+          />
+
+          <!-- 12. 数据规范整合 -> 一户一档 -->
+          <EnterpriseDossierView
+            v-else-if="activeMenu === 'enterprise_dossier'"
+          />
+
           <!-- 7. Water Plan Management (计划用水管理 -> 填报审批) View -->
           <div
             v-else-if="activeMenu === 'water_plan' || activeMenu === 'water_plan_management'"
@@ -262,6 +274,8 @@ import WaterPlanManagementView from './components/vue/WaterPlanManagement/WaterP
 import AlarmWorkOrderView from './components/vue/AlarmWorkOrderView.vue';
 import AlarmDetailView from './components/vue/AlarmDetailView.vue';
 import WaterDataRevisionView from './components/vue/WaterDataRevisionView.vue';
+import ManualCollectionPlatformView from './components/vue/ManualCollection/ManualCollectionPlatformView.vue';
+import EnterpriseDossierView from './components/vue/EnterpriseDossierView.vue';
 
 // Master State
 const savedPlatform = typeof window !== 'undefined' ? (localStorage.getItem('xns_active_platform') as 'water' | 'mes') : null;

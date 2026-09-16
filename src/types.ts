@@ -331,6 +331,16 @@ export interface AgricultureWaterRow {
   total?: number;
 }
 
+export interface LivestockWaterRow {
+  livestockType: string; // 畜禽种类/饲养品种 (如: 肉牛、奶牛、生猪、肉羊、蛋鸡)
+  count: number; // 存栏/饲养数量(头/只/羽)
+  quota: number; // 用水定额(L/头·天)
+  days?: number; // 饲养天数
+  surfaceWater: number; // 地表水 (万m³)
+  groundwater: number; // 地下水 (万m³)
+  total?: number; // 总计 (万m³)
+}
+
 export interface PowerWaterRow {
   units: number;
   capacity: string;
@@ -341,6 +351,16 @@ export interface PowerWaterRow {
   hydroMinFlow: number;
   thermalMaxHourly: number;
   total?: number;
+}
+
+export interface ServiceWaterRow {
+  industryName: string; // 服务类型/经营行业 (如: 住宿餐饮、商务办公、商超零售、洗车洗浴)
+  scale: string; // 经营规模/面积/客流 (如: "建筑面积 15000㎡")
+  quota: number; // 用水定额
+  surfaceWater: number; // 地表水 (万m³)
+  groundwater: number; // 地下水 (万m³)
+  recycledWater?: number; // 非常规水/再生水 (万m³)
+  total?: number; // 总计 (万m³)
 }
 
 export interface MonthlySummaryRow {
@@ -356,10 +376,13 @@ export interface MonthlySummaryRow {
 }
 
 export interface FormQuotaData {
+  requiredCategories?: string[]; // 勾选的必须填写分类: ['living', 'industry', 'agriculture', 'livestock', 'power', 'service']
   livingWaterRows: LivingWaterRow[];
   industryWaterRows: IndustryWaterRow[];
   agricultureWaterRows: AgricultureWaterRow[];
+  livestockWaterRows?: LivestockWaterRow[]; // 牲畜饲养用水
   powerWaterRows: PowerWaterRow[];
+  serviceWaterRows?: ServiceWaterRow[]; // 服务业用水
   monthlySummaryRows?: MonthlySummaryRow[]; // 1至12月用水总结表
 }
 
@@ -386,6 +409,112 @@ export interface WaterPlanDocumentIssue {
   remarks?: string; // 备注说明
   approvedTotalVolume?: number; // 批复核定总量 (万m³)
 }
+
+// ==================== 数据归集 - 人工归集功能类型 ====================
+export type ReportCycleType = 'month' | 'quarter' | 'year'; // 按月 / 按季度 / 按年
+export type ManualAuditStatus = '待审核' | '已通过' | '已驳回' | '草稿';
+
+export interface NonOnlineFacility {
+  id: string;
+  code: string; // 计量器具编号
+  name: string; // 设施名称
+  waterOwner: string; // 取水权人
+  permitNumber: string; // 取水许可证编号
+  district: string; // 所属区县
+  waterUsage: string; // 取水用途
+  waterSourceType: string; // 水源类型
+  meteringMethod: string; // 计量方式 (机械水表 / 电磁水表 / 超声波水表等)
+  specModel: string; // 规格型号
+  address: string; // 安装地点
+  transmissionMethod: '非在线'; // 传输方式：非在线
+  reportCycle: ReportCycleType; // 填报配置周期：'month' | 'quarter' | 'year'
+  currentBaseReading: number; // 当前表底数 (m³)
+  lastReportPeriod: string; // 最近填报期次，如 '2026年08月' 或 '2026年第二季度'
+  lastReportDate: string; // 最近抄报时间
+  reporterName: string; // 填报责任人
+  reporterPhone: string; // 责任人电话
+  status: '正常' | '停用'; // 设施状态
+  deadlineDesc?: string; // 周期时限说明，如 "每月5日前填报" / "每季度初10日前填报"
+  quotaVolume?: number; // 年度/季度核定额度 (万m³)
+}
+
+export interface ManualReportRecord {
+  id: string;
+  recordNo: string; // 归集单号，如 RG202609-001
+  facilityId: string;
+  facilityCode: string;
+  facilityName: string;
+  waterOwner: string;
+  permitNumber: string;
+  district: string;
+  waterUsage: string;
+  meteringMethod: string;
+  reportCycle: ReportCycleType; // 填报周期类型: month | quarter | year
+  year: number; // 年份，如 2026
+  periodKey: string; // 唯一期次键，如 '2026-01', '2026-08', '2026-Q1', '2026-Y'
+  periodLabel: string; // 期次显示名称，如 '2026年08月', '2026年第二季度', '2026年度'
+  startReading: number; // 上期底数 (m³)
+  endReading: number; // 本期底数 (m³)
+  waterVolume: number; // 本期水量 (m³)
+  readingDate: string; // 抄表日期
+  submitTime: string; // 填报提交时间
+  reporterName: string; // 填报人员
+  reporterPhone: string; // 填报人员电话
+  auditStatus: ManualAuditStatus; // 审核状态: 待审核 / 已通过 / 已驳回
+  voucherFiles: string[]; // 现场水表抄表凭证附件
+  notes?: string; // 填报备注
+  isBatch?: boolean; // 是否批量补报
+  auditor?: string; // 审核人
+  auditTime?: string; // 审核时间
+  auditComment?: string; // 审核意见
+}
+
+export interface ManualReportFilterParams {
+  keyword: string; // 设施名称/编码/权人
+  district: string; // 区县
+  reportCycle: string; // 周期配置: 全部 / month / quarter / year
+  auditStatus: string; // 审核状态: 全部 / 待审核 / 已通过 / 已驳回
+  dateRange: string; // 日期区间
+}
+
+// ======================= 数据规范整合 - 一户一档 =======================
+export type EnterpriseDataSourceType = '国控' | '省控' | '中央资金';
+export type EnterpriseLicenseStatus = '正常' | '临期' | '变更中' | '延续审批中' | '已过期' | '已注销';
+export type EnterpriseAccountStatus = '正常' | '启用' | '停运' | '在建';
+
+export interface EnterpriseDossier {
+  id: string;
+  issuingAuthority: string; // 发证机关
+  creditCode: string; // 统一信用代码
+  waterOwnerName: string; // 取水权人名称
+  permitNumber: string; // 取水许可证
+  dataSourceType: EnterpriseDataSourceType; // 数据来源类型（国控、省控、中央资金）
+  aboveDesignatedScale: boolean; // 规模以上 (true/false)
+  waterSourceType: string; // 水源类型 (地表水、地下水、非常规水、矿井水、混合水源)
+  licenseStatus: EnterpriseLicenseStatus; // 证照状态 (正常、临期、变更中、延续审批中、已过期、已注销)
+  intakeProjectCount: number; // 取水口工程数量
+  intakeCount: number; // 取水口数据 (数量)
+  meteringPointCount: number; // 计量点数量
+  onlineMeteringCount: number; // 在线计量点
+  offlineMeteringCount: number; // 非在线计量点
+  status: EnterpriseAccountStatus; // 状态 (正常、启用、停运、在建)
+  district: string; // 所属区县
+  legalPerson?: string; // 法定代表人
+  contactPhone?: string; // 联系电话
+  address?: string; // 取水地址
+  annualPermitVolume?: number; // 年许可取水量(万m³)
+}
+
+export interface EnterpriseDossierFilterParams {
+  keyword: string; // 权人名称 / 信用代码 / 许可证
+  issuingAuthority: string; // 发证机关
+  dataSourceType: string; // 数据来源类型 (全部 / 国控 / 省控 / 中央资金)
+  aboveDesignatedScale: string; // 规模以上 (全部 / 是 / 否)
+  waterSourceType: string; // 水源类型
+  licenseStatus: string; // 证照状态
+  status: string; // 状态
+}
+
 
 
 

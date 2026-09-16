@@ -1,6 +1,6 @@
 {
   "name": "西宁市取用水管理平台",
-  "description": "基于Vue 3打造的青海省与西宁市取用水计量监管平台，支持行政区划联动、计量设施台账、全国违规问题排查与省级审核复核全流程闭环处置",
+  "description": "西宁市取用水管理平台，包含计量设施监管、数据归集（非在线设施人工填报与审核流转）、数据规范整合（一户一档全景电子台账与拓扑）、数据质量控制与计划用水填报审批",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

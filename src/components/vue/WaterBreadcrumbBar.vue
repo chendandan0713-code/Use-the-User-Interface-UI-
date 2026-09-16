@@ -100,6 +100,20 @@
           <span>水量数据修订</span>
         </button>
 
+        <!-- 人工归集 tab (when active) -->
+        <button
+          v-if="activeMenu === 'manual_collection'"
+          type="button"
+          @click="$emit('navigate', 'manual_collection')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs font-semibold"
+        >
+          <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          <span>数据归集 - 人工归集</span>
+        </button>
+
         <!-- 违规问题处理（全国） tab -->
         <button
           type="button"
@@ -152,6 +166,26 @@
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
           <span>计划用水填报审批</span>
+        </button>
+
+        <!-- 一户一档 tab -->
+        <button
+          type="button"
+          @click="$emit('navigate', 'enterprise_dossier')"
+          :class="[
+            'px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5',
+            activeMenu === 'enterprise_dossier'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs font-semibold'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-transparent'
+          ]"
+        >
+          <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>一户一档</span>
         </button>
 
         <!-- 计量设施管理 tab -->
@@ -232,6 +266,8 @@ const currentTabTitle = computed(() => {
       return '数据质量控制 - 告警处置 - 告警明细';
     case 'water_data_revision':
       return '数据质量控制 - 水量数据修订';
+    case 'manual_collection':
+      return '数据归集 - 人工归集 (非在线设施填报与审核)';
     case 'violation_national':
     case 'violation_handling':
       return '数据质量控制 - 违规问题排查 - 违规问题处理（全国）';
@@ -239,6 +275,8 @@ const currentTabTitle = computed(() => {
       return '数据质量控制 - 违规问题排查 - 违规问题处理（省级）';
     case 'water_plan':
       return '计划用水管理 - 填报审批';
+    case 'enterprise_dossier':
+      return '数据规范整合 - 一户一档';
     case 'fault':
       return '故障记录';
     case 'scenarios':

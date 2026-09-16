@@ -625,6 +625,16 @@ export function createActualWaterQuotaForRecord(record?: WaterPlanRecord | null)
         total: 10.8
       }
     ],
+    livestockWaterRows: [
+      {
+        livestockType: '后勤基地生猪/肉禽',
+        count: 150,
+        quota: 35.0,
+        days: 365,
+        surfaceWater: 0.05,
+        groundwater: 0.07
+      }
+    ],
     powerWaterRows: [
       {
         units: 1,
@@ -638,6 +648,17 @@ export function createActualWaterQuotaForRecord(record?: WaterPlanRecord | null)
         total: 6.5
       }
     ],
+    serviceWaterRows: [
+      {
+        industryName: '综合办公与餐饮招待中心',
+        scale: '8500㎡',
+        quota: 3.2,
+        surfaceWater: 0.18,
+        groundwater: 0.12,
+        recycledWater: 0.06
+      }
+    ],
+    requiredCategories: ['living', 'industry'],
     monthlySummaryRows: [
       { month: '1月', surfaceWater: 15.2, groundwater: 14.8, recycledWater: 1.0, rainWater: 0.1, mineWater: 0.0, brackishWater: 0.0 },
       { month: '2月', surfaceWater: 14.8, groundwater: 14.2, recycledWater: 0.95, rainWater: 0.15, mineWater: 0.0, brackishWater: 0.0 },
@@ -717,6 +738,16 @@ export function createPlanWaterQuotaForRecord(record?: WaterPlanRecord | null): 
         total: 10.2
       }
     ],
+    livestockWaterRows: [
+      {
+        livestockType: '后勤基地生猪/肉禽',
+        count: 150,
+        quota: 33.0,
+        days: 365,
+        surfaceWater: 0.05,
+        groundwater: 0.06
+      }
+    ],
     powerWaterRows: [
       {
         units: 1,
@@ -730,6 +761,17 @@ export function createPlanWaterQuotaForRecord(record?: WaterPlanRecord | null): 
         total: 6.8
       }
     ],
+    serviceWaterRows: [
+      {
+        industryName: '综合办公与餐饮招待中心',
+        scale: '8500㎡',
+        quota: 3.0,
+        surfaceWater: 0.17,
+        groundwater: 0.11,
+        recycledWater: 0.07
+      }
+    ],
+    requiredCategories: ['living', 'industry'],
     monthlySummaryRows: [
       { month: '1月', surfaceWater: 16.0, groundwater: 15.2, recycledWater: 1.1, rainWater: 0.12, mineWater: 0.0, brackishWater: 0.0 },
       { month: '2月', surfaceWater: 15.5, groundwater: 14.8, recycledWater: 1.05, rainWater: 0.18, mineWater: 0.0, brackishWater: 0.0 },

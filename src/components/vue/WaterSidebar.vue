@@ -166,24 +166,73 @@
         </svg>
       </button>
 
-      <!-- 数据归集 -->
-      <button
-        type="button"
-        @click="notifyStub('数据归集')"
-        class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white/90 hover:bg-white/10 hover:text-white transition cursor-pointer text-left"
-      >
-        <div class="flex items-center gap-2.5 min-w-0">
-          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+      <!-- 数据归集 (可展开子菜单) -->
+      <div>
+        <button
+          type="button"
+          @click="isDataCollectionExpanded = !isDataCollectionExpanded"
+          class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white font-medium hover:bg-white/10 transition cursor-pointer text-left"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            <span class="truncate">数据归集</span>
+          </div>
+          <svg
+            :class="['w-3.5 h-3.5 transition-transform duration-200', isDataCollectionExpanded ? 'rotate-180' : '']"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-          <span class="truncate">数据归集</span>
+        </button>
+
+        <!-- Submenu items under 数据归集 -->
+        <div v-show="isDataCollectionExpanded" class="pl-3 pr-1 py-1 space-y-1">
+          <!-- 人工归集 (核心新功能页面) -->
+          <button
+            type="button"
+            @click="selectMenu('manual_collection')"
+            :class="[
+              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs',
+              activeMenu === 'manual_collection'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              <span class="truncate">人工归集</span>
+            </div>
+            <span
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
+              :class="activeMenu === 'manual_collection' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/40'"
+            >
+              非在线
+            </span>
+          </button>
+
+          <!-- 自动采集监控 -->
+          <button
+            type="button"
+            @click="notifyStub('自动采集监控')"
+            class="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/85 hover:bg-white/10 hover:text-white transition cursor-pointer text-left text-xs"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            <span class="truncate">在线自动采集</span>
+          </button>
         </div>
-        <svg class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
+      </div>
 
       <!-- 计量监管 (Expanded by default) -->
       <div>
@@ -406,30 +455,62 @@
         </div>
       </div>
 
-      <!-- 数据规范整合 -->
-      <button
-        type="button"
-        @click="notifyStub('数据规范整合')"
-        class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white/90 hover:bg-white/10 hover:text-white transition cursor-pointer text-left"
-      >
-        <div class="flex items-center gap-2.5 min-w-0">
-          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="4" y1="21" x2="4" y2="14"></line>
-            <line x1="4" y1="10" x2="4" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12" y2="3"></line>
-            <line x1="20" y1="21" x2="20" y2="16"></line>
-            <line x1="20" y1="12" x2="20" y2="3"></line>
-            <line x1="1" y1="14" x2="7" y2="14"></line>
-            <line x1="9" y1="8" x2="15" y2="8"></line>
-            <line x1="17" y1="16" x2="23" y2="16"></line>
+      <!-- 数据规范整合 (Expandable) -->
+      <div>
+        <button
+          type="button"
+          @click="isDataIntegrationExpanded = !isDataIntegrationExpanded"
+          class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white font-medium hover:bg-white/10 transition cursor-pointer text-left"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="21" x2="4" y2="14"></line>
+              <line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+            <span class="truncate">数据规范整合</span>
+          </div>
+          <svg
+            :class="['w-3.5 h-3.5 transition-transform duration-200', isDataIntegrationExpanded ? 'rotate-180' : '']"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-          <span class="truncate">数据规范整合</span>
+        </button>
+
+        <!-- Submenu items under 数据规范整合 -->
+        <div v-show="isDataIntegrationExpanded" class="pl-3 pr-1 py-1 space-y-1">
+          <!-- 一户一档 (功能菜单) -->
+          <button
+            type="button"
+            @click="selectMenu('enterprise_dossier')"
+            :class="[
+              'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition cursor-pointer',
+              activeMenu === 'enterprise_dossier'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <circle cx="10" cy="9" r="1.5"></circle>
+            </svg>
+            <span class="truncate">一户一档</span>
+          </button>
         </div>
-        <svg class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
+      </div>
 
       <!-- 数据质量控制 (Expandable Group with 2nd & 3rd submenus) -->
       <div>
@@ -642,7 +723,9 @@ const emit = defineEmits<{
 
 const isSupervisionExpanded = ref(true);
 const isWaterPlanExpanded = ref(true);
+const isDataCollectionExpanded = ref(true);
 const isDataGovernanceExpanded = ref(false);
+const isDataIntegrationExpanded = ref(true);
 const isQualityControlExpanded = ref(true);
 const isAlarmExpanded = ref(true);
 const isViolationExpanded = ref(true);
@@ -650,6 +733,12 @@ const isViolationExpanded = ref(true);
 watch(
   () => props.activeMenu,
   (menu) => {
+    if (menu === 'manual_collection') {
+      isDataCollectionExpanded.value = true;
+    }
+    if (menu === 'enterprise_dossier') {
+      isDataIntegrationExpanded.value = true;
+    }
     if (['alarm_work_order', 'alarm_detail', 'water_data_revision', 'violation_national', 'violation_provincial', 'violation_handling'].includes(menu)) {
       isQualityControlExpanded.value = true;
       if (['alarm_work_order', 'alarm_detail'].includes(menu)) {

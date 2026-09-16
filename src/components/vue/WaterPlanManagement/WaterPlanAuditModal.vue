@@ -160,211 +160,299 @@
             </div>
           </div>
 
-          <!-- 左侧滚动卡片表单区域 -->
-          <div class="flex-1 overflow-y-auto p-3.5 space-y-2.5 custom-scrollbar">
-            
-            <!-- 卡片 1: 申报单位基础信息 (同计量设施管理编辑弹窗卡片规范) -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                <div class="flex items-center gap-2">
-                  <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                  <span class="text-[13px] font-bold text-slate-800">申报主体基础信息</span>
+          <!-- 左侧滚动卡片表单区域 (向上滑动时收起基础信息，表单切换栏、表单名称栏、用水类型勾选栏顶部固定展示) -->
+          <div
+            ref="leftScrollContainer"
+            @scroll="handleLeftScroll"
+            class="flex-1 overflow-y-auto p-3.5 custom-scrollbar"
+          >
+            <!-- 卡片 1: 申报主体基础信息 (向上滑动自动折叠收起，支持手动展开/收起) -->
+            <div class="bg-white rounded-lg border border-slate-200/80 shadow-2xs mb-2.5 transition-all duration-300 overflow-hidden">
+              <div class="flex items-center justify-between px-3.5 py-2.5 bg-slate-50/70 border-b border-slate-100">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-1 h-3.5 bg-[#1677ff] rounded-full shrink-0"></span>
+                  <span class="text-[13px] font-bold text-slate-800 shrink-0">申报主体基础信息</span>
+
+                  <!-- 收起时显示的精简摘要标签 -->
+                  <div v-if="isBaseInfoCollapsed" class="flex items-center gap-2 text-xs text-slate-500 font-normal truncate ml-1">
+                    <span class="truncate max-w-[180px]" :title="form.waterOwner">
+                      <span class="text-slate-400">权人: </span>{{ form.waterOwner || '--' }}
+                    </span>
+                    <span class="text-slate-300">|</span>
+                    <span class="font-mono">
+                      <span class="text-slate-400">证号: </span>{{ form.permitNumber || '--' }}
+                    </span>
+                    <span class="text-slate-300">|</span>
+                    <span class="font-mono">
+                      <span class="text-slate-400">许可: </span>{{ (form.permitVolume ?? 0).toFixed(2) }}万m³
+                    </span>
+                  </div>
                 </div>
+
+                <!-- 收起/展开切换按钮 -->
+                <button
+                  type="button"
+                  @click="toggleBaseInfo"
+                  class="text-xs text-[#1677ff] hover:text-blue-700 font-medium flex items-center gap-1 cursor-pointer px-2 py-1 rounded hover:bg-blue-50 transition shrink-0 select-none"
+                  :title="isBaseInfoCollapsed ? '展开基础信息' : '收起基础信息'"
+                >
+                  <span>{{ isBaseInfoCollapsed ? '展开信息' : '收起信息' }}</span>
+                  <svg
+                    class="w-3.5 h-3.5 transition-transform duration-200"
+                    :class="isBaseInfoCollapsed ? '' : 'rotate-180'"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
               </div>
 
-              <!-- 基础信息输入栅格 (采用规整对齐的3列栅格布局) -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2.5 text-xs">
-                <!-- 第一行：取水权人 (跨2列) + 取水许可编号 (1列) -->
-                <div class="col-span-1 md:col-span-2 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">取水权人</label>
-                  <input
-                    type="text"
-                    v-model="form.waterOwner"
-                    placeholder="请输入取水权人全称"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
-                </div>
-
-                <div class="col-span-1 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">许可证号</label>
-                  <input
-                    type="text"
-                    v-model="form.permitNumber"
-                    placeholder="请输入许可证编号"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
-                </div>
-
-                <!-- 第二行：许可水量 + 年产值 + 邮政编码 -->
-                <div class="col-span-1 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">许可水量</label>
-                  <div class="relative flex-1">
+              <!-- 基础信息输入栅格 (采用规整对齐的3列栅格布局，折叠动画过渡) -->
+              <div
+                class="transition-all duration-300 ease-in-out overflow-hidden"
+                :class="isBaseInfoCollapsed ? 'max-h-0 opacity-0 p-0' : 'max-h-[600px] opacity-100 p-3.5'"
+              >
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2.5 text-xs">
+                  <!-- 第一行：取水权人 (跨2列) + 取水许可编号 (1列) -->
+                  <div class="col-span-1 md:col-span-2 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">取水权人</label>
                     <input
-                      type="number"
-                      step="0.01"
-                      v-model.number="form.permitVolume"
-                      class="w-full h-8 pl-2.5 pr-12 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                      type="text"
+                      v-model="form.waterOwner"
+                      placeholder="请输入取水权人全称"
+                      class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
                     />
-                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-sans pointer-events-none">万m³</span>
                   </div>
-                </div>
 
-                <div class="col-span-1 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">年产值</label>
-                  <div class="relative flex-1">
+                  <div class="col-span-1 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">许可证号</label>
                     <input
-                      type="number"
-                      step="1"
-                      v-model.number="form.annualOutputValue"
-                      class="w-full h-8 pl-2.5 pr-11 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                      type="text"
+                      v-model="form.permitNumber"
+                      placeholder="请输入许可证编号"
+                      class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
                     />
-                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-sans pointer-events-none">万元</span>
                   </div>
-                </div>
 
-                <div class="col-span-1 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">邮政编码</label>
-                  <input
-                    type="text"
-                    v-model="form.postalCode"
-                    placeholder="6位邮编"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
-                </div>
+                  <!-- 第二行：许可水量 + 年产值 + 邮政编码 -->
+                  <div class="col-span-1 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">许可水量</label>
+                    <div class="relative flex-1">
+                      <input
+                        type="number"
+                        step="0.01"
+                        v-model.number="form.permitVolume"
+                        class="w-full h-8 pl-2.5 pr-12 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                      />
+                      <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-sans pointer-events-none">万m³</span>
+                    </div>
+                  </div>
 
-                <!-- 第三行：联系人 + 联系电话 + 电子邮箱 -->
-                <div class="col-span-1 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
-                    <span class="text-rose-500 mr-0.5">*</span>联系人
-                  </label>
-                  <input
-                    type="text"
-                    v-model="form.contactPerson"
-                    placeholder="填报联系人"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
-                </div>
+                  <div class="col-span-1 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">年产值</label>
+                    <div class="relative flex-1">
+                      <input
+                        type="number"
+                        step="1"
+                        v-model.number="form.annualOutputValue"
+                        class="w-full h-8 pl-2.5 pr-11 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                      />
+                      <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-sans pointer-events-none">万元</span>
+                    </div>
+                  </div>
 
-                <div class="col-span-1 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
-                    <span class="text-rose-500 mr-0.5">*</span>联系电话
-                  </label>
-                  <input
-                    type="text"
-                    v-model="form.contactPhone"
-                    placeholder="手机或办公电话"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
-                </div>
+                  <div class="col-span-1 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">邮政编码</label>
+                    <input
+                      type="text"
+                      v-model="form.postalCode"
+                      placeholder="6位邮编"
+                      class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                    />
+                  </div>
 
-                <div class="col-span-1 flex items-center">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">电子邮箱</label>
-                  <input
-                    type="email"
-                    v-model="form.email"
-                    placeholder="电子邮箱地址"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
-                </div>
+                  <!-- 第三行：联系人 + 联系电话 + 电子邮箱 -->
+                  <div class="col-span-1 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
+                      <span class="text-rose-500 mr-0.5">*</span>联系人
+                    </label>
+                    <input
+                      type="text"
+                      v-model="form.contactPerson"
+                      placeholder="填报联系人"
+                      class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                    />
+                  </div>
 
-                <!-- 第四行：详细地址 (跨3列) -->
-                <div class="col-span-1 md:col-span-3 flex items-center pt-0.5">
-                  <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
-                    <span class="text-rose-500 mr-0.5">*</span>详细地址
-                  </label>
-                  <input
-                    type="text"
-                    v-model="form.detailedAddress"
-                    placeholder="请输入详细地址"
-                    class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
-                  />
+                  <div class="col-span-1 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
+                      <span class="text-rose-500 mr-0.5">*</span>联系电话
+                    </label>
+                    <input
+                      type="text"
+                      v-model="form.contactPhone"
+                      placeholder="手机或办公电话"
+                      class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md font-mono text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                    />
+                  </div>
+
+                  <div class="col-span-1 flex items-center">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">电子邮箱</label>
+                    <input
+                      type="email"
+                      v-model="form.email"
+                      placeholder="电子邮箱地址"
+                      class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                    />
+                  </div>
+
+                  <!-- 第四行：详细地址 (跨3列) -->
+                  <div class="col-span-1 md:col-span-3 flex items-center pt-0.5">
+                    <label class="w-20 shrink-0 text-slate-500 font-normal text-right pr-2.5">
+                      <span class="text-rose-500 mr-0.5">*</span>详细地址
+                    </label>
+                    <input
+                      type="text"
+                      v-model="form.detailedAddress"
+                      placeholder="请输入详细地址"
+                      class="flex-1 h-8 px-2.5 bg-white border border-[#dce6f5] rounded-md text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 transition"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- 两个表单的切换按钮 (仅展示填报年度和名称) -->
-            <div class="grid grid-cols-2 gap-2.5">
-              <!-- 表单 1: 本年实际用水填报表 -->
-              <button
-                type="button"
-                @click="activeFormTab = 'actual'"
-                class="py-2.5 px-3.5 rounded-lg border transition cursor-pointer flex items-center justify-between"
-                :class="[
-                  activeFormTab === 'actual'
-                    ? 'bg-blue-50 border-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs'
-                    : 'bg-white border-slate-200 hover:bg-slate-50'
-                ]"
-              >
-                <div class="flex items-center gap-2">
-                  <span
-                    class="w-2 h-2 rounded-full"
-                    :class="activeFormTab === 'actual' ? 'bg-[#1677ff]' : 'bg-slate-400'"
-                  ></span>
-                  <span
-                    class="font-bold text-xs"
-                    :class="activeFormTab === 'actual' ? 'text-blue-900' : 'text-slate-700'"
-                  >
-                    本年实际用水填报表
-                  </span>
-                </div>
-                <span
-                  class="px-2 py-0.5 rounded text-[11px] font-medium font-mono"
-                  :class="activeFormTab === 'actual' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'"
-                >
-                  {{ currentYear }}年度
-                </span>
-              </button>
-
-              <!-- 表单 2: 下年度计划用水填报表 -->
-              <button
-                type="button"
-                @click="activeFormTab = 'plan'"
-                class="py-2.5 px-3.5 rounded-lg border transition cursor-pointer flex items-center justify-between"
-                :class="[
-                  activeFormTab === 'plan'
-                    ? 'bg-blue-50 border-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs'
-                    : 'bg-white border-slate-200 hover:bg-slate-50'
-                ]"
-              >
-                <div class="flex items-center gap-2">
-                  <span
-                    class="w-2 h-2 rounded-full"
-                    :class="activeFormTab === 'plan' ? 'bg-[#1677ff]' : 'bg-slate-400'"
-                  ></span>
-                  <span
-                    class="font-bold text-xs"
-                    :class="activeFormTab === 'plan' ? 'text-blue-900' : 'text-slate-700'"
-                  >
-                    下年度计划用水填报表
-                  </span>
-                </div>
-                <span
-                  class="px-2 py-0.5 rounded text-[11px] font-medium font-mono"
-                  :class="activeFormTab === 'plan' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'"
-                >
-                  {{ nextYear }}年度
-                </span>
-              </button>
-            </div>
-
-            <!-- 表单 1：本年实际用水填报表 (包含生活、工业、农业、发电四项核定) -->
+            <!-- 表单 1：本年实际用水填报表 (表单切换栏通过 slot 插入吸顶区域固定展示) -->
             <WaterQuotaAuditForm
               v-show="activeFormTab === 'actual'"
               title="表单一：本年实际用水填报表"
               theme="blue"
               v-model="actualQuotaForm"
-            />
+            >
+              <template #tabs>
+                <!-- 表单切换栏：固定在最顶部 -->
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    @click="activeFormTab = 'actual'"
+                    class="py-2 px-3 rounded-lg border transition cursor-pointer flex items-center justify-between select-none"
+                    :class="[
+                      activeFormTab === 'actual'
+                        ? 'bg-blue-50 border-[#1677ff] text-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs font-semibold'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100/80'
+                    ]"
+                  >
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <span
+                        class="w-2 h-2 rounded-full shrink-0"
+                        :class="activeFormTab === 'actual' ? 'bg-[#1677ff]' : 'bg-slate-400'"
+                      ></span>
+                      <span class="text-xs truncate">本年实际用水填报表</span>
+                    </div>
+                    <span
+                      class="px-1.5 py-0.5 rounded text-[11px] font-mono shrink-0 ml-1"
+                      :class="activeFormTab === 'actual' ? 'bg-blue-100 text-blue-800 font-medium' : 'bg-slate-200/70 text-slate-600'"
+                    >
+                      {{ currentYear }}年度
+                    </span>
+                  </button>
 
-            <!-- 表单 2：下年度计划用水填报表 (包含生活、工业、农业、发电四项核定) -->
+                  <button
+                    type="button"
+                    @click="activeFormTab = 'plan'"
+                    class="py-2 px-3 rounded-lg border transition cursor-pointer flex items-center justify-between select-none"
+                    :class="[
+                      activeFormTab === 'plan'
+                        ? 'bg-blue-50 border-[#1677ff] text-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs font-semibold'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100/80'
+                    ]"
+                  >
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <span
+                        class="w-2 h-2 rounded-full shrink-0"
+                        :class="activeFormTab === 'plan' ? 'bg-[#1677ff]' : 'bg-slate-400'"
+                      ></span>
+                      <span class="text-xs truncate">下年度计划用水填报表</span>
+                    </div>
+                    <span
+                      class="px-1.5 py-0.5 rounded text-[11px] font-mono shrink-0 ml-1"
+                      :class="activeFormTab === 'plan' ? 'bg-blue-100 text-blue-800 font-medium' : 'bg-slate-200/70 text-slate-600'"
+                    >
+                      {{ nextYear }}年度
+                    </span>
+                  </button>
+                </div>
+              </template>
+            </WaterQuotaAuditForm>
+
+            <!-- 表单 2：下年度计划用水填报表 (表单切换栏通过 slot 插入吸顶区域固定展示) -->
             <WaterQuotaAuditForm
               v-show="activeFormTab === 'plan'"
               title="表单二：下年度计划用水填报表"
               theme="blue"
               v-model="planQuotaForm"
-            />
+            >
+              <template #tabs>
+                <!-- 表单切换栏：固定在最顶部 -->
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    @click="activeFormTab = 'actual'"
+                    class="py-2 px-3 rounded-lg border transition cursor-pointer flex items-center justify-between select-none"
+                    :class="[
+                      activeFormTab === 'actual'
+                        ? 'bg-blue-50 border-[#1677ff] text-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs font-semibold'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100/80'
+                    ]"
+                  >
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <span
+                        class="w-2 h-2 rounded-full shrink-0"
+                        :class="activeFormTab === 'actual' ? 'bg-[#1677ff]' : 'bg-slate-400'"
+                      ></span>
+                      <span class="text-xs truncate">本年实际用水填报表</span>
+                    </div>
+                    <span
+                      class="px-1.5 py-0.5 rounded text-[11px] font-mono shrink-0 ml-1"
+                      :class="activeFormTab === 'actual' ? 'bg-blue-100 text-blue-800 font-medium' : 'bg-slate-200/70 text-slate-600'"
+                    >
+                      {{ currentYear }}年度
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    @click="activeFormTab = 'plan'"
+                    class="py-2 px-3 rounded-lg border transition cursor-pointer flex items-center justify-between select-none"
+                    :class="[
+                      activeFormTab === 'plan'
+                        ? 'bg-blue-50 border-[#1677ff] text-[#1677ff] ring-1 ring-[#1677ff] shadow-2xs font-semibold'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100/80'
+                    ]"
+                  >
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <span
+                        class="w-2 h-2 rounded-full shrink-0"
+                        :class="activeFormTab === 'plan' ? 'bg-[#1677ff]' : 'bg-slate-400'"
+                      ></span>
+                      <span class="text-xs truncate">下年度计划用水填报表</span>
+                    </div>
+                    <span
+                      class="px-1.5 py-0.5 rounded text-[11px] font-mono shrink-0 ml-1"
+                      :class="activeFormTab === 'plan' ? 'bg-blue-100 text-blue-800 font-medium' : 'bg-slate-200/70 text-slate-600'"
+                    >
+                      {{ nextYear }}年度
+                    </span>
+                  </button>
+                </div>
+              </template>
+            </WaterQuotaAuditForm>
 
             <!-- 卡片 4: 审核批注与核定结论 -->
-            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-1.5">
+            <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-1.5 mt-2.5">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
@@ -780,27 +868,7 @@
               </div>
             </div>
 
-            <!-- Tab 3: 电子证照信息 -->
-            <div v-else-if="activeRightTab === 'electronic_license'" class="space-y-4">
-              <div class="bg-white p-6 rounded-lg border border-slate-200/80 shadow-2xs space-y-4 max-w-[680px] mx-auto">
-                <div class="text-center space-y-1 pb-3 border-b-2 border-[#1677ff]">
-                  <span class="text-base font-bold tracking-widest text-slate-900">中华人民共和国取水许可证</span>
-                  <div class="text-xs font-mono text-slate-500">{{ form.permitNumber }}</div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-y-3 text-xs">
-                  <div><span class="text-slate-400">取水权人：</span><span class="font-medium text-slate-800">{{ form.waterOwner }}</span></div>
-                  <div><span class="text-slate-400">法定代表人：</span><span class="font-medium text-slate-800">{{ form.contactPerson }}</span></div>
-                  <div><span class="text-slate-400">有效期限：</span><span class="font-mono text-slate-800">2023-01-01 至 2028-12-31</span></div>
-                  <div><span class="text-slate-400">年许可取水量：</span><span class="font-mono font-semibold text-blue-600">{{ form.permitVolume }} 万m³</span></div>
-                  <div class="col-span-2"><span class="text-slate-400">取水地点：</span><span class="text-slate-800">{{ form.detailedAddress }}</span></div>
-                  <div><span class="text-slate-400">发证机关：</span><span class="text-slate-800">西宁市水务局</span></div>
-                  <div><span class="text-slate-400">证照防伪码：</span><span class="font-mono text-emerald-600">QHQ-2026-XN-VALID</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Tab 4: 用水定额标签页 (根据最新标准要求高保真重构) -->
+            <!-- Tab 3: 用水定额标签页 (根据最新标准要求高保真重构) -->
             <div v-else-if="activeRightTab === 'water_quota'" class="space-y-4">
               
               <!-- 模块 1: 近三年用水计划 -->
@@ -1015,93 +1083,230 @@
 
             </div>
 
-            <!-- Tab 5: 申报材料与佐证附件 (完全与计量设施档案列表查看附件样式一致) -->
-            <div v-else-if="activeRightTab === 'attachments'" class="space-y-4">
-              <div class="bg-white rounded-lg border border-slate-200/80 p-5 shadow-2xs space-y-3.5">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <!-- Tab 4: 业务流程 (从提交到审核的每一个节点) -->
+            <div v-else-if="activeRightTab === 'business_process'" class="space-y-4">
+              <!-- 业务流程概览卡片 -->
+              <div class="bg-white rounded-lg border border-slate-200/80 p-4 shadow-2xs">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
                   <div class="flex items-center gap-2">
-                    <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[13px] font-bold text-slate-800">申报佐证附件材料列表</span>
-                    <span class="text-xs text-gray-400 font-mono">({{ attachments.length }} 个文件)</span>
+                    <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
+                    <h4 class="text-sm font-bold text-slate-800">申报审批全周期业务流转节点</h4>
+                    <span class="text-xs font-mono text-slate-500">业务编号: XN-WP-{{ form.year || 2026 }}-{{ form.permitNumber?.slice(-4) || '0012' }}</span>
                   </div>
-                  <span class="text-[11px] text-gray-400">水利核验佐证凭据</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500">当前流转状态:</span>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-[#1677ff] border border-blue-200">
+                      {{ record.status }} (第 5/6 步)
+                    </span>
+                  </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <!-- 流程全景步骤轴 -->
+                <div class="grid grid-cols-6 gap-1 pt-3">
                   <div
-                    v-for="(att, aIdx) in attachments"
-                    :key="aIdx"
-                    class="flex items-center justify-between p-2.5 rounded-lg border border-[#c4d8ee] bg-[#f9fbfe] hover:bg-[#f0f5fd] transition gap-2.5"
+                    v-for="(node, nIdx) in businessProcessNodes"
+                    :key="node.id"
+                    class="flex flex-col items-center text-center relative"
                   >
-                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                      <!-- 1. 图片图标 (蓝底相机) -->
+                    <!-- 节点圆点与连线 -->
+                    <div class="w-full flex items-center mb-2">
                       <div
-                        v-if="att.type === 'image'"
-                        class="w-7 h-7 rounded bg-[#e6f1fc] text-[#1677ff] flex items-center justify-center shrink-0"
+                        class="flex-1 h-0.5"
+                        :class="nIdx === 0 ? 'invisible' : (node.status === 'completed' || node.status === 'current' ? 'bg-[#1677ff]' : 'bg-slate-200')"
+                      ></div>
+                      <div
+                        class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition shadow-2xs"
+                        :class="[
+                          node.status === 'completed'
+                            ? 'bg-emerald-500 text-white'
+                            : node.status === 'current'
+                            ? 'bg-[#1677ff] text-white ring-4 ring-blue-100 animate-pulse'
+                            : 'bg-slate-100 text-slate-400 border border-slate-300'
+                        ]"
                       >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                          <polyline points="21 15 16 10 5 21"></polyline>
+                        <svg v-if="node.status === 'completed'" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                          <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
+                        <span v-else>{{ node.id }}</span>
                       </div>
-
-                      <!-- 2. Word 图标 (蓝紫色底 W) -->
                       <div
-                        v-else-if="att.type === 'word'"
-                        class="w-7 h-7 rounded bg-[#eef0fe] text-[#2f54eb] flex items-center justify-center shrink-0 font-bold text-xs"
-                      >
-                        W
-                      </div>
+                        class="flex-1 h-0.5"
+                        :class="nIdx === businessProcessNodes.length - 1 ? 'invisible' : (node.status === 'completed' ? 'bg-[#1677ff]' : 'bg-slate-200')"
+                      ></div>
+                    </div>
+                    <!-- 节点名称与标签 -->
+                    <span
+                      class="text-[11px] font-medium leading-tight line-clamp-2 px-1"
+                      :class="node.status === 'current' ? 'text-[#1677ff] font-bold' : (node.status === 'completed' ? 'text-slate-800' : 'text-slate-400')"
+                    >
+                      {{ node.shortName }}
+                    </span>
+                    <span class="text-[10px] text-slate-400 mt-0.5 font-mono">{{ node.statusText }}</span>
+                  </div>
+                </div>
+              </div>
 
-                      <!-- 3. PDF 图标 (红底文档) -->
+              <!-- 节点明细流转清单卡片 -->
+              <div class="space-y-3">
+                <div
+                  v-for="node in businessProcessNodes"
+                  :key="node.id"
+                  class="bg-white rounded-lg border transition duration-150 p-4 shadow-2xs relative"
+                  :class="[
+                    node.status === 'current'
+                      ? 'border-[#1677ff] ring-1 ring-blue-100 bg-gradient-to-r from-blue-50/20 via-white to-white'
+                      : 'border-slate-200/80 hover:border-slate-300'
+                  ]"
+                >
+                  <!-- 节点顶栏 -->
+                  <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
                       <div
-                        v-else
-                        class="w-7 h-7 rounded bg-[#feebee] text-[#f5222d] flex items-center justify-center shrink-0"
+                        class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold font-mono"
+                        :class="[
+                          node.status === 'completed'
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                            : node.status === 'current'
+                            ? 'bg-[#1677ff] text-white'
+                            : 'bg-slate-100 text-slate-400 border border-slate-200'
+                        ]"
                       >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                          <polyline points="14 2 14 8 20 8"></polyline>
-                          <line x1="16" y1="13" x2="8" y2="13"></line>
-                          <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
+                        0{{ node.id }}
                       </div>
-
-                      <div class="truncate">
-                        <span class="text-xs text-gray-800 font-medium truncate block" :title="att.name">
-                          {{ att.name }}
-                        </span>
-                        <span class="text-[10.5px] text-gray-400 font-mono block">
-                          {{ att.size }} · 计划申请佐证文件
-                        </span>
-                      </div>
+                      <span class="text-xs font-bold text-slate-800">{{ node.name }}</span>
+                      <span :class="['px-1.5 py-0.5 rounded text-[10.5px] border', node.tagColor]">
+                        {{ node.tag }}
+                      </span>
                     </div>
 
-                    <div class="flex items-center gap-1.5 shrink-0 text-gray-400">
-                      <button
-                        v-if="att.type === 'image' || att.type === 'pdf'"
-                        type="button"
-                        @click.stop="openPreview(att)"
-                        class="hover:text-[#1677ff] p-1.5 cursor-pointer rounded transition"
-                        title="预览附件"
+                    <div class="flex items-center gap-3 text-xs">
+                      <span
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
+                        :class="[
+                          node.status === 'completed'
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                            : node.status === 'current'
+                            ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                            : 'bg-slate-100 text-slate-500 border border-slate-200'
+                        ]"
                       >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        @click.stop="downloadAttachment(att)"
-                        class="hover:text-[#1677ff] p-1.5 cursor-pointer rounded transition"
-                        title="下载附件"
+                        <span
+                          class="w-1.5 h-1.5 rounded-full"
+                          :class="[
+                            node.status === 'completed'
+                              ? 'bg-emerald-500'
+                              : node.status === 'current'
+                              ? 'bg-[#1677ff] animate-pulse'
+                              : 'bg-slate-400'
+                          ]"
+                        ></span>
+                        {{ node.statusText }}
+                      </span>
+                      <span class="text-slate-400 font-mono text-[11px]">{{ node.time }}</span>
+                    </div>
+                  </div>
+
+                  <!-- 经办人信息与办理说明 -->
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs py-2.5 text-slate-600 bg-slate-50/60 px-3 rounded-md my-2 border border-slate-100">
+                    <div>
+                      <span class="text-slate-400">办理人员：</span>
+                      <strong class="text-slate-800 font-medium">{{ node.handler }}</strong>
+                      <span class="text-slate-400 text-[11px] ml-1">({{ node.handlerRole }})</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400">经办部门：</span>
+                      <span class="text-slate-700">{{ node.department }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400">流转耗时：</span>
+                      <span class="font-mono text-slate-700">{{ node.duration }}</span>
+                    </div>
+                  </div>
+
+                  <!-- 节点说明详情 -->
+                  <div class="text-xs text-slate-600 leading-relaxed space-y-1.5">
+                    <p>{{ node.desc }}</p>
+                    
+                    <!-- 成果与结论提示条 -->
+                    <div class="p-2 rounded bg-blue-50/40 border border-blue-100 flex items-start gap-2">
+                      <svg class="w-3.5 h-3.5 text-[#1677ff] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                      </svg>
+                      <span class="text-slate-700 font-medium text-[11.5px]">{{ node.resultText }}</span>
+                    </div>
+                  </div>
+
+                  <!-- 节点 1 特别展示：申报附件资料 (包含预览与下载) -->
+                  <div v-if="node.hasAttachments" class="mt-2.5 pt-2 border-t border-slate-100">
+                    <span class="text-[11px] text-slate-400 block mb-1.5">申报提交的佐证附件：</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div
+                        v-for="(att, aIdx) in attachments"
+                        :key="aIdx"
+                        class="flex items-center justify-between p-2 rounded-lg border border-[#c4d8ee] bg-white hover:bg-[#f0f5fd] transition gap-2"
                       >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="7 10 12 15 17 10"></polyline>
-                          <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                      </button>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                          <div
+                            v-if="att.type === 'image'"
+                            class="w-5 h-5 rounded bg-[#e6f1fc] text-[#1677ff] flex items-center justify-center shrink-0"
+                          >
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                          </div>
+                          <div
+                            v-else-if="att.type === 'word'"
+                            class="w-5 h-5 rounded bg-[#eef0fe] text-[#2f54eb] flex items-center justify-center shrink-0 font-bold text-[10px]"
+                          >
+                            W
+                          </div>
+                          <div
+                            v-else
+                            class="w-5 h-5 rounded bg-[#feebee] text-[#f5222d] flex items-center justify-center shrink-0"
+                          >
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                              <line x1="16" y1="13" x2="8" y2="13"></line>
+                              <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                          </div>
+                          <span class="text-[11px] text-gray-800 truncate font-normal" :title="att.name">
+                            {{ att.name }}
+                          </span>
+                        </div>
+
+                        <div class="flex items-center gap-1 shrink-0 text-gray-400">
+                          <button
+                            v-if="att.type === 'image' || att.type === 'pdf'"
+                            type="button"
+                            @click.stop="openPreview(att)"
+                            class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
+                            title="预览附件"
+                          >
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                              <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            @click.stop="downloadAttachment(att)"
+                            class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
+                            title="下载附件"
+                          >
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                              <polyline points="7 10 12 15 17 10"></polyline>
+                              <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1113,7 +1318,7 @@
 
       </div>
 
-      <!-- 3. 全局底部操作栏 (右侧取消/驳回/通过按钮) -->
+      <!-- 3. 全局底部操作栏 (右侧取消/驳回/审核气泡按钮) -->
       <div class="px-5 py-2.5 bg-white border-t border-slate-200/80 flex items-center justify-end shrink-0">
         <!-- 右侧操作按钮组 -->
         <div class="flex items-center gap-2.5">
@@ -1138,16 +1343,113 @@
             <span>不同意 (驳回)</span>
           </button>
 
-          <button
-            type="button"
-            @click="handleApprove"
-            class="px-6 py-2 rounded-md bg-[#1677ff] hover:bg-blue-600 text-white text-xs font-medium transition cursor-pointer shadow-2xs flex items-center gap-1.5"
+          <!-- 审核气泡弹窗 -->
+          <t-popup
+            trigger="click"
+            placement="top-end"
+            v-model:visible="auditPopupVisible"
           >
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span>同意并通过</span>
-          </button>
+            <template #content>
+              <div class="p-4 w-[380px] bg-white rounded-lg shadow-xl border border-slate-200 text-xs space-y-3 text-left">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                    <span class="w-1.5 h-3 bg-[#1677ff] rounded-full"></span>
+                    <span>填写审核意见</span>
+                  </div>
+                  <span class="text-[11px] text-[#1677ff] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-mono">
+                    {{ form.year || 2026 }}年度计划
+                  </span>
+                </div>
+
+                <!-- 审核核定结论 -->
+                <div class="space-y-1.5">
+                  <label class="text-slate-500 text-[11px] font-medium block">审核核定结论</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <label
+                      class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded border cursor-pointer transition text-xs select-none"
+                      :class="auditDecision === 'approve' ? 'bg-blue-50 border-[#1677ff] text-[#1677ff] font-semibold ring-1 ring-blue-100' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'"
+                    >
+                      <input type="radio" value="approve" v-model="auditDecision" class="hidden" />
+                      <span class="w-2 h-2 rounded-full" :class="auditDecision === 'approve' ? 'bg-[#1677ff]' : 'bg-slate-300'"></span>
+                      <span>同意审核通过</span>
+                    </label>
+                    <label
+                      class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded border cursor-pointer transition text-xs select-none"
+                      :class="auditDecision === 'reject' ? 'bg-rose-50 border-rose-500 text-rose-600 font-semibold ring-1 ring-rose-100' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'"
+                    >
+                      <input type="radio" value="reject" v-model="auditDecision" class="hidden" />
+                      <span class="w-2 h-2 rounded-full" :class="auditDecision === 'reject' ? 'bg-rose-500' : 'bg-slate-300'"></span>
+                      <span>不同意并驳回</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 常用快捷评语 -->
+                <div class="space-y-1">
+                  <label class="text-slate-500 text-[11px] font-medium block">快捷常用评语</label>
+                  <div class="flex flex-wrap gap-1">
+                    <button
+                      type="button"
+                      v-for="(phrase, pIdx) in quickAuditOpinions"
+                      :key="pIdx"
+                      @click="auditOpinion = phrase"
+                      class="text-[10.5px] px-2 py-0.5 rounded bg-slate-50 hover:bg-blue-50 hover:text-[#1677ff] text-slate-600 border border-slate-200 transition text-left truncate max-w-full"
+                      :title="phrase"
+                    >
+                      {{ phrase }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 审核意见多行输入框 -->
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <label class="text-slate-500 text-[11px] font-medium">审核意见说明</label>
+                    <span class="text-[10.5px] text-slate-400">必填</span>
+                  </div>
+                  <textarea
+                    v-model="auditOpinion"
+                    rows="3"
+                    placeholder="请输入核定结论及审核意见..."
+                    class="w-full p-2.5 bg-slate-50 border border-[#dce6f5] rounded-md text-xs text-slate-800 focus:outline-none focus:border-[#1677ff] focus:bg-white resize-none transition"
+                  ></textarea>
+                </div>
+
+                <!-- 弹窗底部操作按钮：取消 与 确认审核 -->
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    @click="auditPopupVisible = false"
+                    class="px-3 py-1.5 rounded bg-white hover:bg-slate-100 text-slate-600 text-xs border border-slate-200 transition cursor-pointer"
+                  >
+                    取消
+                  </button>
+                  <button
+                    type="button"
+                    @click="handleConfirmAuditFromPopup"
+                    class="px-4 py-1.5 rounded bg-[#1677ff] hover:bg-blue-600 text-white font-medium text-xs shadow-2xs transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>确认审核</span>
+                  </button>
+                </div>
+              </div>
+            </template>
+
+            <!-- 触发按钮：审核 -->
+            <button
+              type="button"
+              class="px-6 py-2 rounded-md bg-[#1677ff] hover:bg-blue-600 text-white text-xs font-medium transition cursor-pointer shadow-2xs flex items-center gap-1.5"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              <span>审核</span>
+            </button>
+          </t-popup>
         </div>
       </div>
     </div>
@@ -1250,13 +1552,153 @@ const emit = defineEmits<{
 const rightTabs = [
   { key: 'plan_application', label: '计划申请填报表' },
   { key: 'summary', label: '取水总结填报表' },
-  { key: 'electronic_license', label: '电子证照信息' },
   { key: 'water_quota', label: '用水定额' },
-  { key: 'attachments', label: '佐证材料与附件' },
+  { key: 'business_process', label: '业务流程' },
 ];
 
-const activeRightTab = ref<'summary' | 'plan_application' | 'electronic_license' | 'water_quota' | 'attachments'>('plan_application');
+const activeRightTab = ref<'summary' | 'plan_application' | 'water_quota' | 'business_process'>('plan_application');
 const auditOpinion = ref('经审查，该单位用水计划指标符合西宁市刚性约束管控方案与行业定额，予以审核通过。');
+
+// 审核气泡弹窗状态与快捷评语
+const auditPopupVisible = ref(false);
+const auditDecision = ref<'approve' | 'reject'>('approve');
+const quickAuditOpinions = [
+  '经审查，用水计划指标符合西宁市刚性约束管控方案与行业定额，予以审核通过。',
+  '指标测算合理规范，符合节约用水刚性约束指标要求，核定通过。',
+  '水资源配置符合黄河流域刚性管控指标方案，同意下达年度计划指标。',
+  '申报用水指标测算依据不足，请结合近三年实际取水台账重新核定后上报。'
+];
+
+// 业务流程流转节点（从提交到审核的每一个节点）
+const businessProcessNodes = computed(() => {
+  const currentRecord = props.record;
+  const isApproved = currentRecord?.status === '审核通过';
+  const isRejected = currentRecord?.status === '审核驳回';
+  const isInAudit = !isApproved && !isRejected;
+
+  return [
+    {
+      id: 1,
+      shortName: '申报提交',
+      name: '用水户计划填报与佐证材料提交',
+      tag: '企业申报',
+      tagColor: 'bg-blue-50 text-blue-600 border-blue-200',
+      status: 'completed',
+      statusText: '已提交',
+      handler: form.value.contactPerson || '张工',
+      handlerRole: '申报经办人',
+      department: form.value.waterOwner || currentRecord?.unitName || '青海亚洲硅业高纯材料有限公司',
+      time: '2026-01-10 09:30:18',
+      duration: '历时 30 分钟',
+      desc: `完成了${form.value.year || 2026}年度用水计划指标申报，填报了计划申请表、取水总结表，关联电子取水许可证（${form.value.permitNumber || 'B630121G2026-0055'}），并上传相关资质佐证材料。`,
+      hasAttachments: true,
+      resultText: `申报计划用水总量: ${(declaredMonthlyGrandTotal.value || 0).toFixed(2)} 万m³（其中地表水 ${(declaredMonthlySurfaceTotal.value || 0).toFixed(2)} 万m³，地下水 ${(declaredMonthlyGroundTotal.value || 0).toFixed(2)} 万m³，非常规水 ${(declaredMonthlyUnconvTotal.value || 0).toFixed(2)} 万m³）`
+    },
+    {
+      id: 2,
+      shortName: '窗口受理',
+      name: '政务服务窗口初审与材料受理',
+      tag: '行政初审',
+      tagColor: 'bg-indigo-50 text-indigo-600 border-indigo-200',
+      status: 'completed',
+      statusText: '初审受理通过',
+      handler: '赵秀芬',
+      handlerRole: '政务窗口受理专员 (工号: XN-042)',
+      department: '西宁市政务服务中心水务局综合窗口',
+      time: '2026-01-11 11:20:45',
+      duration: '用时 1.2 工作日',
+      desc: '对企业提交的取水许可电子证照有效性、取水申请表填写规范性及佐证材料完整度进行查验核验，材料齐全合规，符合受理条件。',
+      hasAttachments: false,
+      resultText: '正式受理（受理编号：XN-SL-20260111-008），业务流转至属地区县水务局现场复验。'
+    },
+    {
+      id: 3,
+      shortName: '现场核查',
+      name: '属地区县水政水资源科现场核查与计量复验',
+      tag: '现场核验',
+      tagColor: 'bg-teal-50 text-teal-600 border-teal-200',
+      status: 'completed',
+      statusText: '现场核验通过',
+      handler: '李文华',
+      handlerRole: '现场核查组长 · 副科长',
+      department: `${currentRecord?.district || '城东区'}水务局水政水资源科`,
+      time: '2026-01-13 14:40:22',
+      duration: '用时 2.0 工作日',
+      desc: '赴取水现场实地核查计量设施运行工况，查验远传水表数采仪在线传输状态，校核历史取水台账，取水规模与申报口径吻合。',
+      hasAttachments: false,
+      resultText: '现场核验合格，超声波与电磁流量计运行正常，未发现私开旁通及超采行为。'
+    },
+    {
+      id: 4,
+      shortName: '定额比对',
+      name: '水资源刚性约束智能比对与定额评审',
+      tag: '定额合规',
+      tagColor: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+      status: 'completed',
+      statusText: '定额核算合格',
+      handler: '王明远',
+      handlerRole: '市级节水工程师',
+      department: '西宁市节约用水办公室',
+      time: '2026-01-14 16:15:30',
+      duration: '用时 1.0 工作日',
+      desc: '对照青海省用水定额地方标准及黄河流域水资源刚性约束指标，利用模型算法比对行业先进定额值与非常规水源配置比例。',
+      hasAttachments: false,
+      resultText: '定额合规比对通过（综合节水评级：A级，工业非常规水配置率达标）。'
+    },
+    {
+      id: 5,
+      shortName: '指标审核',
+      name: '市水务局水资源管理科审批审核',
+      tag: '指标审核',
+      tagColor: isInAudit ? 'bg-blue-50 text-[#1677ff] border-blue-300 font-semibold' : (isApproved ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'),
+      status: isInAudit ? 'current' : 'completed',
+      statusText: isInAudit ? '当前审核中' : (isApproved ? '审核通过' : '审核驳回'),
+      handler: currentRecord?.auditor || '张建军 (审批主管)',
+      handlerRole: '水资源核定主管 / 当前审批员',
+      department: '西宁市水务局水资源管理科',
+      time: isInAudit ? '办理中（当前节点）' : (currentRecord?.auditDate || '2026-01-16 10:30:00'),
+      duration: isInAudit ? '当前待办节点' : '已完成',
+      desc: isInAudit
+        ? '正在通过本审核窗口对生活、工业、农业、牲畜、发电、服务业等各项用水定额进行逐项校核，核定地表水、地下水与非常规水源计划量，出具审核意见。'
+        : `审核结论：${currentRecord?.auditOpinion || auditOpinion.value}`,
+      hasAttachments: false,
+      resultText: isInAudit
+        ? '待确认审核下达'
+        : (isApproved ? '已同意并通过核定指标' : '已驳回整改')
+    },
+    {
+      id: 6,
+      shortName: '批文下达',
+      name: '年度计划用水批复下达与电子证照签发',
+      tag: '批文送达',
+      tagColor: 'bg-slate-100 text-slate-500 border-slate-200',
+      status: isApproved ? 'completed' : 'pending',
+      statusText: isApproved ? '已发文下达' : '待流转',
+      handler: '发文归档中心 / 系统服务',
+      handlerRole: '电子证照签章系统',
+      department: '西宁市水务局综合行政发文办',
+      time: isApproved ? currentRecord?.auditDate || '2026-01-16 10:35:00' : '待审批通过后触发',
+      duration: '系统即时',
+      desc: '生成正式带红色电子公章的《西宁市年度计划用水核定批复通知书》，通过青海政务服务网推送至企业端并同步至税务及水资源实时监控系统。',
+      hasAttachments: false,
+      resultText: isApproved ? '已生成红头盖章批复件，完成全流程闭环归档。' : '前置审批通过后自动触发签发流程。'
+    }
+  ];
+});
+
+// 弹窗确认审核逻辑
+const handleConfirmAuditFromPopup = () => {
+  if (!auditOpinion.value.trim()) {
+    MessagePlugin.warning('请填写审核意见');
+    return;
+  }
+  if (auditDecision.value === 'reject') {
+    handleReject();
+  } else {
+    handleApprove();
+  }
+  auditPopupVisible.value = false;
+};
 
 // 近三年用水计划数据 (与截图完全一致)
 const recentThreeYearsPlan = ref([
@@ -1590,11 +2032,51 @@ const createInitialPlanData = (): FormQuotaData => ({
 const actualQuotaForm = ref<FormQuotaData>(createInitialActualData());
 const planQuotaForm = ref<FormQuotaData>(createInitialPlanData());
 
-// 监听选中的 record 初始化基础信息与双表单
+// 左侧表单区域：向上滑动时自动收起基础信息，并支持手动切换展开/收起
+const isBaseInfoCollapsed = ref(false);
+const userManuallyToggled = ref(false);
+const leftScrollContainer = ref<HTMLElement | null>(null);
+
+const toggleBaseInfo = () => {
+  userManuallyToggled.value = true;
+  isBaseInfoCollapsed.value = !isBaseInfoCollapsed.value;
+};
+
+const handleLeftScroll = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (!target) return;
+  // 向上滑动内容（向下滚动浏览表单，scrollTop > 40）时，自动收起基础信息
+  if (target.scrollTop > 40 && !isBaseInfoCollapsed.value && !userManuallyToggled.value) {
+    isBaseInfoCollapsed.value = true;
+  } else if (target.scrollTop <= 5 && isBaseInfoCollapsed.value && !userManuallyToggled.value) {
+    // 回到最顶部时，若未被手动固定收起，可自动还原展开
+    isBaseInfoCollapsed.value = false;
+  }
+};
+
+// 监听弹窗显示与选中的 record 初始化基础信息与双表单
+watch(
+  () => props.visible,
+  (val) => {
+    if (val) {
+      isBaseInfoCollapsed.value = false;
+      userManuallyToggled.value = false;
+      if (leftScrollContainer.value) {
+        leftScrollContainer.value.scrollTop = 0;
+      }
+    }
+  }
+);
+
 watch(
   () => props.record,
   (rec) => {
     if (rec) {
+      isBaseInfoCollapsed.value = false;
+      userManuallyToggled.value = false;
+      if (leftScrollContainer.value) {
+        leftScrollContainer.value.scrollTop = 0;
+      }
       form.value.waterOwner = rec.unitName || '青海亚洲硅业高纯材料有限公司';
       form.value.permitNumber = rec.permitNumber || 'B630121G2026-0055';
       form.value.permitVolume = rec.permitVolume || 2345.87;

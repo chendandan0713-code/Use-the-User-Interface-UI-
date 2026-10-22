@@ -100,6 +100,19 @@
           <span>水量数据修订</span>
         </button>
 
+        <!-- 推送链路 tab (when active) -->
+        <button
+          v-if="activeMenu === 'push_pipeline'"
+          type="button"
+          @click="$emit('navigate', 'push_pipeline')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs font-semibold"
+        >
+          <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>数据归集 - 推送链路</span>
+        </button>
+
         <!-- 人工归集 tab (when active) -->
         <button
           v-if="activeMenu === 'manual_collection'"
@@ -112,6 +125,72 @@
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
           </svg>
           <span>数据归集 - 人工归集</span>
+        </button>
+
+        <!-- 小型灌区核算 tab (when active) -->
+        <button
+          v-if="activeMenu === 'irrigation_accounting'"
+          type="button"
+          @click="$emit('navigate', 'irrigation_accounting')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs font-semibold"
+        >
+          <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+          </svg>
+          <span>取用水量核算 - 小型灌区核算</span>
+        </button>
+
+        <!-- 畜禽用水核算 tab (when active) -->
+        <button
+          v-if="activeMenu === 'livestock_accounting'"
+          type="button"
+          @click="$emit('navigate', 'livestock_accounting')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 shadow-2xs font-semibold"
+        >
+          <svg class="w-3.5 h-3.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"></path>
+          </svg>
+          <span>取用水量核算 - 畜禽用水核算</span>
+        </button>
+
+        <!-- 鱼塘用水核算 tab (when active) -->
+        <button
+          v-if="activeMenu === 'fishpond_accounting'"
+          type="button"
+          @click="$emit('navigate', 'fishpond_accounting')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5 bg-cyan-50 text-cyan-700 border border-cyan-200 shadow-2xs font-semibold"
+        >
+          <svg class="w-3.5 h-3.5 text-cyan-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12h20M2 12c4-6 16-6 20 0M2 12c4 6 16 6 20 0"></path>
+          </svg>
+          <span>取用水量核算 - 鱼塘用水核算</span>
+        </button>
+
+        <!-- 建筑业用水核算 tab (when active) -->
+        <button
+          v-if="activeMenu === 'construction_accounting'"
+          type="button"
+          @click="$emit('navigate', 'construction_accounting')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs font-semibold"
+        >
+          <svg class="w-3.5 h-3.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"></path>
+          </svg>
+          <span>取用水量核算 - 建筑业用水核算</span>
+        </button>
+
+        <!-- 水量填报与审核 tab (when active) -->
+        <button
+          v-if="activeMenu === 'water_reporting'"
+          type="button"
+          @click="$emit('navigate', 'water_reporting')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs font-semibold"
+        >
+          <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          </svg>
+          <span>取用水量核算 - 水量填报(证照月报·年度支撑)</span>
         </button>
 
         <!-- 违规问题处理（全国） tab -->
@@ -188,6 +267,24 @@
           <span>一户一档</span>
         </button>
 
+        <!-- 档案完整度核算 tab -->
+        <button
+          type="button"
+          @click="$emit('navigate', 'dossier_completeness')"
+          :class="[
+            'px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5',
+            activeMenu === 'dossier_completeness'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs font-semibold'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-transparent'
+          ]"
+        >
+          <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span>档案完整度核算</span>
+        </button>
+
         <!-- 计量设施管理 tab -->
         <button
           type="button"
@@ -204,6 +301,23 @@
             <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
           </svg>
           <span>计量设施管理</span>
+        </button>
+
+        <!-- 计量健康状态管理 tab -->
+        <button
+          type="button"
+          @click="$emit('navigate', 'meter_health')"
+          :class="[
+            'px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-1.5',
+            activeMenu === 'meter_health'
+              ? 'bg-blue-50 text-blue-600 border border-blue-200 shadow-2xs font-semibold'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-transparent'
+          ]"
+        >
+          <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+          <span>计量健康状态管理</span>
         </button>
 
         <!-- 故障记录 tab -->
@@ -266,8 +380,20 @@ const currentTabTitle = computed(() => {
       return '数据质量控制 - 告警处置 - 告警明细';
     case 'water_data_revision':
       return '数据质量控制 - 水量数据修订';
+    case 'push_pipeline':
+      return '数据归集 - 推送链路 (日水量数据获取与国家平台推送全链路)';
     case 'manual_collection':
       return '数据归集 - 人工归集 (非在线设施填报与审核)';
+    case 'irrigation_accounting':
+      return '取用水量核算 - 小型灌区核算 (县级填报·市级初审·省级终审)';
+    case 'livestock_accounting':
+      return '取用水量核算 - 畜禽用水核算管理 (县级填报·市级审核)';
+    case 'fishpond_accounting':
+      return '取用水量核算 - 鱼塘用水核算管理 (县级填报·市级审核)';
+    case 'construction_accounting':
+      return '取用水量核算 - 建筑业用水核算管理 (县级填报·市级审核)';
+    case 'water_reporting':
+      return '取用水量核算 - 水量填报与审核 (县级填报·市级审核·证照月度·年度支撑)';
     case 'violation_national':
     case 'violation_handling':
       return '数据质量控制 - 违规问题排查 - 违规问题处理（全国）';
@@ -277,6 +403,10 @@ const currentTabTitle = computed(() => {
       return '计划用水管理 - 填报审批';
     case 'enterprise_dossier':
       return '数据规范整合 - 一户一档';
+    case 'dossier_completeness':
+      return '数据规范整合 - 档案完整度核算';
+    case 'meter_health':
+      return '计量监管 - 计量健康状态管理';
     case 'fault':
       return '故障记录';
     case 'scenarios':

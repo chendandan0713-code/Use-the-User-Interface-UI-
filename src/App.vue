@@ -1,32 +1,40 @@
 <template>
   <div class="h-screen w-screen flex flex-col overflow-hidden bg-slate-100 font-sans text-slate-800 antialiased select-none">
-    <!-- Top Global Navigation Bar -->
-    <TopNavbar
-      :active-platform="activePlatform"
-      @switch-platform="handleSwitchPlatform"
-      @open-notifications="handleOpenNotifications"
+    <!-- 0. 综合应用场景大屏 (Digital twin command center matching screenshot) -->
+    <WaterScenariosDashboard
+      v-if="activeMenu === 'scenarios'"
+      @navigate="handleSelectMenu"
     />
 
-    <!-- Main Workspace Container -->
-    <div class="flex-1 flex min-h-0 overflow-hidden">
-      
-      <!-- Left Sidebar (When in Water platform) -->
-      <WaterSidebar
-        v-if="activePlatform === 'water'"
-        :active-menu="activeMenu"
-        @select-menu="handleSelectMenu"
+    <template v-else>
+      <!-- Top Global Navigation Bar -->
+      <TopNavbar
+        :active-platform="activePlatform"
+        @switch-platform="handleSwitchPlatform"
+        @navigate="handleSelectMenu"
+        @open-notifications="handleOpenNotifications"
       />
 
-      <!-- Right Content Layout -->
-      <main class="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-[#edf3fb]">
-        <!-- Breadcrumb & Tab Bar -->
-        <WaterBreadcrumbBar
+      <!-- Main Workspace Container -->
+      <div class="flex-1 flex min-h-0 overflow-hidden">
+        
+        <!-- Left Sidebar (When in Water platform) -->
+        <WaterSidebar
           v-if="activePlatform === 'water'"
           :active-menu="activeMenu"
-          @navigate="handleSelectMenu"
-          @refresh="handleRefreshData"
-          @switch-mes="handleSwitchPlatform('mes')"
+          @select-menu="handleSelectMenu"
         />
+
+        <!-- Right Content Layout -->
+        <main class="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-[#edf3fb]">
+          <!-- Breadcrumb & Tab Bar -->
+          <WaterBreadcrumbBar
+            v-if="activePlatform === 'water'"
+            :active-menu="activeMenu"
+            @navigate="handleSelectMenu"
+            @refresh="handleRefreshData"
+            @switch-mes="handleSwitchPlatform('mes')"
+          />
 
         <!-- View Router -->
         <div class="flex-1 min-h-0 overflow-hidden flex flex-col">
@@ -84,6 +92,11 @@
             </div>
           </div>
 
+          <!-- 4-2. 计量健康状态管理 (计量监管 -> 计量健康状态管理) -->
+          <MeterHealthManagementView
+            v-else-if="activeMenu === 'meter_health'"
+          />
+
           <!-- 5. Fault Reporting Management View -->
           <div
             v-else-if="activeMenu === 'fault'"
@@ -140,7 +153,12 @@
             level="provincial"
           />
 
-          <!-- 11. 数据归集 -> 人工归集 (非在线计量设施人工填报与审核) -->
+          <!-- 11. 数据归集 -> 推送链路 (日水量数据获取与国家平台推送全链路拓扑与明细) -->
+          <PushPipelineView
+            v-else-if="activeMenu === 'push_pipeline'"
+          />
+
+          <!-- 11-2. 数据归集 -> 人工归集 (非在线计量设施人工填报与审核) -->
           <ManualCollectionPlatformView
             v-else-if="activeMenu === 'manual_collection'"
             :selected-district="selectedDistrict"
@@ -150,6 +168,41 @@
           <!-- 12. 数据规范整合 -> 一户一档 -->
           <EnterpriseDossierView
             v-else-if="activeMenu === 'enterprise_dossier'"
+          />
+
+          <!-- 12-2. 数据规范整合 -> 档案完整度核算 -->
+          <DossierCompletenessAccountingView
+            v-else-if="activeMenu === 'dossier_completeness'"
+          />
+
+          <!-- 13. 取用水量核算 -> 小型灌区核算 (县级填报·市级初审·省级终审) -->
+          <IrrigationAccountingView
+            v-else-if="activeMenu === 'irrigation_accounting'"
+            initial-tab="monthly_accounting"
+          />
+
+          <!-- 14. 取用水量核算 -> 畜禽用水核算管理 (县级填报·市级审核) -->
+          <IrrigationAccountingView
+            v-else-if="activeMenu === 'livestock_accounting'"
+            initial-tab="livestock"
+          />
+
+          <!-- 15. 取用水量核算 -> 鱼塘用水核算管理 (县级填报·市级审核) -->
+          <IrrigationAccountingView
+            v-else-if="activeMenu === 'fishpond_accounting'"
+            initial-tab="fishpond"
+          />
+
+          <!-- 16. 取用水量核算 -> 建筑业用水核算管理 (县级填报·市级审核) -->
+          <IrrigationAccountingView
+            v-else-if="activeMenu === 'construction_accounting'"
+            initial-tab="construction"
+          />
+
+          <!-- 17. 取用水量核算 -> 水量填报与审核 (县级填报·市级审核·年度数据支撑) -->
+          <IrrigationAccountingView
+            v-else-if="activeMenu === 'water_reporting'"
+            initial-tab="water_reporting"
           />
 
           <!-- 7. Water Plan Management (计划用水管理 -> 填报审批) View -->
@@ -201,6 +254,7 @@
         </div>
       </main>
     </div>
+    </template>
 
     <!-- Modals & Drawers -->
     <WaterFacilityDetailModal
@@ -258,6 +312,7 @@ import WaterDistrictTree from './components/vue/WaterDistrictTree.vue';
 import WaterFilterBar from './components/vue/WaterFilterBar.vue';
 import WaterFacilityTable from './components/vue/WaterFacilityTable.vue';
 import WaterHomePage from './components/vue/WaterHomePage.vue';
+import WaterScenariosDashboard from './components/vue/WaterScenariosDashboard.vue';
 import SystemLoadingPage from './components/vue/SystemLoadingPage.vue';
 import WaterFacilityDetailModal from './components/vue/WaterFacilityDetailModal.vue';
 import WaterFacilityModal from './components/vue/WaterFacilityModal.vue';
@@ -275,14 +330,22 @@ import AlarmWorkOrderView from './components/vue/AlarmWorkOrderView.vue';
 import AlarmDetailView from './components/vue/AlarmDetailView.vue';
 import WaterDataRevisionView from './components/vue/WaterDataRevisionView.vue';
 import ManualCollectionPlatformView from './components/vue/ManualCollection/ManualCollectionPlatformView.vue';
+import PushPipelineView from './components/vue/DataCollection/PushPipelineView.vue';
 import EnterpriseDossierView from './components/vue/EnterpriseDossierView.vue';
+import DossierCompletenessAccountingView from './components/vue/DossierCompletenessAccountingView.vue';
+import MeterHealthManagementView from './components/vue/MeterHealthManagementView.vue';
+import IrrigationAccountingView from './components/vue/IrrigationAccounting/IrrigationAccountingView.vue';
+import SmallIrrigationSubView from './components/vue/IrrigationAccounting/SmallIrrigationSubView.vue';
+import LivestockAccountingSubView from './components/vue/IrrigationAccounting/LivestockAccountingSubView.vue';
+import FishpondAccountingSubView from './components/vue/IrrigationAccounting/FishpondAccountingSubView.vue';
+import ConstructionAccountingSubView from './components/vue/IrrigationAccounting/ConstructionAccountingSubView.vue';
 
 // Master State
 const savedPlatform = typeof window !== 'undefined' ? (localStorage.getItem('xns_active_platform') as 'water' | 'mes') : null;
 const savedMenu = typeof window !== 'undefined' ? localStorage.getItem('xns_active_menu') : null;
 
 const activePlatform = ref<'water' | 'mes'>(savedPlatform || 'water');
-const activeMenu = ref<string>(savedMenu || 'alarm_work_order');
+const activeMenu = ref<string>(savedMenu || 'push_pipeline');
 const selectedDistrict = ref<string>('全部');
 
 // Facilities Data

@@ -140,31 +140,196 @@
         </div>
       </div>
 
-      <!-- 取用水量核算 -->
-      <button
-        type="button"
-        @click="notifyStub('取用水量核算')"
-        class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white/90 hover:bg-white/10 hover:text-white transition cursor-pointer text-left"
-      >
-        <div class="flex items-center gap-2.5 min-w-0">
-          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
-            <line x1="8" y1="6" x2="16" y2="6"></line>
-            <line x1="16" y1="14" x2="16" y2="18"></line>
-            <path d="M16 10h.01"></path>
-            <path d="M12 10h.01"></path>
-            <path d="M8 10h.01"></path>
-            <path d="M12 14h.01"></path>
-            <path d="M8 14h.01"></path>
-            <path d="M12 18h.01"></path>
-            <path d="M8 18h.01"></path>
+      <!-- 取用水量核算 (可展开子菜单：新增小型灌区核算) -->
+      <div>
+        <button
+          type="button"
+          @click="isAccountingExpanded = !isAccountingExpanded"
+          class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white font-medium hover:bg-white/10 transition cursor-pointer text-left"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+              <line x1="8" y1="6" x2="16" y2="6"></line>
+              <line x1="16" y1="14" x2="16" y2="18"></line>
+              <path d="M16 10h.01"></path>
+              <path d="M12 10h.01"></path>
+              <path d="M8 10h.01"></path>
+              <path d="M12 14h.01"></path>
+              <path d="M8 14h.01"></path>
+              <path d="M12 18h.01"></path>
+              <path d="M8 18h.01"></path>
+            </svg>
+            <span class="truncate">取用水量核算</span>
+          </div>
+          <svg
+            :class="['w-3.5 h-3.5 transition-transform duration-200', isAccountingExpanded ? 'rotate-180' : '']"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-          <span class="truncate">取用水量核算</span>
+        </button>
+
+        <!-- Submenu items under 取用水量核算 -->
+        <div v-show="isAccountingExpanded" class="pl-3 pr-1 py-1 space-y-1">
+          <!-- 水量填报与审核 (新增：证照月报·年度支撑·市县一体复用) -->
+          <button
+            type="button"
+            @click="selectMenu('water_reporting')"
+            :class="[
+              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs',
+              activeMenu === 'water_reporting'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+              </svg>
+              <span class="truncate">水量填报与审核</span>
+            </div>
+            <span
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
+              :class="activeMenu === 'water_reporting' ? 'bg-blue-100 text-blue-700' : 'bg-cyan-400/30 text-cyan-100 border border-cyan-300/40'"
+            >
+              证照月报
+            </span>
+          </button>
+
+          <!-- 小型灌区核算 (核心子功能) -->
+          <button
+            type="button"
+            @click="selectMenu('irrigation_accounting')"
+            :class="[
+              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs',
+              activeMenu === 'irrigation_accounting'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+              </svg>
+              <span class="truncate">小型灌区核算</span>
+            </div>
+            <span
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
+              :class="activeMenu === 'irrigation_accounting' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/40'"
+            >
+              县填市审
+            </span>
+          </button>
+
+          <!-- 畜禽用水核算管理 (新增) -->
+          <button
+            type="button"
+            @click="selectMenu('livestock_accounting')"
+            :class="[
+              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs',
+              activeMenu === 'livestock_accounting'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"></path>
+              </svg>
+              <span class="truncate">畜禽用水核算</span>
+            </div>
+            <span
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
+              :class="activeMenu === 'livestock_accounting' ? 'bg-blue-100 text-blue-700' : 'bg-amber-500/30 text-amber-200 border border-amber-400/40'"
+            >
+              年鉴存栏
+            </span>
+          </button>
+
+          <!-- 鱼塘用水核算管理 (新增) -->
+          <button
+            type="button"
+            @click="selectMenu('fishpond_accounting')"
+            :class="[
+              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs',
+              activeMenu === 'fishpond_accounting'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 12h20M2 12c4-6 16-6 20 0M2 12c4 6 16 6 20 0"></path>
+              </svg>
+              <span class="truncate">鱼塘用水核算</span>
+            </div>
+            <span
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
+              :class="activeMenu === 'fishpond_accounting' ? 'bg-blue-100 text-blue-700' : 'bg-cyan-500/30 text-cyan-200 border border-cyan-400/40'"
+            >
+              补水定额
+            </span>
+          </button>
+
+          <!-- 建筑业用水核算管理 (新增) -->
+          <button
+            type="button"
+            @click="selectMenu('construction_accounting')"
+            :class="[
+              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs',
+              activeMenu === 'construction_accounting'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"></path>
+                <path d="M9 9v.01M9 13v.01M9 17v.01"></path>
+              </svg>
+              <span class="truncate">建筑业用水核算</span>
+            </div>
+            <span
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
+              :class="activeMenu === 'construction_accounting' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-500/30 text-indigo-200 border border-indigo-400/40'"
+            >
+              竣工定额
+            </span>
+          </button>
+
+          <!-- 工业用水核算 -->
+          <button
+            type="button"
+            @click="notifyStub('工业用水核算')"
+            class="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/85 hover:bg-white/10 hover:text-white transition cursor-pointer text-left"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span class="truncate">工业用水核算</span>
+          </button>
+
+          <!-- 水量核算平衡表 -->
+          <button
+            type="button"
+            @click="notifyStub('水量核算平衡表')"
+            class="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/85 hover:bg-white/10 hover:text-white transition cursor-pointer text-left"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span class="truncate">水量核算平衡表</span>
+          </button>
         </div>
-        <svg class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
+      </div>
 
       <!-- 数据归集 (可展开子菜单) -->
       <div>
@@ -194,6 +359,31 @@
 
         <!-- Submenu items under 数据归集 -->
         <div v-show="isDataCollectionExpanded" class="pl-3 pr-1 py-1 space-y-1">
+          <!-- 推送链路 (核心新功能页面：日水量获取到推送国家平台全链路) -->
+          <button
+            type="button"
+            @click="selectMenu('push_pipeline')"
+            :class="[
+              'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs',
+              activeMenu === 'push_pipeline'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              <span class="truncate">推送链路</span>
+            </div>
+            <span
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
+              :class="activeMenu === 'push_pipeline' ? 'bg-blue-100 text-blue-700' : 'bg-cyan-400/30 text-cyan-100 border border-cyan-300/40'"
+            >
+              国平台同步
+            </span>
+          </button>
+
           <!-- 人工归集 (核心新功能页面) -->
           <button
             type="button"
@@ -373,11 +563,23 @@
           <!-- 计量健康状态管理 -->
           <button
             type="button"
-            @click="notifyStub('计量健康状态管理')"
-            class="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/85 hover:bg-white/10 hover:text-white transition cursor-pointer text-left"
+            @click="selectMenu('meter_health')"
+            :class="[
+              'w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left transition cursor-pointer',
+              activeMenu === 'meter_health'
+                ? 'bg-white text-[#2563EB] font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            <svg
+              class="w-3.5 h-3.5 shrink-0"
+              :class="activeMenu === 'meter_health' ? 'text-[#2563EB]' : 'text-white'"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
             </svg>
             <span class="truncate">计量健康状态管理</span>
           </button>
@@ -508,6 +710,24 @@
               <circle cx="10" cy="9" r="1.5"></circle>
             </svg>
             <span class="truncate">一户一档</span>
+          </button>
+
+          <!-- 档案完整度核算 (功能菜单) -->
+          <button
+            type="button"
+            @click="selectMenu('dossier_completeness')"
+            :class="[
+              'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition cursor-pointer',
+              activeMenu === 'dossier_completeness'
+                ? 'bg-white text-blue-600 font-bold shadow-xs'
+                : 'text-white/85 hover:bg-white/10 hover:text-white'
+            ]"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span class="truncate">档案完整度核算</span>
           </button>
         </div>
       </div>
@@ -723,6 +943,7 @@ const emit = defineEmits<{
 
 const isSupervisionExpanded = ref(true);
 const isWaterPlanExpanded = ref(true);
+const isAccountingExpanded = ref(true);
 const isDataCollectionExpanded = ref(true);
 const isDataGovernanceExpanded = ref(false);
 const isDataIntegrationExpanded = ref(true);
@@ -733,7 +954,10 @@ const isViolationExpanded = ref(true);
 watch(
   () => props.activeMenu,
   (menu) => {
-    if (menu === 'manual_collection') {
+    if (menu === 'irrigation_accounting') {
+      isAccountingExpanded.value = true;
+    }
+    if (menu === 'manual_collection' || menu === 'push_pipeline') {
       isDataCollectionExpanded.value = true;
     }
     if (menu === 'enterprise_dossier') {

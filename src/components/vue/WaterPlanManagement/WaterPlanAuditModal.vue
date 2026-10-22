@@ -152,14 +152,6 @@
         
         <!-- ====================== 左侧：填报内容可修改 ====================== -->
         <div class="w-1/2 flex flex-col min-h-0 bg-[#f8fafc]/30">
-          <!-- 左栏标题导航 -->
-          <div class="px-5 py-2.5 bg-white border-b border-slate-200/80 flex items-center justify-between shrink-0">
-            <div class="flex items-center gap-2">
-              <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
-              <span class="text-[13px] font-bold text-slate-800">申报指标核定与修改</span>
-            </div>
-          </div>
-
           <!-- 左侧滚动卡片表单区域 (向上滑动时收起基础信息，表单切换栏、表单名称栏、用水类型勾选栏顶部固定展示) -->
           <div
             ref="leftScrollContainer"
@@ -328,9 +320,15 @@
             <!-- 表单 1：本年实际用水填报表 (表单切换栏通过 slot 插入吸顶区域固定展示) -->
             <WaterQuotaAuditForm
               v-show="activeFormTab === 'actual'"
-              title="表单一：本年实际用水填报表"
+              ref="actualFormRef"
               theme="blue"
               v-model="actualQuotaForm"
+              :activeCategory="currentCategory"
+              :activeProductName="currentProduct"
+              @update:activeCategory="handleCategoryChanged"
+              @category-change="handleCategoryChanged"
+              @product-select="handleProductSelected"
+              @open-quota-bubble="handleOpenQuotaBubble"
             >
               <template #tabs>
                 <!-- 表单切换栏：固定在最顶部 -->
@@ -391,9 +389,15 @@
             <!-- 表单 2：下年度计划用水填报表 (表单切换栏通过 slot 插入吸顶区域固定展示) -->
             <WaterQuotaAuditForm
               v-show="activeFormTab === 'plan'"
-              title="表单二：下年度计划用水填报表"
+              ref="planFormRef"
               theme="blue"
               v-model="planQuotaForm"
+              :activeCategory="currentCategory"
+              :activeProductName="currentProduct"
+              @update:activeCategory="handleCategoryChanged"
+              @category-change="handleCategoryChanged"
+              @product-select="handleProductSelected"
+              @open-quota-bubble="handleOpenQuotaBubble"
             >
               <template #tabs>
                 <!-- 表单切换栏：固定在最顶部 -->
@@ -494,819 +498,603 @@
           <!-- 右侧内容滚动区域 -->
           <div class="flex-1 overflow-y-auto p-3.5 space-y-2.5 custom-scrollbar">
             
-            <!-- Tab 1: 计划申请填报表 (完整预览卡片) -->
-            <div v-if="activeRightTab === 'plan_application'" class="space-y-4">
+            <!-- Tab: 用水定额 (全联动对应类型查看，与左侧填报无缝融合) -->
+            <div v-if="activeRightTab === 'water_quota'" class="space-y-3.5">
               
-              <!-- 基础信息只读网格卡片 -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <!-- 工业产品定额智能检索与匹配结果（气泡推荐面板 / 点击一键填充左侧当前行） -->
+              <div
+                v-if="currentCategory === 'industry'"
+                class="bg-gradient-to-br from-blue-50/90 via-white to-sky-50/50 rounded-xl border-2 border-blue-400/80 p-3.5 shadow-sm space-y-3 relative overflow-hidden"
+              >
+                <!-- 发光与气泡装饰背景 -->
+                <div class="absolute -right-8 -top-8 w-28 h-28 bg-blue-100/50 rounded-full blur-xl pointer-events-none"></div>
+
+                <div class="flex items-center justify-between gap-2 relative">
                   <div class="flex items-center gap-2">
-                    <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[13px] font-bold text-slate-800">申请基础信息</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#1677ff] ring-4 ring-blue-100 animate-pulse"></span>
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold text-slate-900">
+                          【{{ currentProduct || quotaFilter.keyword || '高纯多晶硅' }}】用水定额检索匹配
+                        </span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#1677ff] text-white">
+                          匹配 {{ matchedIndustrialQuotas.length }} 个定额标准
+                        </span>
+                      </div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">
+                        正在为左侧【工业用水第 <strong class="text-[#1677ff] font-mono">{{ currentActiveRowIndex + 1 }}</strong> 行】核定定额指标，点击任意一项直接填充当前行
+                      </div>
+                    </div>
                   </div>
-                  <span class="text-[11px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200 font-mono">
-                    {{ form.year || 2026 }}年度申请
-                  </span>
+
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      @click="quotaBubbleModalVisible = true"
+                      class="px-2.5 py-1 rounded-md bg-white hover:bg-blue-50 text-[#1677ff] border border-blue-300 text-xs font-medium transition cursor-pointer flex items-center gap-1 shadow-2xs"
+                      title="打开大图浮动气泡弹窗查看并选用"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                      <span>气泡弹窗</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2.5 text-xs">
-                  <!-- 第一行：取水权人 (跨2列) + 许可证号 (1列) -->
-                  <div class="col-span-1 md:col-span-2 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">取水权人：</span>
-                    <span class="font-medium text-slate-800 truncate" :title="form.waterOwner">{{ form.waterOwner }}</span>
-                  </div>
+                <!-- 匹配定额卡片列表（清晰展示：行业编码、行业名称、产品名称、用水定额参数、分区范围 5项核心数值） -->
+                <div class="space-y-2 relative">
+                  <div
+                    v-for="(qItem, qIdx) in matchedIndustrialQuotas"
+                    :key="qItem.id || qIdx"
+                    @click="handleApplyQuota(qItem, currentActiveRowIndex)"
+                    class="group bg-white rounded-lg border border-blue-200/90 hover:border-[#1677ff] p-2.5 hover:shadow-md transition-all cursor-pointer space-y-2 relative"
+                  >
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 border-b border-slate-100 pb-1.5">
+                      <div class="flex flex-wrap items-center gap-1.5">
+                        <!-- 1. 行业编码 -->
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-blue-50 text-[#1677ff] border border-blue-200">
+                          <span class="text-slate-400 font-normal text-[10px]">行业编码:</span>
+                          {{ qItem.industryCode }}
+                        </span>
+                        <!-- 2. 行业名称 -->
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                          <span class="text-slate-400 font-normal text-[10px]">行业名称:</span>
+                          {{ qItem.industryName }}
+                        </span>
+                        <!-- 3. 产品名称 -->
+                        <span class="font-bold text-xs text-slate-900 group-hover:text-[#1677ff] transition">
+                          {{ qItem.productName }}
+                        </span>
+                      </div>
 
-                  <div class="col-span-1 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">许可证号：</span>
-                    <span class="font-mono text-slate-800">{{ form.permitNumber }}</span>
-                  </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <span
+                          v-if="qItem.waterEfficiencyGrade"
+                          class="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          :class="qItem.waterEfficiencyGrade.includes('领跑') || qItem.waterEfficiencyGrade.includes('先进') ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'"
+                        >
+                          {{ qItem.waterEfficiencyGrade }}
+                        </span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-slate-50 border border-slate-200">
+                          {{ qItem.standardDoc }}
+                        </span>
+                      </div>
+                    </div>
 
-                  <!-- 第二行：许可水量 + 年产值 + 邮政编码 -->
-                  <div class="col-span-1 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">许可水量：</span>
-                    <span class="font-mono font-medium text-slate-800">{{ (form.permitVolume ?? 0).toFixed(2) }} <span class="text-slate-500 font-sans text-[11px]">万m³</span></span>
-                  </div>
+                    <!-- 核心数值指标栏：定额参数 与 分区范围 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      <!-- 4. 用水定额参数 -->
+                      <div class="flex items-center justify-between p-2 rounded-md bg-blue-50/50 border border-blue-100">
+                        <div class="space-y-0.5">
+                          <div class="text-[11px] text-blue-700 font-medium">用水定额参数</div>
+                          <div class="text-[10px] text-slate-400 font-sans">标准指标 / 领跑值</div>
+                        </div>
+                        <div class="font-mono font-bold text-base text-[#1677ff]">
+                          {{ qItem.quotaParam }}
+                        </div>
+                      </div>
 
-                  <div class="col-span-1 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">年产值：</span>
-                    <span class="font-mono font-medium text-slate-800">{{ form.annualOutputValue }} <span class="text-slate-500 font-sans text-[11px]">万元</span></span>
-                  </div>
+                      <!-- 5. 分区范围 -->
+                      <div class="flex items-center justify-between p-2 rounded-md bg-slate-50 border border-slate-200/70">
+                        <div class="space-y-0.5">
+                          <div class="text-[11px] text-slate-600 font-medium">分区范围</div>
+                          <div class="text-xs text-slate-700 font-sans truncate max-w-[190px]" :title="qItem.regionScope">
+                            {{ qItem.regionScope }}
+                          </div>
+                        </div>
+                        <div class="text-[11px] text-slate-500 font-mono shrink-0">
+                          {{ qItem.waterRegion }}
+                        </div>
+                      </div>
+                    </div>
 
-                  <div class="col-span-1 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">邮政编码：</span>
-                    <span class="font-mono text-slate-800">{{ form.postalCode }}</span>
-                  </div>
+                    <!-- 工艺与填充按钮 -->
+                    <div class="flex items-center justify-between pt-1 text-[11px] text-slate-500">
+                      <span class="truncate max-w-[340px] text-slate-500" :title="qItem.processType">
+                        工艺: {{ qItem.processType || '标准生产工艺' }}
+                      </span>
 
-                  <!-- 第三行：联系人 + 联系电话 + 电子邮箱 -->
-                  <div class="col-span-1 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">联系人：</span>
-                    <span class="text-slate-800">{{ form.contactPerson }}</span>
-                  </div>
-
-                  <div class="col-span-1 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">联系电话：</span>
-                    <span class="font-mono text-slate-800">{{ form.contactPhone }}</span>
-                  </div>
-
-                  <div class="col-span-1 flex items-center">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">电子邮箱：</span>
-                    <span class="text-slate-800">{{ form.email }}</span>
-                  </div>
-
-                  <!-- 第四行：详细地址 (跨3列) -->
-                  <div class="col-span-1 md:col-span-3 flex items-center pt-1 border-t border-slate-100">
-                    <span class="w-20 text-slate-400 shrink-0 text-right pr-2.5">详细地址：</span>
-                    <span class="text-slate-800">{{ form.detailedAddress }}</span>
+                      <button
+                        type="button"
+                        @click.stop="handleApplyQuota(qItem, currentActiveRowIndex)"
+                        class="px-2.5 py-1 rounded bg-[#1677ff] hover:bg-blue-700 text-white font-medium text-xs flex items-center gap-1 shadow-2xs transition cursor-pointer group-hover:ring-2 group-hover:ring-blue-300"
+                      >
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>选用填充第 {{ currentActiveRowIndex + 1 }} 行</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- 生活用水表格 (只读卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <!-- 1. 近三年用水计划量参考（展示地表水、地下水、非常规水四类指标） -->
+              <div class="bg-white rounded-xl border border-slate-200/90 p-3 shadow-2xs space-y-2">
+                <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[13px] font-bold text-slate-800">生活用水申报明细</span>
+                    <span class="w-1.5 h-3.5 bg-[#1677ff] rounded-full"></span>
+                    <span class="text-xs font-bold text-slate-800">近三年用水计划量参考</span>
+                    <span class="text-[11px] text-slate-400">（地表水、地下水、非常规水分类参考指标）</span>
                   </div>
-                  <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] text-slate-400 font-mono">单位: 万m³</span>
+                    <button
+                      type="button"
+                      @click="quotaGuideModalVisible = true"
+                      class="px-2.5 py-1 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-medium transition cursor-pointer flex items-center gap-1"
+                    >
+                      <svg class="w-3.5 h-3.5 text-[#1677ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                      </svg>
+                      <span>核定依据说明</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
+                <div class="overflow-x-auto custom-scrollbar border border-[#b8cde6] rounded-md bg-white">
                   <table class="w-full text-xs text-center border-collapse">
                     <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
                       <tr class="divide-x divide-[#b8cde6]">
-                        <th class="py-2 px-3 border-r border-[#b8cde6]">供水人口(人)</th>
-                        <th class="py-2 px-3 border-r border-[#b8cde6]">人均定额(L/人·天)</th>
-                        <th class="py-2 px-3 border-r border-[#b8cde6]">地表水</th>
-                        <th class="py-2 px-3 border-r border-[#b8cde6]">地下水</th>
-                        <th class="py-2 px-3 font-semibold text-slate-800">总计</th>
+                        <th class="py-1.5 px-3">年份</th>
+                        <th class="py-1.5 px-3">地表水</th>
+                        <th class="py-1.5 px-3">地下水</th>
+                        <th class="py-1.5 px-3">非常规水</th>
+                        <th class="py-1.5 px-3 font-semibold text-slate-800">合计</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-[#b8cde6] font-mono text-slate-800">
-                      <tr
-                        v-for="(row, idx) in declaredLivingRows"
-                        :key="idx"
-                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
-                      >
-                        <td class="py-2 px-3 text-slate-800">{{ row.population }}</td>
-                        <td class="py-2 px-3 text-slate-800">{{ (row.quota ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-3 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-3 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-3 font-semibold text-slate-800">
-                          {{ ((Number(row.surfaceWater) || 0) + (Number(row.groundwater) || 0)).toFixed(2) }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- 工业用水表格 (只读多级表头卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[13px] font-bold text-slate-800">工业用水申报明细</span>
-                  </div>
-                  <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
-                </div>
-
-                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
-                  <table class="w-full text-xs text-center border-collapse min-w-[700px]">
-                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
-                      <tr class="divide-x divide-[#b8cde6]">
-                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">主要产品</th>
-                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">产品定额</th>
-                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">年产量</th>
-                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">产品水量</th>
-                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">地表水</th>
-                        <th rowspan="2" class="py-2 px-2 border-r border-[#b8cde6]">地下水</th>
-                        <th colspan="5" class="py-1 px-2 border-b border-r border-[#b8cde6]">非常规水</th>
-                        <th rowspan="2" class="py-2 px-2 font-semibold text-slate-800">总计</th>
-                      </tr>
-                      <tr class="divide-x divide-[#b8cde6] text-[11px]">
-                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">再生水</th>
-                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">雨水</th>
-                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">矿井水</th>
-                        <th class="py-1 px-1.5 border-r border-[#b8cde6]">微咸水</th>
-                        <th class="py-1 px-1.5 font-semibold border-r border-[#b8cde6] text-slate-800">非常规计</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
-                      <tr
-                        v-for="(row, idx) in declaredIndustryRows"
-                        :key="idx"
-                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
-                      >
-                        <td class="py-2 px-2 text-slate-800">{{ row.productName }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.quota ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ row.output }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ row.productVolume }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (row.recycledWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (row.rainWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (row.mineWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (row.brackishWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 font-semibold text-slate-800">
-                          {{ ((Number(row.recycledWater) || 0) + (Number(row.rainWater) || 0) + (Number(row.mineWater) || 0) + (Number(row.brackishWater) || 0)).toFixed(2) }}
-                        </td>
-                        <td class="py-2 px-2 font-semibold text-slate-800">
-                          {{ ((Number(row.surfaceWater) || 0) + (Number(row.groundwater) || 0)).toFixed(2) }}
-                        </td>
-                      </tr>
-
-                      <!-- 合计行 -->
-                      <tr class="bg-[#f0f5fc] font-semibold divide-x divide-[#b8cde6] text-slate-800">
-                        <td class="py-2 px-2 font-sans text-slate-800">合计</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="py-2 px-2 text-slate-800">{{ (declaredIndustrySurfaceTotal ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (declaredIndustryGroundTotal ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryRecycledTotal ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryRainTotal ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryMineTotal ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-1.5 text-slate-800">{{ (declaredIndustryBrackishTotal ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800 font-bold">{{ (declaredIndustryUnconventionalTotal ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800 font-bold">{{ ((declaredIndustrySurfaceTotal || 0) + (declaredIndustryGroundTotal || 0)).toFixed(2) }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- 农业用水表格 (只读卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[13px] font-bold text-slate-800">农业灌溉用水明细</span>
-                  </div>
-                  <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
-                </div>
-
-                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
-                  <table class="w-full text-xs text-center border-collapse">
-                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6] text-[11px]">
-                      <tr class="divide-x divide-[#b8cde6]">
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">实际灌溉面积(亩)</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">年内灌溉次数</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">定额(m³/亩·次)</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">主要作物</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">灌溉方式</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">地表水</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">地下水</th>
-                        <th class="py-2 px-2 font-semibold text-slate-800">总计</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
-                      <tr
-                        v-for="(row, idx) in declaredAgriRows"
-                        :key="idx"
-                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
-                      >
-                        <td class="py-2 px-2 text-slate-800">{{ (row.area ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ row.times }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ row.quota }}</td>
-                        <td class="py-2 px-2 font-sans text-slate-800">{{ row.crops }}</td>
-                        <td class="py-2 px-2 font-sans text-slate-800">{{ row.method }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 font-semibold text-slate-800">{{ ((row.total ?? ((row.surfaceWater || 0) + (row.groundwater || 0)))).toFixed(2) }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- 发电用水表格 (只读卡片) -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1 h-3 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[13px] font-bold text-slate-800">水力/火力发电用水明细</span>
-                  </div>
-                  <span class="text-slate-400 font-mono text-[11px]">单位: 万m³</span>
-                </div>
-
-                <div class="border border-[#b8cde6] rounded-md bg-white shadow-2xs overflow-x-auto custom-scrollbar">
-                  <table class="w-full text-xs text-center border-collapse">
-                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6] text-[11px]">
-                      <tr class="divide-x divide-[#b8cde6]">
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">机组台数</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">降级容量</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">年发电量</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">年利用小时</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">地表水</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">地下水</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">水电最小机组流量</th>
-                        <th class="py-2 px-2 border-r border-[#b8cde6]">火电最高小时用水</th>
-                        <th class="py-2 px-2 font-semibold text-slate-800">总计</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
-                      <tr
-                        v-for="(row, idx) in declaredPowerRows"
-                        :key="idx"
-                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
-                      >
-                        <td class="py-2 px-2 text-slate-800">{{ row.units }}台</td>
-                        <td class="py-2 px-2 text-slate-800">{{ row.capacity }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ row.generation }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ row.hours }}h</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.surfaceWater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.groundwater ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.hydroMinFlow ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 text-slate-800">{{ (row.thermalMaxHourly ?? 0).toFixed(2) }}</td>
-                        <td class="py-2 px-2 font-semibold text-slate-800">{{ ((row.total ?? ((row.surfaceWater || 0) + (row.groundwater || 0)))).toFixed(2) }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- 5. 申报1至12月用水总结表 -->
-              <div class="bg-white p-4 rounded-lg border border-[#b8cde6] shadow-2xs space-y-2">
-                <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
-                    <span class="font-bold text-slate-800 text-xs">5. 用水总结表（1至12月）</span>
-                  </div>
-                  <span class="text-[11px] font-mono text-slate-500">单位: 万m³</span>
-                </div>
-                <div class="overflow-x-auto custom-scrollbar border border-[#b8cde6] rounded-md">
-                  <table class="w-full text-xs text-center border-collapse min-w-[720px]">
-                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
-                      <tr class="divide-x divide-[#b8cde6]">
-                        <th rowspan="2" class="py-1.5 px-2 w-14 border-r border-[#b8cde6]">月份</th>
-                        <th rowspan="2" class="py-1.5 px-2 min-w-[65px] border-r border-[#b8cde6]">地表水</th>
-                        <th rowspan="2" class="py-1.5 px-2 min-w-[65px] border-r border-[#b8cde6]">地下水</th>
-                        <th colspan="5" class="py-1 px-2 border-b border-r border-[#b8cde6]">非常规水</th>
-                        <th rowspan="2" class="py-1.5 px-2 min-w-[70px] font-semibold text-slate-800">总计</th>
-                      </tr>
-                      <tr class="divide-x divide-[#b8cde6] text-[11px]">
-                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">再生水</th>
-                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">雨水</th>
-                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">矿井水</th>
-                        <th class="py-1 px-1.5 min-w-[55px] border-r border-[#b8cde6]">微咸水</th>
-                        <th class="py-1 px-1.5 min-w-[65px] font-semibold border-r border-[#b8cde6] text-slate-800">非常规计</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#b8cde6] font-mono text-[11.5px] text-slate-800">
-                      <tr
-                        v-for="(row, idx) in declaredMonthlyRows"
-                        :key="idx"
-                        class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
-                      >
-                        <td class="py-1 px-2 font-sans font-medium text-slate-800 bg-slate-50/50">{{ row.month }}</td>
-                        <td class="py-1 px-2 text-slate-800">{{ Number(row.surfaceWater || 0).toFixed(2) }}</td>
-                        <td class="py-1 px-2 text-slate-800">{{ Number(row.groundwater || 0).toFixed(2) }}</td>
-                        <td class="py-1 px-2 text-slate-800">{{ Number(row.recycledWater || 0).toFixed(2) }}</td>
-                        <td class="py-1 px-2 text-slate-800">{{ Number(row.rainWater || 0).toFixed(2) }}</td>
-                        <td class="py-1 px-2 text-slate-800">{{ Number(row.mineWater || 0).toFixed(2) }}</td>
-                        <td class="py-1 px-2 text-slate-800">{{ Number(row.brackishWater || 0).toFixed(2) }}</td>
-                        <td class="py-1 px-2 text-slate-800 font-semibold">{{ ((Number(row.recycledWater) || 0) + (Number(row.rainWater) || 0) + (Number(row.mineWater) || 0) + (Number(row.brackishWater) || 0)).toFixed(2) }}</td>
-                        <td class="py-1 px-2 font-semibold text-slate-800">{{ ((Number(row.surfaceWater) || 0) + (Number(row.groundwater) || 0) + (Number(row.recycledWater) || 0) + (Number(row.rainWater) || 0) + (Number(row.mineWater) || 0) + (Number(row.brackishWater) || 0)).toFixed(2) }}</td>
-                      </tr>
-                      <tr class="bg-[#f0f5fc] font-semibold divide-x divide-[#b8cde6] text-slate-800">
-                        <td class="py-1.5 px-2 font-sans text-slate-800">合计</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlySurfaceTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyGroundTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyRecycledTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyRainTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyMineTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800">{{ declaredMonthlyBrackishTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800 font-bold">{{ declaredMonthlyUnconvTotal.toFixed(2) }}</td>
-                        <td class="py-1.5 px-1.5 font-mono text-slate-800 font-bold">{{ declaredMonthlyGrandTotal.toFixed(2) }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Tab 2: 取水总结填报表 -->
-            <div v-else-if="activeRightTab === 'summary'" class="space-y-4">
-              <div class="bg-white p-5 rounded-lg border border-slate-200/80 shadow-2xs space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
-                    <span class="font-bold text-slate-800 text-sm">全项取用水指标汇总</span>
-                  </div>
-                  <span class="text-xs font-mono text-[#1677ff]">单位: 万m³</span>
-                </div>
-
-                <div class="grid grid-cols-3 gap-3.5">
-                  <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200/90">
-                    <span class="text-slate-500 text-[11px] block mb-1">取水许可证年许可量</span>
-                    <span class="text-base font-bold font-mono text-slate-800">{{ (form.permitVolume ?? 0).toFixed(2) }}</span>
-                  </div>
-
-                  <div class="p-3.5 bg-blue-50/50 rounded-lg border border-blue-200">
-                    <span class="text-blue-600 text-[11px] font-medium block mb-1">申报核定计划总用水量</span>
-                    <span class="text-base font-bold font-mono text-[#1677ff]">
-                      {{ (planTotalVolume ?? 0).toFixed(2) }}
-                    </span>
-                  </div>
-
-                  <div class="p-3.5 bg-emerald-50/50 rounded-lg border border-emerald-200">
-                    <span class="text-emerald-700 text-[11px] font-medium block mb-1">非常规水源综合利用量</span>
-                    <span class="text-base font-bold font-mono text-emerald-600">{{ (planUnconventionalVolume ?? 0).toFixed(2) }}</span>
-                  </div>
-                </div>
-
-                <div class="text-xs text-slate-600 leading-relaxed bg-slate-50/70 p-3.5 rounded-lg border border-slate-200/80 space-y-1">
-                  <p class="font-semibold text-slate-800 mb-1 flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#1677ff]"></span>
-                    水资源红线刚性约束合规性分析：
-                  </p>
-                  <p>1. 本次申报年度用水计划总量未超出取水许可证红线额度，具备充足水资源承载力；</p>
-                  <p>2. 工业取水结构中非常规水源配置比例合理，符合国家节水行动西宁实施方案技术要求。</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Tab 3: 用水定额标签页 (根据最新标准要求高保真重构) -->
-            <div v-else-if="activeRightTab === 'water_quota'" class="space-y-4">
-              
-              <!-- 模块 1: 近三年用水计划 -->
-              <div class="space-y-2">
-                <h4 class="text-sm font-bold text-slate-800 tracking-tight">近三年用水计划</h4>
-                
-                <div class="border border-[#b8cde6] rounded-md overflow-hidden bg-white shadow-2xs">
-                  <table class="w-full text-xs text-center border-collapse">
-                    <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6]">
-                      <tr class="divide-x divide-[#b8cde6] text-xs">
-                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">年份</th>
-                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">地表水</th>
-                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">地下水</th>
-                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">再生水</th>
-                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">集蓄雨水</th>
-                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">矿坑（井）水</th>
-                        <th class="py-2.5 px-3 border-r border-[#b8cde6]">微咸水</th>
-                        <th class="py-2.5 px-3 font-semibold text-slate-800">总计</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#b8cde6] font-mono text-xs">
+                    <tbody class="divide-y divide-[#b8cde6] font-mono">
                       <tr
                         v-for="row in recentThreeYearsPlan"
                         :key="row.year"
                         class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
                       >
-                        <td class="py-2.5 px-3 text-slate-800 font-sans font-medium">{{ row.year }}</td>
-                        <td class="py-2.5 px-3 text-slate-800">{{ row.surfaceWater }}</td>
-                        <td class="py-2.5 px-3 text-slate-800">{{ row.groundwater }}</td>
-                        <td class="py-2.5 px-3 text-slate-800">{{ row.recycledWater }}</td>
-                        <td class="py-2.5 px-3 text-slate-800">{{ row.rainWater }}</td>
-                        <td class="py-2.5 px-3 text-slate-800">{{ row.mineWater }}</td>
-                        <td class="py-2.5 px-3 text-slate-800">{{ row.brackishWater }}</td>
-                        <td class="py-2.5 px-3 text-slate-800 font-semibold">{{ row.total }}</td>
+                        <td class="py-1.5 px-3 text-slate-800 font-sans font-medium">{{ row.year }}年度</td>
+                        <td class="py-1.5 px-3 text-slate-700">{{ row.surfaceWater }}</td>
+                        <td class="py-1.5 px-3 text-slate-700">{{ row.groundwater }}</td>
+                        <td class="py-1.5 px-3 text-slate-700">{{ row.unconventionalWater }}</td>
+                        <td class="py-1.5 px-3 text-slate-800 font-bold">{{ row.total }}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <!-- 模块 2: 用水定额工具栏与定额卡片列表 -->
-              <div class="space-y-3 pt-1">
-                <!-- 工具栏：用水定额标题 + 填报说明按钮 + 筛选项 -->
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                  <!-- 左侧标题与填报说明按钮 -->
-                  <div class="flex items-center gap-2.5">
-                    <span class="text-sm font-bold text-slate-800">用水定额</span>
-                    <button
-                      type="button"
-                      @click="quotaGuideModalVisible = true"
-                      class="px-2.5 py-0.5 rounded bg-[#1677ff] hover:bg-blue-600 text-white text-xs font-medium transition cursor-pointer shadow-2xs"
-                    >
-                      填报说明
-                    </button>
-                  </div>
-
-                  <!-- 右侧检索筛选区 (与截图 100% 对应) -->
-                  <div class="flex items-center gap-2">
-                    <!-- 灌溉方式 -->
-                    <div class="relative w-28">
-                      <select
-                        v-model="quotaFilter.method"
-                        class="w-full h-7 pl-2.5 pr-6 bg-white border border-slate-300 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
-                      >
-                        <option value="全部">全部方式</option>
-                        <option value="常规灌溉">常规灌溉</option>
-                        <option value="喷灌">喷灌</option>
-                        <option value="微灌">微灌</option>
-                        <option value="滴灌">滴灌</option>
-                      </select>
-                      <svg class="w-3.5 h-3.5 absolute right-2 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                    </div>
-
-                    <!-- 效率值 -->
-                    <div class="relative w-24">
-                      <select
-                        v-model="quotaFilter.efficiency"
-                        class="w-full h-7 pl-2.5 pr-6 bg-white border border-slate-300 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
-                      >
-                        <option value="全部">全部效率</option>
-                        <option value="50%">50%</option>
-                        <option value="60%">60%</option>
-                        <option value="70%">70%</option>
-                      </select>
-                      <svg class="w-3.5 h-3.5 absolute right-2 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                    </div>
-
-                    <!-- 产品名称输入框 -->
-                    <div class="relative w-36">
-                      <input
-                        type="text"
-                        v-model="quotaFilter.keyword"
-                        placeholder="产品名称"
-                        class="w-full h-7 pl-2.5 pr-7 bg-white border border-slate-300 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] transition"
-                      />
-                      <svg class="w-3.5 h-3.5 absolute right-2 top-1.5 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 定额卡片列表 (与截图排版完全一致) -->
-                <div class="space-y-2.5">
-                  <div
-                    v-for="item in displayedQuotaList"
-                    :key="item.id"
-                    class="bg-[#f8fafc]/50 rounded-xl border border-slate-200/90 p-3.5 space-y-2.5 transition-all hover:border-[#bfdbfe] hover:bg-white shadow-2xs"
+              <!-- 2. 定额分类多标签切换栏 (支持直接点击切换) -->
+              <div class="bg-white rounded-xl border border-slate-200/80 p-1.5 shadow-2xs flex items-center gap-1 overflow-x-auto no-scrollbar select-none">
+                <button
+                  v-for="catTab in quotaCategoryTabs"
+                  :key="catTab.key"
+                  type="button"
+                  @click="handleCategoryTabClick(catTab.key)"
+                  class="py-1.5 px-3 rounded-lg text-xs transition cursor-pointer flex items-center gap-1.5 shrink-0"
+                  :class="[
+                    quotaFilter.category === catTab.key
+                      ? 'bg-[#1677ff] text-white font-medium shadow-2xs'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
+                  ]"
+                >
+                  <span>{{ catTab.label }}</span>
+                  <span
+                    class="px-1.5 py-0.2 rounded-full text-[10px] font-mono"
+                    :class="quotaFilter.category === catTab.key ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'"
                   >
-                    <!-- 顶部标题与浅绿药丸标签 -->
-                    <div class="flex flex-wrap items-center gap-2.5">
-                      <span class="font-normal text-slate-800 text-xs tracking-tight">
-                        {{ item.code }}【{{ item.category }}】：{{ item.productName }}
+                    {{ catTab.count }}
+                  </span>
+                </button>
+              </div>
+
+              <!-- 3. 动态属性检索筛选条 (根据工业/农业/通用自动自适应) -->
+              <div class="bg-white rounded-xl border border-slate-200/80 p-3 shadow-2xs space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2.5">
+                  <div class="flex flex-wrap items-center gap-2">
+                    
+                    <!-- 工业专用筛选项 -->
+                    <template v-if="quotaFilter.category === 'industry'">
+                      <!-- 行业门类 -->
+                      <div class="flex items-center gap-1 text-xs text-slate-600">
+                        <span class="text-slate-400">门类:</span>
+                        <div class="relative">
+                          <select
+                            v-model="quotaFilter.industryCategory"
+                            @change="quotaCurrentPage = 1"
+                            class="h-7 pl-2 pr-6 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
+                          >
+                            <option value="全部">全部行业</option>
+                            <option value="光伏制造">光伏制造</option>
+                            <option value="锂电材料">锂电材料</option>
+                            <option value="有色金属">有色金属</option>
+                            <option value="黑色金属">黑色金属</option>
+                            <option value="建材水泥">建材水泥</option>
+                            <option value="食品轻工">食品轻工</option>
+                            <option value="化工原料">化工原料</option>
+                          </select>
+                          <svg class="w-3.5 h-3.5 absolute right-1.5 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <!-- 定额等级 -->
+                      <div class="flex items-center gap-1 text-xs text-slate-600">
+                        <span class="text-slate-400">等级:</span>
+                        <div class="relative">
+                          <select
+                            v-model="quotaFilter.efficiencyGrade"
+                            @change="quotaCurrentPage = 1"
+                            class="h-7 pl-2 pr-6 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
+                          >
+                            <option value="全部">全部等级</option>
+                            <option value="先进领跑者">先进领跑者</option>
+                            <option value="地方通用">地方通用</option>
+                          </select>
+                          <svg class="w-3.5 h-3.5 absolute right-1.5 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+                    </template>
+
+                    <!-- 农业专用筛选项 -->
+                    <template v-else-if="quotaFilter.category === 'agriculture'">
+                      <!-- 灌溉方式 -->
+                      <div class="flex items-center gap-1 text-xs text-slate-600">
+                        <span class="text-slate-400">灌溉:</span>
+                        <div class="relative">
+                          <select
+                            v-model="quotaFilter.method"
+                            @change="quotaCurrentPage = 1"
+                            class="h-7 pl-2 pr-6 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
+                          >
+                            <option value="全部">全部方式</option>
+                            <option value="常规灌溉">常规灌溉</option>
+                            <option value="喷灌">喷灌</option>
+                            <option value="微灌">微灌</option>
+                            <option value="滴灌">滴灌</option>
+                          </select>
+                          <svg class="w-3.5 h-3.5 absolute right-1.5 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <!-- 效率值 -->
+                      <div class="flex items-center gap-1 text-xs text-slate-600">
+                        <span class="text-slate-400">效率:</span>
+                        <div class="relative">
+                          <select
+                            v-model="quotaFilter.efficiency"
+                            @change="quotaCurrentPage = 1"
+                            class="h-7 pl-2 pr-6 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
+                          >
+                            <option value="全部">全部效率</option>
+                            <option value="50%">50%</option>
+                            <option value="60%">60%</option>
+                            <option value="70%">70%</option>
+                          </select>
+                          <svg class="w-3.5 h-3.5 absolute right-2 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <!-- 地貌分区 -->
+                      <div class="flex items-center gap-1 text-xs text-slate-600">
+                        <span class="text-slate-400">地貌:</span>
+                        <div class="relative">
+                          <select
+                            v-model="quotaFilter.topography"
+                            @change="quotaCurrentPage = 1"
+                            class="h-7 pl-2 pr-6 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] appearance-none cursor-pointer"
+                          >
+                            <option value="全部">全部地貌</option>
+                            <option value="川水">川水</option>
+                            <option value="浅山">浅山</option>
+                            <option value="脑山">脑山</option>
+                          </select>
+                          <svg class="w-3.5 h-3.5 absolute right-1.5 top-2 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+                    </template>
+
+                  </div>
+
+                  <!-- 关键词搜索输入框 -->
+                  <div class="relative w-48">
+                    <input
+                      type="text"
+                      v-model="quotaFilter.keyword"
+                      @input="quotaCurrentPage = 1"
+                      :placeholder="quotaFilter.category === 'industry' ? '搜索工业产品/材料...' : quotaFilter.category === 'agriculture' ? '搜索农作物/品种...' : '搜索产品名称或标准...'"
+                      class="w-full h-7 pl-2.5 pr-7 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 focus:outline-none focus:border-[#1677ff] focus:bg-white transition"
+                    />
+                    <svg class="w-3.5 h-3.5 absolute right-2 top-1.5 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <!-- 5. 定额标准卡片列表 (高保真工业/农业/生活规范卡片) -->
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+                  <span>共找到 <strong class="text-[#1677ff] font-semibold">{{ filteredQuotaList.length }}</strong> 条对应的标准定额</span>
+                  <span v-if="currentProduct" class="text-[11px] text-blue-600">
+                    高亮蓝框项为与左侧当前申报项精准匹配的标准
+                  </span>
+                </div>
+
+                <div
+                  v-for="item in displayedQuotaList"
+                  :key="item.id"
+                  class="rounded-xl border p-3.5 space-y-2.5 transition-all shadow-2xs"
+                  :class="[
+                    currentProduct && (item.productName.toLowerCase().includes(currentProduct.toLowerCase()) || currentProduct.toLowerCase().includes(item.productName.toLowerCase()))
+                      ? 'bg-blue-50/30 border-[#1677ff] ring-1 ring-[#1677ff]/30'
+                      : 'bg-white border-slate-200/90 hover:border-slate-300'
+                  ]"
+                >
+                  <!-- 顶部标题与药丸标签组 -->
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-blue-50 text-[#1677ff] border border-blue-200">
+                        <span class="text-slate-400 font-normal text-[10px]">行业编码:</span> {{ item.industryCode }}
                       </span>
-                      
-                      <!-- 标签组 -->
-                      <div v-if="item.efficiency || item.topography || item.altitude" class="flex items-center gap-2">
-                        <span
-                          v-if="item.efficiency"
-                          class="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] font-normal text-[11px]"
-                        >
-                          效率值: {{ item.efficiency }}
-                        </span>
-                        <span
-                          v-if="item.topography"
-                          class="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] font-normal text-[11px]"
-                        >
-                          地貌分区: {{ item.topography }}
-                        </span>
-                        <span
-                          v-if="item.altitude"
-                          class="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] font-normal text-[11px]"
-                        >
-                          海拔: {{ item.altitude }}
-                        </span>
-                      </div>
+                      <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                        <span class="text-slate-400 font-normal text-[10px]">行业名称:</span> {{ item.industryName }}
+                      </span>
+                      <span class="font-bold text-slate-900 text-xs">
+                        {{ item.productName }}
+                      </span>
+                      <span
+                        v-if="currentProduct && (item.productName.toLowerCase().includes(currentProduct.toLowerCase()) || currentProduct.toLowerCase().includes(item.productName.toLowerCase()))"
+                        class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-[#1677ff] flex items-center gap-1"
+                      >
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        左侧申报匹配
+                      </span>
                     </div>
 
-                    <!-- 属性网格：单位用水定额 / 灌溉方式 / 水资源分区 -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-400">
-                      <div>
-                        单位用水定额：<span class="text-slate-600 font-mono">{{ item.quotaValue }}</span>
-                      </div>
-                      <div>
-                        灌溉方式：<span class="text-slate-600">{{ item.method }}</span>
-                      </div>
-                      <div>
-                        水资源分区：<span class="text-slate-600">{{ item.waterRegion }}</span>
-                      </div>
-                    </div>
-
-                    <!-- 分区范围 -->
-                    <div class="text-xs text-slate-400">
-                      分区范围：<span class="text-slate-600">{{ item.regionScope }}</span>
+                    <!-- 等级或技术标签 -->
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <span
+                        v-if="item.waterEfficiencyGrade"
+                        class="px-2 py-0.5 rounded-full text-[11px] font-medium"
+                        :class="item.waterEfficiencyGrade.includes('领跑') || item.waterEfficiencyGrade.includes('先进') ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'"
+                      >
+                        {{ item.waterEfficiencyGrade }}
+                      </span>
+                      <span
+                        v-if="item.efficiency"
+                        class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px]"
+                      >
+                        效率: {{ item.efficiency }}
+                      </span>
+                      <span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-slate-50 border border-slate-200">
+                        {{ item.standardDoc }}
+                      </span>
                     </div>
                   </div>
 
-                  <!-- 空状态 -->
-                  <div v-if="displayedQuotaList.length === 0" class="py-8 text-center text-slate-400 text-xs">
-                    暂无符合筛选条件的用水定额信息
+                  <!-- 属性网格：单位用水定额参数 / 领跑者先进值 / 分区范围 -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    <div class="p-2 rounded-lg bg-blue-50/50 border border-blue-100">
+                      <div class="text-blue-700 text-[11px] font-medium">用水定额参数</div>
+                      <div class="text-[#1677ff] font-bold font-mono text-sm mt-0.5">{{ item.quotaParam }}</div>
+                    </div>
+
+                    <div v-if="item.advancedQuotaStr" class="p-2 rounded-lg bg-amber-50/50 border border-amber-100/80">
+                      <div class="text-amber-700 text-[11px]">节水领跑者先进值</div>
+                      <div class="text-amber-900 font-bold font-mono text-sm mt-0.5">{{ item.advancedQuotaStr }}</div>
+                    </div>
+
+                    <div v-else-if="item.method" class="p-2 rounded-lg bg-emerald-50/50 border border-emerald-100/80">
+                      <div class="text-emerald-700 text-[11px]">核定灌溉方式</div>
+                      <div class="text-emerald-900 font-semibold text-xs mt-1">{{ item.method }}</div>
+                    </div>
+
+                    <div class="p-2 rounded-lg bg-slate-50/80 border border-slate-200">
+                      <div class="text-slate-600 text-[11px] font-medium">分区范围</div>
+                      <div class="text-slate-700 font-medium text-xs mt-1 truncate" :title="item.regionScope">{{ item.regionScope }}</div>
+                    </div>
+                  </div>
+
+                  <!-- 详细参数行：生产工艺 / 非常规水替代 / 分区适用范围 -->
+                  <div class="text-xs text-slate-500 space-y-1 bg-slate-50/50 rounded-lg p-2.5 border border-slate-100">
+                    <div v-if="item.processType" class="flex items-start gap-1">
+                      <span class="text-slate-400 shrink-0">生产工艺：</span>
+                      <span class="text-slate-700">{{ item.processType }}</span>
+                    </div>
+                    <div v-if="item.unconvWaterReq" class="flex items-start gap-1">
+                      <span class="text-slate-400 shrink-0">水源要求：</span>
+                      <span class="text-slate-700 font-medium text-blue-700">{{ item.unconvWaterReq }}</span>
+                    </div>
+                    <div class="flex items-start gap-1">
+                      <span class="text-slate-400 shrink-0">适用范围：</span>
+                      <span class="text-slate-700">{{ item.regionScope }}</span>
+                    </div>
+                    <div v-if="item.notes" class="flex items-start gap-1">
+                      <span class="text-slate-400 shrink-0">核定备注：</span>
+                      <span class="text-slate-600">{{ item.notes }}</span>
+                    </div>
+                  </div>
+
+                  <!-- 卡片底部操作栏：一键采用此定额 -->
+                  <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                    <span class="text-[11px] text-slate-400">
+                      标准依据：青海省水利厅·西宁市水资源管理委员会
+                    </span>
+                    <button
+                      type="button"
+                      @click="handleApplyQuota(item, currentActiveRowIndex)"
+                      class="py-1 px-3 rounded bg-blue-50 hover:bg-[#1677ff] text-[#1677ff] hover:text-white border border-blue-200 hover:border-[#1677ff] text-xs font-medium transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      <span>选用填充至第 {{ currentActiveRowIndex + 1 }} 行 ({{ item.quotaParam }})</span>
+                    </button>
                   </div>
                 </div>
 
-                <!-- 底部翻页组件 (与截图中的 < 1 [2] 3 4 5 > 样式完全一致) -->
-                <div class="flex items-center justify-end pt-2">
-                  <div class="flex items-center gap-1.5 text-xs text-slate-600 select-none">
-                    <!-- 上一页 -->
-                    <button
-                      type="button"
-                      :disabled="quotaCurrentPage === 1"
-                      @click="quotaCurrentPage > 1 && quotaCurrentPage--"
-                      class="w-7 h-7 rounded border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                      </svg>
-                    </button>
+                <!-- 空状态 -->
+                <div v-if="displayedQuotaList.length === 0" class="py-10 text-center space-y-2 bg-white rounded-xl border border-slate-200">
+                  <svg class="w-8 h-8 text-slate-300 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <p class="text-slate-500 text-xs">未搜索到与“{{ quotaFilter.keyword || getCategoryName(quotaFilter.category) }}”匹配的定额标准</p>
+                  <button
+                    type="button"
+                    @click="clearKeyword"
+                    class="px-3 py-1 text-xs text-[#1677ff] hover:underline cursor-pointer"
+                  >
+                    查看该类全部定额
+                  </button>
+                </div>
+              </div>
 
-                    <!-- 页码 1 到 5 (第2页高亮选中蓝框) -->
-                    <button
-                      v-for="page in quotaTotalPages"
-                      :key="page"
-                      type="button"
-                      @click="quotaCurrentPage = page"
-                      class="w-7 h-7 rounded border text-xs font-normal transition cursor-pointer flex items-center justify-center"
-                      :class="quotaCurrentPage === page
-                        ? 'border-[#1677ff] text-[#1677ff] bg-white font-medium shadow-2xs'
-                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
-                    >
-                      {{ page }}
-                    </button>
+              <!-- 6. 底部翻页组件 -->
+              <div class="flex items-center justify-between pt-1 text-xs text-slate-500 select-none">
+                <span>第 {{ quotaCurrentPage }} / {{ quotaTotalPages }} 页 (共 {{ filteredQuotaList.length }} 项)</span>
+                <div class="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    :disabled="quotaCurrentPage === 1"
+                    @click="quotaCurrentPage > 1 && quotaCurrentPage--"
+                    class="w-7 h-7 rounded border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </button>
 
-                    <!-- 下一页 -->
-                    <button
-                      type="button"
-                      :disabled="quotaCurrentPage === quotaTotalPages"
-                      @click="quotaCurrentPage < quotaTotalPages && quotaCurrentPage++"
-                      class="w-7 h-7 rounded border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                      </svg>
-                    </button>
-                  </div>
+                  <button
+                    v-for="page in quotaTotalPages"
+                    :key="page"
+                    type="button"
+                    @click="quotaCurrentPage = page"
+                    class="w-7 h-7 rounded border text-xs transition cursor-pointer flex items-center justify-center"
+                    :class="quotaCurrentPage === page
+                      ? 'border-[#1677ff] text-[#1677ff] bg-white font-semibold shadow-2xs'
+                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
+                  >
+                    {{ page }}
+                  </button>
+
+                  <button
+                    type="button"
+                    :disabled="quotaCurrentPage === quotaTotalPages"
+                    @click="quotaCurrentPage < quotaTotalPages && quotaCurrentPage++"
+                    class="w-7 h-7 rounded border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </button>
                 </div>
               </div>
 
             </div>
 
-            <!-- Tab 4: 业务流程 (从提交到审核的每一个节点) -->
-            <div v-else-if="activeRightTab === 'business_process'" class="space-y-4">
-              <!-- 业务流程概览卡片 -->
-              <div class="bg-white rounded-lg border border-slate-200/80 p-4 shadow-2xs">
-                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
-                    <h4 class="text-sm font-bold text-slate-800">申报审批全周期业务流转节点</h4>
-                    <span class="text-xs font-mono text-slate-500">业务编号: XN-WP-{{ form.year || 2026 }}-{{ form.permitNumber?.slice(-4) || '0012' }}</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs text-slate-500">当前流转状态:</span>
-                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-[#1677ff] border border-blue-200">
-                      {{ record.status }} (第 5/6 步)
-                    </span>
-                  </div>
-                </div>
-
-                <!-- 流程全景步骤轴 -->
-                <div class="grid grid-cols-6 gap-1 pt-3">
-                  <div
-                    v-for="(node, nIdx) in businessProcessNodes"
-                    :key="node.id"
-                    class="flex flex-col items-center text-center relative"
-                  >
-                    <!-- 节点圆点与连线 -->
-                    <div class="w-full flex items-center mb-2">
-                      <div
-                        class="flex-1 h-0.5"
-                        :class="nIdx === 0 ? 'invisible' : (node.status === 'completed' || node.status === 'current' ? 'bg-[#1677ff]' : 'bg-slate-200')"
-                      ></div>
-                      <div
-                        class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition shadow-2xs"
-                        :class="[
-                          node.status === 'completed'
-                            ? 'bg-emerald-500 text-white'
-                            : node.status === 'current'
-                            ? 'bg-[#1677ff] text-white ring-4 ring-blue-100 animate-pulse'
-                            : 'bg-slate-100 text-slate-400 border border-slate-300'
-                        ]"
-                      >
-                        <svg v-if="node.status === 'completed'" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span v-else>{{ node.id }}</span>
-                      </div>
-                      <div
-                        class="flex-1 h-0.5"
-                        :class="nIdx === businessProcessNodes.length - 1 ? 'invisible' : (node.status === 'completed' ? 'bg-[#1677ff]' : 'bg-slate-200')"
-                      ></div>
-                    </div>
-                    <!-- 节点名称与标签 -->
-                    <span
-                      class="text-[11px] font-medium leading-tight line-clamp-2 px-1"
-                      :class="node.status === 'current' ? 'text-[#1677ff] font-bold' : (node.status === 'completed' ? 'text-slate-800' : 'text-slate-400')"
-                    >
-                      {{ node.shortName }}
-                    </span>
-                    <span class="text-[10px] text-slate-400 mt-0.5 font-mono">{{ node.statusText }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 节点明细流转清单卡片 -->
-              <div class="space-y-3">
+            <!-- Tab 4: 业务流程 (竖向流程图，仅展示流程图) -->
+            <div v-else-if="activeRightTab === 'business_process'" class="bg-white rounded-xl border border-slate-200/90 p-6 shadow-2xs">
+              <div class="max-w-md mx-auto py-2">
                 <div
-                  v-for="node in businessProcessNodes"
+                  v-for="(node, nIdx) in businessProcessNodes"
                   :key="node.id"
-                  class="bg-white rounded-lg border transition duration-150 p-4 shadow-2xs relative"
-                  :class="[
-                    node.status === 'current'
-                      ? 'border-[#1677ff] ring-1 ring-blue-100 bg-gradient-to-r from-blue-50/20 via-white to-white'
-                      : 'border-slate-200/80 hover:border-slate-300'
-                  ]"
+                  class="relative flex items-start gap-4 pb-8 last:pb-2"
                 >
-                  <!-- 节点顶栏 -->
-                  <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
-                    <div class="flex items-center gap-2.5">
-                      <div
-                        class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold font-mono"
+                  <!-- 竖向流向连接线 -->
+                  <div
+                    v-if="nIdx !== businessProcessNodes.length - 1"
+                    class="absolute left-5 top-10 bottom-0 w-0.5"
+                    :class="node.status === 'completed' ? 'bg-[#1677ff]' : 'bg-slate-200'"
+                  ></div>
+
+                  <!-- 节点圆形指示器 (完成/当前/未流转) -->
+                  <div
+                    class="relative z-10 w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs shadow-2xs transition"
+                    :class="[
+                      node.status === 'completed'
+                        ? 'bg-emerald-500 text-white shadow-emerald-100'
+                        : node.status === 'current'
+                        ? 'bg-[#1677ff] text-white ring-4 ring-blue-100 shadow-blue-100 animate-pulse'
+                        : 'bg-slate-50 border-2 border-slate-300 text-slate-400'
+                    ]"
+                  >
+                    <svg v-if="node.status === 'completed'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span v-else>{{ node.id }}</span>
+                  </div>
+
+                  <!-- 节点流程信息卡片 -->
+                  <div
+                    class="flex-1 rounded-lg border p-3.5 shadow-2xs transition"
+                    :class="[
+                      node.status === 'current'
+                        ? 'border-[#1677ff] ring-1 ring-blue-100 bg-blue-50/20'
+                        : node.status === 'completed'
+                        ? 'border-emerald-200 bg-emerald-50/10'
+                        : 'border-slate-200 bg-white'
+                    ]"
+                  >
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-800">{{ node.shortName }}</span>
+                        <span class="text-[11px] text-slate-400">（{{ node.name }}）</span>
+                      </div>
+                      <span
+                        class="px-2 py-0.5 rounded text-[11px] font-medium"
                         :class="[
                           node.status === 'completed'
                             ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                             : node.status === 'current'
-                            ? 'bg-[#1677ff] text-white'
+                            ? 'bg-blue-50 text-[#1677ff] border border-blue-200'
                             : 'bg-slate-100 text-slate-400 border border-slate-200'
                         ]"
                       >
-                        0{{ node.id }}
-                      </div>
-                      <span class="text-xs font-bold text-slate-800">{{ node.name }}</span>
-                      <span :class="['px-1.5 py-0.5 rounded text-[10.5px] border', node.tagColor]">
-                        {{ node.tag }}
-                      </span>
-                    </div>
-
-                    <div class="flex items-center gap-3 text-xs">
-                      <span
-                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
-                        :class="[
-                          node.status === 'completed'
-                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                            : node.status === 'current'
-                            ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                            : 'bg-slate-100 text-slate-500 border border-slate-200'
-                        ]"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full"
-                          :class="[
-                            node.status === 'completed'
-                              ? 'bg-emerald-500'
-                              : node.status === 'current'
-                              ? 'bg-[#1677ff] animate-pulse'
-                              : 'bg-slate-400'
-                          ]"
-                        ></span>
                         {{ node.statusText }}
                       </span>
-                      <span class="text-slate-400 font-mono text-[11px]">{{ node.time }}</span>
                     </div>
-                  </div>
 
-                  <!-- 经办人信息与办理说明 -->
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs py-2.5 text-slate-600 bg-slate-50/60 px-3 rounded-md my-2 border border-slate-100">
-                    <div>
-                      <span class="text-slate-400">办理人员：</span>
-                      <strong class="text-slate-800 font-medium">{{ node.handler }}</strong>
-                      <span class="text-slate-400 text-[11px] ml-1">({{ node.handlerRole }})</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-400">经办部门：</span>
-                      <span class="text-slate-700">{{ node.department }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-400">流转耗时：</span>
-                      <span class="font-mono text-slate-700">{{ node.duration }}</span>
-                    </div>
-                  </div>
-
-                  <!-- 节点说明详情 -->
-                  <div class="text-xs text-slate-600 leading-relaxed space-y-1.5">
-                    <p>{{ node.desc }}</p>
-                    
-                    <!-- 成果与结论提示条 -->
-                    <div class="p-2 rounded bg-blue-50/40 border border-blue-100 flex items-start gap-2">
-                      <svg class="w-3.5 h-3.5 text-[#1677ff] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    <div v-if="nIdx !== businessProcessNodes.length - 1" class="pt-2 text-[11px] text-slate-400 flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5 text-[#1677ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
                       </svg>
-                      <span class="text-slate-700 font-medium text-[11.5px]">{{ node.resultText }}</span>
-                    </div>
-                  </div>
-
-                  <!-- 节点 1 特别展示：申报附件资料 (包含预览与下载) -->
-                  <div v-if="node.hasAttachments" class="mt-2.5 pt-2 border-t border-slate-100">
-                    <span class="text-[11px] text-slate-400 block mb-1.5">申报提交的佐证附件：</span>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <div
-                        v-for="(att, aIdx) in attachments"
-                        :key="aIdx"
-                        class="flex items-center justify-between p-2 rounded-lg border border-[#c4d8ee] bg-white hover:bg-[#f0f5fd] transition gap-2"
-                      >
-                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                          <div
-                            v-if="att.type === 'image'"
-                            class="w-5 h-5 rounded bg-[#e6f1fc] text-[#1677ff] flex items-center justify-center shrink-0"
-                          >
-                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                              <polyline points="21 15 16 10 5 21"></polyline>
-                            </svg>
-                          </div>
-                          <div
-                            v-else-if="att.type === 'word'"
-                            class="w-5 h-5 rounded bg-[#eef0fe] text-[#2f54eb] flex items-center justify-center shrink-0 font-bold text-[10px]"
-                          >
-                            W
-                          </div>
-                          <div
-                            v-else
-                            class="w-5 h-5 rounded bg-[#feebee] text-[#f5222d] flex items-center justify-center shrink-0"
-                          >
-                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                              <polyline points="14 2 14 8 20 8"></polyline>
-                              <line x1="16" y1="13" x2="8" y2="13"></line>
-                              <line x1="16" y1="17" x2="8" y2="17"></line>
-                            </svg>
-                          </div>
-                          <span class="text-[11px] text-gray-800 truncate font-normal" :title="att.name">
-                            {{ att.name }}
-                          </span>
-                        </div>
-
-                        <div class="flex items-center gap-1 shrink-0 text-gray-400">
-                          <button
-                            v-if="att.type === 'image' || att.type === 'pdf'"
-                            type="button"
-                            @click.stop="openPreview(att)"
-                            class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
-                            title="预览附件"
-                          >
-                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                              <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                          </button>
-                          <button
-                            type="button"
-                            @click.stop="downloadAttachment(att)"
-                            class="hover:text-[#1677ff] p-1 cursor-pointer rounded transition"
-                            title="下载附件"
-                          >
-                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                              <polyline points="7 10 12 15 17 10"></polyline>
-                              <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
+                      <span class="text-slate-500">流转至下一节点</span>
                     </div>
                   </div>
                 </div>
@@ -1530,6 +1318,142 @@
         </div>
       </div>
     </t-dialog>
+
+    <!-- 工业用水定额大图智能检索与匹配（气泡弹窗浮窗模式） -->
+    <t-dialog
+      v-model:visible="quotaBubbleModalVisible"
+      header="工业用水定额检索与智能匹配（气泡弹窗）"
+      width="820px"
+      :footer="false"
+      top="7vh"
+    >
+      <div class="p-1 space-y-3">
+        <!-- 弹窗说明与目标行提示 -->
+        <div class="p-3 bg-gradient-to-r from-blue-50/90 to-sky-50/40 rounded-xl border border-blue-200 flex items-center justify-between gap-3 flex-wrap">
+          <div class="space-y-0.5">
+            <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
+              <span>检索关键词：【{{ currentProduct || quotaFilter.keyword || '高纯多晶硅' }}】</span>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#1677ff] text-white">
+                匹配到 {{ matchedIndustrialQuotas.length }} 个定额标准
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500">
+              当前填报目标：左侧表单【工业用水第 <strong class="text-[#1677ff] font-mono">{{ currentActiveRowIndex + 1 }}</strong> 行】。点击下方任一定额卡片，即可自动填充至该行。
+            </p>
+          </div>
+          <div class="relative w-64 shrink-0">
+            <input
+              type="text"
+              v-model="quotaFilter.keyword"
+              placeholder="输入产品名、行业名称或编码过滤..."
+              class="w-full h-8 pl-7 pr-2.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100"
+            />
+            <svg class="w-3.5 h-3.5 absolute left-2 top-2.5 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 匹配定额卡片/表格展示 -->
+        <div class="max-h-[58vh] overflow-y-auto space-y-2.5 custom-scrollbar pr-1">
+          <div
+            v-for="(qItem, qIdx) in matchedIndustrialQuotas"
+            :key="qItem.id || qIdx"
+            @click="handleApplyQuotaAndCloseBubble(qItem, currentActiveRowIndex)"
+            class="p-3 bg-white rounded-xl border border-slate-200 hover:border-[#1677ff] hover:bg-blue-50/20 transition-all cursor-pointer shadow-2xs space-y-2.5 group relative"
+          >
+            <!-- 头部：行业编码、行业名称、产品名称 -->
+            <div class="flex items-center justify-between gap-2 flex-wrap border-b border-slate-100 pb-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <!-- 1. 行业编码 -->
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-bold bg-blue-50 text-[#1677ff] border border-blue-200">
+                  <span class="text-slate-400 font-normal text-[10px]">行业编码:</span>
+                  {{ qItem.industryCode }}
+                </span>
+                <!-- 2. 行业名称 -->
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                  <span class="text-slate-400 font-normal text-[10px]">行业名称:</span>
+                  {{ qItem.industryName }}
+                </span>
+                <!-- 3. 产品名称 -->
+                <span class="font-bold text-xs text-slate-900 group-hover:text-[#1677ff] transition">
+                  {{ qItem.productName }}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span
+                  v-if="qItem.waterEfficiencyGrade"
+                  class="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                  :class="qItem.waterEfficiencyGrade.includes('领跑') || qItem.waterEfficiencyGrade.includes('先进') ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'"
+                >
+                  {{ qItem.waterEfficiencyGrade }}
+                </span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-slate-50 border border-slate-200">
+                  {{ qItem.standardDoc }}
+                </span>
+              </div>
+            </div>
+
+            <!-- 数值参数网格：用水定额参数 与 分区范围 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <!-- 4. 用水定额参数 -->
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-blue-50/60 border border-blue-100">
+                <div class="space-y-0.5">
+                  <div class="text-[11px] text-blue-700 font-medium">用水定额参数</div>
+                  <div class="text-[10px] text-slate-400 font-sans">地方标准通用/领跑指标</div>
+                </div>
+                <div class="font-mono font-bold text-base text-[#1677ff]">
+                  {{ qItem.quotaParam }}
+                </div>
+              </div>
+
+              <!-- 5. 分区范围 -->
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                <div class="space-y-0.5 truncate max-w-[260px]">
+                  <div class="text-[11px] text-slate-600 font-medium">分区范围</div>
+                  <div class="text-xs text-slate-700 truncate" :title="qItem.regionScope">
+                    {{ qItem.regionScope }}
+                  </div>
+                </div>
+                <div class="text-[10px] text-slate-500 font-mono shrink-0">
+                  {{ qItem.waterRegion }}
+                </div>
+              </div>
+            </div>
+
+            <!-- 工艺与选用按钮 -->
+            <div class="flex items-center justify-between pt-1 text-xs text-slate-500">
+              <span class="truncate max-w-[460px] text-[11px]">
+                生产工艺：{{ qItem.processType || '标准成熟工艺' }}
+              </span>
+              <button
+                type="button"
+                @click.stop="handleApplyQuotaAndCloseBubble(qItem, currentActiveRowIndex)"
+                class="px-3 py-1.5 rounded-lg bg-[#1677ff] hover:bg-blue-700 text-white font-medium text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+              >
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>选用填充到第 {{ currentActiveRowIndex + 1 }} 行</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+          <span>提示：点击任意定额卡片可直接将数值填充至左侧表单对应行，并自动关闭气泡弹窗。</span>
+          <button
+            type="button"
+            @click="quotaBubbleModalVisible = false"
+            class="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium cursor-pointer transition"
+          >
+            关闭
+          </button>
+        </div>
+      </div>
+    </t-dialog>
   </div>
 </template>
 
@@ -1537,7 +1461,7 @@
 import { ref, reactive, computed, watch } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import type { WaterPlanRecord, FormQuotaData, MonthlySummaryRow } from '../../../types';
-import WaterQuotaAuditForm from './WaterQuotaAuditForm.vue';
+import WaterQuotaAuditForm, { type WaterCategoryKey } from './WaterQuotaAuditForm.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -1549,14 +1473,34 @@ const emit = defineEmits<{
   (e: 'submit-audit', updatedRecord: WaterPlanRecord): void;
 }>();
 
+// 右侧标签栏：仅保留“用水定额”和“业务流程”
 const rightTabs = [
-  { key: 'plan_application', label: '计划申请填报表' },
-  { key: 'summary', label: '取水总结填报表' },
   { key: 'water_quota', label: '用水定额' },
   { key: 'business_process', label: '业务流程' },
 ];
 
-const activeRightTab = ref<'summary' | 'plan_application' | 'water_quota' | 'business_process'>('plan_application');
+const activeRightTab = ref<'water_quota' | 'business_process'>('water_quota');
+
+// 左右表单与定额数据联动状态
+const actualFormRef = ref<any>(null);
+const planFormRef = ref<any>(null);
+const currentCategory = ref<WaterCategoryKey>('industry');
+const currentProduct = ref<string>('高纯多晶硅');
+const currentActiveRowIndex = ref<number>(0);
+
+const getCategoryName = (cat: WaterCategoryKey | 'all') => {
+  switch (cat) {
+    case 'industry': return '工业用水';
+    case 'agriculture': return '农业用水';
+    case 'living': return '生活用水';
+    case 'livestock': return '牲畜饲养';
+    case 'power': return '水力与火力发电';
+    case 'service': return '现代服务业';
+    case 'all': return '全部定额';
+    default: return '用水定额';
+  }
+};
+
 const auditOpinion = ref('经审查，该单位用水计划指标符合西宁市刚性约束管控方案与行业定额，予以审核通过。');
 
 // 审核气泡弹窗状态与快捷评语
@@ -1700,129 +1644,1183 @@ const handleConfirmAuditFromPopup = () => {
   auditPopupVisible.value = false;
 };
 
-// 近三年用水计划数据 (与截图完全一致)
+// 近三年用水计划数据（展示地表水、地下水、非常规水四类指标参考）
 const recentThreeYearsPlan = ref([
-  { year: '2025', surfaceWater: '0.00', groundwater: '0.01', recycledWater: '0.02', rainWater: '0.00', mineWater: '0.01', brackishWater: '0.00', total: '0.01' },
-  { year: '2024', surfaceWater: '0.03', groundwater: '0.04', recycledWater: '0.05', rainWater: '0.03', mineWater: '0.04', brackishWater: '0.03', total: '0.04' },
-  { year: '2023', surfaceWater: '0.06', groundwater: '0.07', recycledWater: '0.08', rainWater: '0.06', mineWater: '0.07', brackishWater: '0.06', total: '0.07' },
+  { year: '2025', surfaceWater: '18.50', groundwater: '5.20', unconventionalWater: '4.30', total: '28.00' },
+  { year: '2024', surfaceWater: '17.80', groundwater: '5.60', unconventionalWater: '3.80', total: '27.20' },
+  { year: '2023', surfaceWater: '16.90', groundwater: '6.00', unconventionalWater: '3.20', total: '26.10' },
 ]);
 
 // 填报说明弹窗
 const quotaGuideModalVisible = ref(false);
+const quotaBubbleModalVisible = ref(false);
 
 // 用水定额卡片数据项接口
-interface QuotaCardItem {
+export interface QuotaCardItem {
   id: string;
   code: string;
+  type: WaterCategoryKey;
+  industryCode: string; // 行业编码 (如 C3824)
+  industryName: string; // 行业名称 (如 光伏设备及元器件制造)
+  cleanProductName: string; // 基础产品名称 (如 高纯多晶硅)
   category: string;
-  productName: string;
+  productName: string; // 细分产品/标准定额项
+  standardQuota: number;
+  quotaUnit: string;
+  quotaValue: string;
+  quotaParam: string; // 用水定额参数 (如 12.00 m³/t)
+  standardDoc: string;
+  // 农业专用
   efficiency?: string;
   topography?: string;
   altitude?: string;
-  quotaValue: string;
-  method: string;
+  method?: string;
+  // 工业专用
+  industryCategory?: string;
+  advancedQuota?: number;
+  advancedQuotaStr?: string;
+  processType?: string;
+  unconvWaterReq?: string;
+  waterEfficiencyGrade?: string;
+  // 通用
   waterRegion: string;
-  regionScope: string;
+  regionScope: string; // 分区范围
+  notes?: string;
 }
 
-// 用水定额筛选条件
+// 用水定额筛选条件（支持行业门类、农业灌溉、关键字及分类联动）
 const quotaFilter = reactive({
-  method: '常规灌溉',
-  efficiency: '50%',
-  keyword: '',
+  category: 'industry' as WaterCategoryKey | 'all',
+  industryCategory: '全部',
+  efficiencyGrade: '全部',
+  method: '全部',
+  efficiency: '全部',
+  topography: '全部',
+  keyword: '高纯多晶硅',
 });
 
-// 当前激活页码 (第2页高亮选中，与截图一致)
-const quotaCurrentPage = ref(2);
-const quotaTotalPages = 5;
+// 当前激活页码与分页
+const quotaCurrentPage = ref(1);
+const quotaPageSize = 6;
 
-// 用水定额卡片基础数据 (与截图 100% 对应)
+// 用水定额全部基础数据（包含工业、农业、生活、畜牧、发电、服务业等地方标准；同一工业产品具备多档不同定额）
 const allQuotaList = ref<QuotaCardItem[]>([
+  // ==================== 1. 工业用水定额（一个产品有多个用水定额，全量具备5项核心数值） ====================
+  // 【高纯多晶硅】多档定额
   {
-    id: 'q-1',
-    code: 'A019283',
-    category: '小麦种植类',
-    productName: '小麦',
+    id: 'ind-1-1',
+    code: 'GB/T 31435',
+    type: 'industry',
+    industryCode: 'C3824',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '高纯多晶硅',
+    category: '光伏材料制造',
+    industryCategory: '光伏制造',
+    productName: '高纯多晶硅 (先进领跑者指标)',
+    standardQuota: 12.00,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤12.00 m³/t',
+    quotaParam: '12.00 m³/t',
+    advancedQuota: 12.00,
+    advancedQuotaStr: '12.00 m³/t',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: '改良西门子法闭环循环还原+母液全蒸发',
+    unconvWaterReq: '非常规水替代率 ≥35%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '西宁经济技术开发区(东川、南川、甘河工业园区)',
+    notes: '优先配置再生水用于循环冷却系统补水'
+  },
+  {
+    id: 'ind-1-2',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3824',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '高纯多晶硅',
+    category: '光伏材料制造',
+    industryCategory: '光伏制造',
+    productName: '高纯多晶硅 (青海地方通用标准)',
+    standardQuota: 14.50,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤14.50 m³/t',
+    quotaParam: '14.50 m³/t',
+    advancedQuota: 12.00,
+    advancedQuotaStr: '12.00 m³/t',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '常规氢化提纯闭环生产',
+    unconvWaterReq: '非常规水替代率 ≥25%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '西宁市及海东市重点工业区',
+    notes: '符合青海省节水评价基准指标'
+  },
+  {
+    id: 'ind-1-3',
+    code: 'GB/T 31435',
+    type: 'industry',
+    industryCode: 'C3824',
+    industryName: '电子专用材料制造',
+    cleanProductName: '高纯多晶硅',
+    category: '电子级高纯材料',
+    industryCategory: '电子材料',
+    productName: '高纯多晶硅 (冷氢化全循环闭式法)',
+    standardQuota: 13.20,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤13.20 m³/t',
+    quotaParam: '13.20 m³/t',
+    advancedQuota: 11.50,
+    advancedQuotaStr: '11.50 m³/t',
+    waterEfficiencyGrade: '先进级',
+    processType: '冷氢化高效低水耗闭路循环',
+    unconvWaterReq: '冷却循环回用率 ≥98.5%',
+    standardDoc: 'GB/T 31435-2023',
+    waterRegion: '湟水流域',
+    regionScope: '青海省各国家级高新技术产业园区',
+    notes: '电子级多晶硅生产先进线执行此标准'
+  },
+  {
+    id: 'ind-1-4',
+    code: 'GB/T 18916.35',
+    type: 'industry',
+    industryCode: 'C3824',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '高纯多晶硅',
+    category: '光伏材料制造',
+    industryCategory: '光伏制造',
+    productName: '高纯多晶硅 (国家准入基准限额)',
+    standardQuota: 16.00,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤16.00 m³/t',
+    quotaParam: '16.00 m³/t',
+    advancedQuota: 13.00,
+    advancedQuotaStr: '13.00 m³/t',
+    waterEfficiencyGrade: '基准通用',
+    processType: '常规西门子还原法',
+    unconvWaterReq: '中水回用率 ≥80%',
+    standardDoc: 'GB/T 18916.35-2021',
+    waterRegion: '黄河流域青海段',
+    regionScope: '黄河流域生态刚性管控重点区',
+    notes: '既有装置技术改造上限指标'
+  },
+
+  // 【单晶硅棒】多档定额
+  {
+    id: 'ind-2-1',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3824',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '单晶硅棒',
+    category: '光伏材料制造',
+    industryCategory: '光伏制造',
+    productName: '单晶硅棒 (先进领跑者指标)',
+    standardQuota: 0.14,
+    quotaUnit: 'm³/kg',
+    quotaValue: '≤0.14 m³/kg',
+    quotaParam: '0.14 m³/kg',
+    advancedQuota: 0.14,
+    advancedQuotaStr: '0.14 m³/kg',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: '连续加料直拉单晶(CCZ)+微细切片工艺',
+    unconvWaterReq: '切片冷却闭式回用率 ≥98%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '西宁经济技术开发区(南川工业园区)',
+    notes: '切片废砂浆中水完全实现闭环再生利用'
+  },
+  {
+    id: 'ind-2-2',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3824',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '单晶硅棒',
+    category: '光伏材料制造',
+    industryCategory: '光伏制造',
+    productName: '单晶硅棒 (地方通用标准)',
+    standardQuota: 0.18,
+    quotaUnit: 'm³/kg',
+    quotaValue: '≤0.18 m³/kg',
+    quotaParam: '0.18 m³/kg',
+    advancedQuota: 0.14,
+    advancedQuotaStr: '0.14 m³/kg',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '常规直拉单晶法(CZ)+金刚线切片',
+    unconvWaterReq: '中水回用率 ≥85%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟水流域西宁段工业集中区',
+    notes: '通用规模化单晶制造企业基准核定依据'
+  },
+  {
+    id: 'ind-2-3',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3824',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '单晶硅棒',
+    category: '光伏材料制造',
+    industryCategory: '光伏制造',
+    productName: '单晶硅棒 (大尺寸N型超薄片)',
+    standardQuota: 0.16,
+    quotaUnit: 'm³/kg',
+    quotaValue: '≤0.16 m³/kg',
+    quotaParam: '0.16 m³/kg',
+    advancedQuota: 0.13,
+    advancedQuotaStr: '0.13 m³/kg',
+    waterEfficiencyGrade: '先进级',
+    processType: 'N型大尺寸210mm硅棒超细线切割',
+    unconvWaterReq: '纯水浓水100%梯级回用',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '南川高新技术产业集聚区',
+    notes: '210/182高规格硅片生产基准'
+  },
+
+  // 【太阳能电池片】多档定额
+  {
+    id: 'ind-3-1',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3825',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '太阳能电池片',
+    category: '光伏电池制造',
+    industryCategory: '光伏制造',
+    productName: '太阳能电池片 (TOPCon高效双面电池)',
+    standardQuota: 0.06,
+    quotaUnit: 'm³/片',
+    quotaValue: '≤0.06 m³/片',
+    quotaParam: '0.06 m³/片',
+    advancedQuota: 0.05,
+    advancedQuotaStr: '0.05 m³/片',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: 'TOPCon高效双面钝化接触工艺',
+    unconvWaterReq: '纯水制备浓水回用率 ≥90%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '西宁经济技术开发区(南川工业园区)',
+    notes: '酸洗洗涤水多级逆流漂洗回用'
+  },
+  {
+    id: 'ind-3-2',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3825',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '太阳能电池片',
+    category: '光伏电池制造',
+    industryCategory: '光伏制造',
+    productName: '太阳能电池片 (地方通用标准)',
+    standardQuota: 0.08,
+    quotaUnit: 'm³/片',
+    quotaValue: '≤0.08 m³/片',
+    quotaParam: '0.08 m³/片',
+    advancedQuota: 0.06,
+    advancedQuotaStr: '0.06 m³/片',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '常规PERC高效单晶电池线',
+    unconvWaterReq: '纯水制备浓水回用率 ≥80%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '青海省全省各工业园区通用',
+    notes: '地方规模化产线申报定额'
+  },
+  {
+    id: 'ind-3-3',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3825',
+    industryName: '光伏设备及元器件制造',
+    cleanProductName: '太阳能电池片',
+    category: '光伏电池制造',
+    industryCategory: '光伏制造',
+    productName: '太阳能电池片 (HJT异质结超低水耗)',
+    standardQuota: 0.05,
+    quotaUnit: 'm³/片',
+    quotaValue: '≤0.05 m³/片',
+    quotaParam: '0.05 m³/片',
+    advancedQuota: 0.045,
+    advancedQuotaStr: '0.045 m³/片',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: 'HJT异质结低温等离子沉积工艺',
+    unconvWaterReq: '纯水闭路循环率 ≥95%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '东川工业园区、南川工业园区',
+    notes: '下一代光伏电池低碳节水示范线'
+  },
+
+  // 【锂电池正极材料】多档定额
+  {
+    id: 'ind-4-1',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3841',
+    industryName: '锂离子电池材料制造',
+    cleanProductName: '动力及储能锂电池材料',
+    category: '锂电储能材料',
+    industryCategory: '锂电材料',
+    productName: '动力及储能锂电池材料 (先进标杆)',
+    standardQuota: 6.80,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤6.80 m³/t',
+    quotaParam: '6.80 m³/t',
+    advancedQuota: 6.80,
+    advancedQuotaStr: '6.80 m³/t',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: '高镍三元前驱体/磷酸铁锂共沉淀+MVR蒸发',
+    unconvWaterReq: '洗涤母液蒸发中水全回用',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '西宁经济技术开发区(南川、东川园区)',
+    notes: '洗涤母液蒸发冷凝液100%返洗'
+  },
+  {
+    id: 'ind-4-2',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3841',
+    industryName: '锂离子电池材料制造',
+    cleanProductName: '动力及储能锂电池材料',
+    category: '锂电储能材料',
+    industryCategory: '锂电材料',
+    productName: '动力及储能锂电池材料 (地方通用标准)',
+    standardQuota: 8.50,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤8.50 m³/t',
+    quotaParam: '8.50 m³/t',
+    advancedQuota: 6.80,
+    advancedQuotaStr: '6.80 m³/t',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '湿法合成母液回收工艺',
+    unconvWaterReq: '非常规水使用率 ≥30%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟水流域工业区',
+    notes: '正极材料规模化制造基础指标'
+  },
+
+  // 【重熔铝锭】多档定额
+  {
+    id: 'ind-5-1',
+    code: 'GB/T 18916.14',
+    type: 'industry',
+    industryCode: 'C3216',
+    industryName: '常用有色金属冶炼',
+    cleanProductName: '重熔铝锭',
+    category: '有色金属冶炼',
+    industryCategory: '有色金属',
+    productName: '重熔铝锭 (先进标杆指标)',
+    standardQuota: 1.35,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤1.35 m³/t',
+    quotaParam: '1.35 m³/t',
+    advancedQuota: 1.35,
+    advancedQuotaStr: '1.35 m³/t',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: '500kA及以上大型预焙电解槽+烟气干法净化',
+    unconvWaterReq: '工业废水零直排',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '甘河工业园区',
+    notes: '循环水排污水全量梯级利用'
+  },
+  {
+    id: 'ind-5-2',
+    code: 'GB/T 18916.14',
+    type: 'industry',
+    industryCode: 'C3216',
+    industryName: '常用有色金属冶炼',
+    cleanProductName: '重熔铝锭',
+    category: '有色金属冶炼',
+    industryCategory: '有色金属',
+    productName: '重熔铝锭 (地方通用标准)',
+    standardQuota: 1.80,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤1.80 m³/t',
+    quotaParam: '1.80 m³/t',
+    advancedQuota: 1.35,
+    advancedQuotaStr: '1.35 m³/t',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '常规大型电解铝及铸锭工艺',
+    unconvWaterReq: '循环冷却水回用率 ≥96%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟水流域及黄河流域工业集中区',
+    notes: '电解铝骨干企业核定标准'
+  },
+
+  // 【硅铁合金】多档定额
+  {
+    id: 'ind-6-1',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3140',
+    industryName: '铁合金冶炼',
+    cleanProductName: '硅铁合金',
+    category: '黑色金属合金',
+    industryCategory: '黑色金属',
+    productName: '硅铁合金 (先进标杆指标)',
+    standardQuota: 1.60,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤1.60 m³/t',
+    quotaParam: '1.60 m³/t',
+    advancedQuota: 1.60,
+    advancedQuotaStr: '1.60 m³/t',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: '全密闭矿热炉冶炼+余热闭路发电',
+    unconvWaterReq: '密闭循环率 ≥99%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '大通北川工业园、甘河工业园区',
+    notes: '高纯度硅铁绿色冶炼示范企业执行'
+  },
+  {
+    id: 'ind-6-2',
+    code: 'DB63/T 1429',
+    type: 'industry',
+    industryCode: 'C3140',
+    industryName: '铁合金冶炼',
+    cleanProductName: '硅铁合金',
+    category: '黑色金属合金',
+    industryCategory: '黑色金属',
+    productName: '硅铁合金 (地方通用标准)',
+    standardQuota: 2.20,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤2.20 m³/t',
+    quotaParam: '2.20 m³/t',
+    advancedQuota: 1.60,
+    advancedQuotaStr: '1.60 m³/t',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '常规半密闭矿热炉冶炼',
+    unconvWaterReq: '冷却水闭路循环',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '青海省全省各铁合金冶炼企业',
+    notes: '通用铁合金生产核定依据'
+  },
+
+  // 【通用硅酸盐水泥】多档定额
+  {
+    id: 'ind-7-1',
+    code: 'GB/T 18916.8',
+    type: 'industry',
+    industryCode: 'C3011',
+    industryName: '水泥制造',
+    cleanProductName: '通用硅酸盐水泥',
+    category: '非金属建材',
+    industryCategory: '建材水泥',
+    productName: '通用硅酸盐水泥 (先进标杆指标)',
+    standardQuota: 0.38,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤0.38 m³/t',
+    quotaParam: '0.38 m³/t',
+    advancedQuota: 0.38,
+    advancedQuotaStr: '0.38 m³/t',
+    waterEfficiencyGrade: '先进标杆',
+    processType: '新型干法窑外分解+低温余热发电闭式循环',
+    unconvWaterReq: '生产过程废水零外排',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟中区、大通县水泥集聚区',
+    notes: '绿色矿山配套熟料线'
+  },
+  {
+    id: 'ind-7-2',
+    code: 'GB/T 18916.8',
+    type: 'industry',
+    industryCode: 'C3011',
+    industryName: '水泥制造',
+    cleanProductName: '通用硅酸盐水泥',
+    category: '非金属建材',
+    industryCategory: '建材水泥',
+    productName: '通用硅酸盐水泥 (地方通用标准)',
+    standardQuota: 0.45,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤0.45 m³/t',
+    quotaParam: '0.45 m³/t',
+    advancedQuota: 0.38,
+    advancedQuotaStr: '0.38 m³/t',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '常规干法窑水泥磨机工艺',
+    unconvWaterReq: '降温水循环回用',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '青海省全省各水泥生产企业',
+    notes: '全省水泥熟料生产通用限额'
+  },
+
+  // 【青稞原浆啤酒】多档定额
+  {
+    id: 'ind-8-1',
+    code: 'GB/T 18916.2',
+    type: 'industry',
+    industryCode: 'C1512',
+    industryName: '啤酒制造',
+    cleanProductName: '青稞原浆啤酒',
+    category: '食品饮料制造',
+    industryCategory: '食品轻工',
+    productName: '青稞原浆啤酒 (先进领跑者指标)',
+    standardQuota: 3.20,
+    quotaUnit: 'm³/kL',
+    quotaValue: '≤3.20 m³/kL',
+    quotaParam: '3.20 m³/kL',
+    advancedQuota: 3.20,
+    advancedQuotaStr: '3.20 m³/kL',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: '高原精酿糖化冷萃发酵+CIP就地清洗水多级梯级回收',
+    unconvWaterReq: '洗瓶冲洗水梯级回用率 ≥85%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '城北区生物科技产业园区',
+    notes: '精品酿造产业节水示范'
+  },
+  {
+    id: 'ind-8-2',
+    code: 'GB/T 18916.2',
+    type: 'industry',
+    industryCode: 'C1512',
+    industryName: '啤酒制造',
+    cleanProductName: '青稞原浆啤酒',
+    category: '食品饮料制造',
+    industryCategory: '食品轻工',
+    productName: '青稞原浆啤酒 (地方通用标准)',
+    standardQuota: 3.80,
+    quotaUnit: 'm³/kL',
+    quotaValue: '≤3.80 m³/kL',
+    quotaParam: '3.80 m³/kL',
+    advancedQuota: 3.20,
+    advancedQuotaStr: '3.20 m³/kL',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '常规啤酒糖化发酵及灌装',
+    unconvWaterReq: '中水用于绿化厂区冲洗',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟水流域酿造产业集中区',
+    notes: '青稞酒与啤酒酿造核算基础'
+  },
+
+  // 【烧碱】多档定额
+  {
+    id: 'ind-9-1',
+    code: 'GB/T 18916.17',
+    type: 'industry',
+    industryCode: 'C2612',
+    industryName: '无机碱制造',
+    cleanProductName: '烧碱',
+    category: '化学原料制造',
+    industryCategory: '化工原料',
+    productName: '烧碱 (先进标杆指标)',
+    standardQuota: 3.90,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤3.90 m³/t',
+    quotaParam: '3.90 m³/t',
+    advancedQuota: 3.90,
+    advancedQuotaStr: '3.90 m³/t',
+    waterEfficiencyGrade: '先进标杆',
+    processType: '零极距高电流密度离子膜电解+蒸汽冷凝液全封闭回用',
+    unconvWaterReq: '冷凝水回用率 ≥98%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '甘河工业园区',
+    notes: '盐化工高水效标杆项目'
+  },
+  {
+    id: 'ind-9-2',
+    code: 'GB/T 18916.17',
+    type: 'industry',
+    industryCode: 'C2612',
+    industryName: '无机碱制造',
+    cleanProductName: '烧碱',
+    category: '化学原料制造',
+    industryCategory: '化工原料',
+    productName: '烧碱 (地方通用标准)',
+    standardQuota: 4.80,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤4.80 m³/t',
+    quotaParam: '4.80 m³/t',
+    advancedQuota: 3.90,
+    advancedQuotaStr: '3.90 m³/t',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '标准复极离子膜法电解',
+    unconvWaterReq: '生产中水梯级利用',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '青海省各化工园区通用',
+    notes: '基础化工品行业准入基准'
+  },
+
+  // 【特殊钢及合金线材】
+  {
+    id: 'ind-10-1',
+    code: 'GB/T 18916.3',
+    type: 'industry',
+    industryCode: 'C3120',
+    industryName: '钢压延加工',
+    cleanProductName: '特殊钢及合金线材',
+    category: '特种钢压延',
+    industryCategory: '黑色金属',
+    productName: '特殊钢及合金线材 (先进领跑者)',
+    standardQuota: 2.10,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤2.10 m³/t',
+    quotaParam: '2.10 m³/t',
+    advancedQuota: 2.10,
+    advancedQuotaStr: '2.10 m³/t',
+    waterEfficiencyGrade: '先进领跑者',
+    processType: '超高功率电炉短流程+全连铸连轧微水冷',
+    unconvWaterReq: '浊环水沉淀过滤闭路循环',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '南川工业园区、城北区特钢基地',
+    notes: '特种合金钢高品质生产线'
+  },
+  {
+    id: 'ind-10-2',
+    code: 'GB/T 18916.3',
+    type: 'industry',
+    industryCode: 'C3120',
+    industryName: '钢压延加工',
+    cleanProductName: '特殊钢及合金线材',
+    category: '特种钢压延',
+    industryCategory: '黑色金属',
+    productName: '特殊钢及合金线材 (地方通用标准)',
+    standardQuota: 2.80,
+    quotaUnit: 'm³/t',
+    quotaValue: '≤2.80 m³/t',
+    quotaParam: '2.80 m³/t',
+    advancedQuota: 2.10,
+    advancedQuotaStr: '2.10 m³/t',
+    waterEfficiencyGrade: '地方通用标准',
+    processType: '电炉炼钢及棒线材热轧工艺',
+    unconvWaterReq: '冷却循环水率 ≥97%',
+    standardDoc: 'DB63/T 1429-2025',
+    waterRegion: '湟水流域',
+    regionScope: '青海省全省各特钢企业',
+    notes: '通用钢铁压延基准定额'
+  },
+
+  // ==================== 2. 农业用水定额 (DB63/T 1428-2025) ====================
+  {
+    id: 'agr-1',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0111',
+    industryName: '谷物种植业',
+    cleanProductName: '小麦',
+    category: '粮食作物种植',
+    productName: '小麦 (常规灌溉-浅山高海拔)',
+    standardQuota: 280,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤280 m³/亩·次',
+    quotaParam: '280 m³/亩·次',
+    method: '常规灌溉',
     efficiency: '50%',
     topography: '浅山',
     altitude: '高',
-    quotaValue: '<=280L/(人·d))',
-    method: '常规灌溉',
-    waterRegion: '湟水',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '湟水流域',
     regionScope: '湟源、西宁、大通、湟中、互助、平安、乐都、民和(川口地区)',
   },
   {
-    id: 'q-2',
-    code: 'A019283',
-    category: '小麦种植类',
-    productName: '小麦',
-    efficiency: '50%',
-    topography: '浅山',
-    altitude: '高',
-    quotaValue: '<=280L/(人·d))',
-    method: '常规灌溉',
-    waterRegion: '玛曲龙羊峡',
-    regionScope: '湟源、西宁、大通、湟中、互助、平安、乐都、民和(川口地区)',
+    id: 'agr-2',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0111',
+    industryName: '谷物种植业',
+    cleanProductName: '小麦',
+    category: '粮食作物种植',
+    productName: '小麦 (喷灌节水-川水中海拔)',
+    standardQuota: 210,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤210 m³/亩·次',
+    quotaParam: '210 m³/亩·次',
+    method: '喷灌',
+    efficiency: '60%',
+    topography: '川水',
+    altitude: '中',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '湟水流域',
+    regionScope: '西宁、湟中、大通川水灌区',
   },
   {
-    id: 'q-3',
-    code: 'A019283',
-    category: '小麦种植类',
-    productName: '小麦',
-    quotaValue: '<=280L/(人·d))',
+    id: 'agr-3',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0111',
+    industryName: '谷物种植业',
+    cleanProductName: '冬小麦',
+    category: '粮食作物种植',
+    productName: '冬小麦 (常规灌溉-川水中海拔)',
+    standardQuota: 260,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤260 m³/亩·次',
+    quotaParam: '260 m³/亩·次',
     method: '常规灌溉',
-    waterRegion: '柴达木盆地',
-    regionScope: '湟源、西宁、大通、湟中、互助、平安、乐都、民和(川口地区)',
-  },
-  {
-    id: 'q-4',
-    code: 'A019284',
-    category: '小麦种植类',
-    productName: '冬小麦',
     efficiency: '50%',
     topography: '川水',
     altitude: '中',
-    quotaValue: '<=260L/(人·d))',
-    method: '常规灌溉',
-    waterRegion: '湟水',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '湟水流域',
     regionScope: '西宁、大通、湟中、互助、平安',
   },
   {
-    id: 'q-5',
-    code: 'A019285',
-    category: '杂粮种植类',
-    productName: '高原青稞',
+    id: 'agr-4',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0119',
+    industryName: '杂粮种植业',
+    cleanProductName: '高原青稞',
+    category: '杂粮作物种植',
+    productName: '高原青稞 (喷灌节水-浅山高海拔)',
+    standardQuota: 190,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤190 m³/亩·次',
+    quotaParam: '190 m³/亩·次',
+    method: '喷灌',
+    efficiency: '60%',
+    topography: '浅山',
+    altitude: '高',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '玛曲龙羊峡',
+    regionScope: '湟源、大通、湟中、海晏高寒片区',
+  },
+  {
+    id: 'agr-5',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0141',
+    industryName: '油料种植业',
+    cleanProductName: '春油菜',
+    category: '油料作物种植',
+    productName: '春油菜 (微灌节水-浅山中海拔)',
+    standardQuota: 175,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤175 m³/亩·次',
+    quotaParam: '175 m³/亩·次',
+    method: '微灌',
+    efficiency: '70%',
+    topography: '浅山',
+    altitude: '中',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '湟水流域',
+    regionScope: '大通、湟中、门源浅山农业带',
+  },
+  {
+    id: 'agr-6',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0121',
+    industryName: '蔬菜种植业',
+    cleanProductName: '温室蔬菜',
+    category: '设施蔬菜种植',
+    productName: '温室蔬菜 (水肥一体化高效滴灌)',
+    standardQuota: 140,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤140 m³/亩·次',
+    quotaParam: '140 m³/亩·次',
+    method: '滴灌',
+    efficiency: '70%',
+    topography: '川水',
+    altitude: '中',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '湟水流域',
+    regionScope: '城北区莫家泉湾、湟中多巴设施农业园区',
+  },
+  {
+    id: 'agr-7',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0131',
+    industryName: '薯类种植业',
+    cleanProductName: '优质马铃薯',
+    category: '薯类作物种植',
+    productName: '优质马铃薯 (节水喷灌-脑山高海拔)',
+    standardQuota: 180,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤180 m³/亩·次',
+    quotaParam: '180 m³/亩·次',
+    method: '喷灌',
     efficiency: '60%',
     topography: '脑山',
     altitude: '高',
-    quotaValue: '<=220L/(人·d))',
-    method: '喷灌',
-    waterRegion: '玛曲龙羊峡',
-    regionScope: '湟源、大通、湟中',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '湟水流域',
+    regionScope: '大通县、湟中区脑山片区',
+  },
+  {
+    id: 'agr-8',
+    code: 'DB63/T 1428',
+    type: 'agriculture',
+    industryCode: 'A0171',
+    industryName: '中药材种植业',
+    cleanProductName: '高原枸杞',
+    category: '经济林果种植',
+    productName: '高原枸杞 (水肥一体滴灌)',
+    standardQuota: 150,
+    quotaUnit: 'm³/亩·次',
+    quotaValue: '≤150 m³/亩·次',
+    quotaParam: '150 m³/亩·次',
+    method: '滴灌',
+    efficiency: '70%',
+    topography: '川水',
+    altitude: '中',
+    standardDoc: 'DB63/T 1428-2025',
+    waterRegion: '柴达木盆地',
+    regionScope: '都兰、德令哈、格尔木绿洲农区',
+  },
+
+  // ==================== 3. 生活用水定额 (DB63/T 1430-2025) ====================
+  {
+    id: 'liv-1',
+    code: 'DB63/T 1430',
+    type: 'living',
+    industryCode: 'O8111',
+    industryName: '公共服务与居民服务',
+    cleanProductName: '城镇居民生活用水',
+    category: '城镇生活',
+    productName: '城镇居民生活用水 (西宁市区基准指标)',
+    standardQuota: 120,
+    quotaUnit: 'L/(人·d)',
+    quotaValue: '≤120 L/(人·d)',
+    quotaParam: '120 L/(人·d)',
+    standardDoc: 'DB63/T 1430-2025',
+    waterRegion: '西宁市区',
+    regionScope: '城中区、城西区、城东区、城北区建成区',
+  },
+  {
+    id: 'liv-2',
+    code: 'DB63/T 1430',
+    type: 'living',
+    industryCode: 'O8111',
+    industryName: '公共服务与居民服务',
+    cleanProductName: '农村居民生活用水',
+    category: '农村生活',
+    productName: '农村居民生活用水 (三县乡村自来水管网)',
+    standardQuota: 85,
+    quotaUnit: 'L/(人·d)',
+    quotaValue: '≤85 L/(人·d)',
+    quotaParam: '85 L/(人·d)',
+    standardDoc: 'DB63/T 1430-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟中区、大通县、湟源县村镇管网覆盖区',
+  },
+
+  // ==================== 4. 牲畜饲养定额 (DB63/T 1431-2025) ====================
+  {
+    id: 'stk-1',
+    code: 'DB63/T 1431',
+    type: 'livestock',
+    industryCode: 'A0311',
+    industryName: '牛饲养业',
+    cleanProductName: '肉牛/奶牛舍饲',
+    category: '规模化畜禽养殖',
+    productName: '肉牛/奶牛舍饲 (自动化饮水及冲栏)',
+    standardQuota: 65,
+    quotaUnit: 'L/(头·d)',
+    quotaValue: '≤65 L/(头·d)',
+    quotaParam: '65 L/(头·d)',
+    standardDoc: 'DB63/T 1431-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟源县、大通县现代畜牧养殖示范园区',
+  },
+  {
+    id: 'stk-2',
+    code: 'DB63/T 1431',
+    type: 'livestock',
+    industryCode: 'A0321',
+    industryName: '生猪饲养业',
+    cleanProductName: '生猪育肥期饲养',
+    category: '生猪规模养殖',
+    productName: '生猪育肥期饲养 (节水式鸭嘴饮水系统)',
+    standardQuota: 30,
+    quotaUnit: 'L/(头·d)',
+    quotaValue: '≤30 L/(头·d)',
+    quotaParam: '30 L/(头·d)',
+    standardDoc: 'DB63/T 1431-2025',
+    waterRegion: '湟水流域',
+    regionScope: '湟中区规模化生猪养殖场',
+  },
+
+  // ==================== 5. 水力与火力发电 (GB/T 18916.1) ====================
+  {
+    id: 'pow-1',
+    code: 'GB/T 18916.1',
+    type: 'power',
+    industryCode: 'D4411',
+    industryName: '火力发电',
+    cleanProductName: '燃煤热电联产机组',
+    category: '火力发电',
+    productName: '燃煤热电联产机组 (空冷高效发电机组)',
+    standardQuota: 0.85,
+    quotaUnit: 'm³/MWh',
+    quotaValue: '≤0.85 m³/MWh',
+    quotaParam: '0.85 m³/MWh',
+    standardDoc: 'GB/T 18916.1-2021',
+    waterRegion: '湟水流域',
+    regionScope: '大通电厂、桥头电厂及其周边工业集聚区',
+  },
+
+  // ==================== 6. 现代服务业 (DB63/T 1432-2025) ====================
+  {
+    id: 'ser-1',
+    code: 'DB63/T 1432',
+    type: 'service',
+    industryCode: 'H6110',
+    industryName: '住宿业',
+    cleanProductName: '星级宾馆饭店',
+    category: '商务服务',
+    productName: '星级宾馆饭店 (涉外高档酒店定额)',
+    standardQuota: 180,
+    quotaUnit: 'L/(床位·d)',
+    quotaValue: '≤180 L/(床位·d)',
+    quotaParam: '180 L/(床位·d)',
+    standardDoc: 'DB63/T 1432-2025',
+    waterRegion: '西宁市区',
+    regionScope: '城西区、城东区涉外星级酒店及接待中心',
+  },
+  {
+    id: 'ser-2',
+    code: 'DB63/T 1432',
+    type: 'service',
+    industryCode: 'P8231',
+    industryName: '普通高等教育',
+    cleanProductName: '大中专院校综合用水',
+    category: '科教文卫',
+    productName: '大中专院校综合用水 (教学科研及学生生活)',
+    standardQuota: 95,
+    quotaUnit: 'L/(生·d)',
+    quotaValue: '≤95 L/(生·d)',
+    quotaParam: '95 L/(生·d)',
+    standardDoc: 'DB63/T 1432-2025',
+    waterRegion: '西宁市区',
+    regionScope: '大学城片区(青海大学、师范大学、青海民族大学等)',
   },
 ]);
 
-// 过滤后的定额列表
-const displayedQuotaList = computed(() => {
+// 顶部定额分类选项卡（统计各类条数）
+const quotaCategoryTabs = computed(() => {
+  const counts: Record<string, number> = {
+    all: allQuotaList.value.length,
+    industry: allQuotaList.value.filter((q) => q.type === 'industry').length,
+    agriculture: allQuotaList.value.filter((q) => q.type === 'agriculture').length,
+    living: allQuotaList.value.filter((q) => q.type === 'living').length,
+    livestock: allQuotaList.value.filter((q) => q.type === 'livestock').length,
+    power: allQuotaList.value.filter((q) => q.type === 'power').length,
+    service: allQuotaList.value.filter((q) => q.type === 'service').length,
+  };
+  return [
+    { key: 'industry' as const, label: '工业用水定额', count: counts.industry },
+    { key: 'agriculture' as const, label: '农业用水定额', count: counts.agriculture },
+    { key: 'living' as const, label: '生活用水定额', count: counts.living },
+    { key: 'livestock' as const, label: '牲畜饲养定额', count: counts.livestock },
+    { key: 'power' as const, label: '发电用水定额', count: counts.power },
+    { key: 'service' as const, label: '现代服务业', count: counts.service },
+    { key: 'all' as const, label: '全部定额', count: counts.all },
+  ];
+});
+
+// 根据分类及条件计算出的定额列表
+const filteredQuotaList = computed(() => {
   return allQuotaList.value.filter((item) => {
-    if (quotaFilter.method !== '全部' && item.method !== quotaFilter.method) {
+    // 1. 类型筛选
+    if (quotaFilter.category !== 'all' && item.type !== quotaFilter.category) {
       return false;
     }
-    if (quotaFilter.efficiency !== '全部' && item.efficiency && item.efficiency !== quotaFilter.efficiency) {
-      return false;
+    // 2. 工业专用筛选
+    if (quotaFilter.category === 'industry' || item.type === 'industry') {
+      if (quotaFilter.industryCategory !== '全部' && item.industryCategory !== quotaFilter.industryCategory) {
+        return false;
+      }
+      if (quotaFilter.efficiencyGrade !== '全部' && item.waterEfficiencyGrade !== quotaFilter.efficiencyGrade) {
+        return false;
+      }
     }
-    if (quotaFilter.keyword.trim()) {
-      const kw = quotaFilter.keyword.trim();
-      return (
-        item.productName.includes(kw) ||
-        item.category.includes(kw) ||
-        item.code.includes(kw) ||
-        item.waterRegion.includes(kw)
-      );
+    // 3. 农业专用筛选
+    if (quotaFilter.category === 'agriculture' || item.type === 'agriculture') {
+      if (quotaFilter.method !== '全部' && item.method !== quotaFilter.method) {
+        return false;
+      }
+      if (quotaFilter.efficiency !== '全部' && item.efficiency && item.efficiency !== quotaFilter.efficiency) {
+        return false;
+      }
+      if (quotaFilter.topography !== '全部' && item.topography && item.topography !== quotaFilter.topography) {
+        return false;
+      }
+    }
+    // 4. 关键字筛选（匹配产品名、分类、标准号、行业类别、分区范围）
+    if (quotaFilter.keyword && quotaFilter.keyword.trim()) {
+      const kw = quotaFilter.keyword.trim().toLowerCase();
+      const match =
+        (item.productName && item.productName.toLowerCase().includes(kw)) ||
+        (item.category && item.category.toLowerCase().includes(kw)) ||
+        (item.code && item.code.toLowerCase().includes(kw)) ||
+        (item.industryCategory && item.industryCategory.toLowerCase().includes(kw)) ||
+        (item.standardDoc && item.standardDoc.toLowerCase().includes(kw)) ||
+        (item.waterRegion && item.waterRegion.toLowerCase().includes(kw)) ||
+        (item.regionScope && item.regionScope.toLowerCase().includes(kw));
+      if (!match) return false;
     }
     return true;
   });
 });
+
+// 分页总数
+const quotaTotalPages = computed(() => {
+  return Math.max(1, Math.ceil(filteredQuotaList.value.length / quotaPageSize));
+});
+
+// 分页后的展示数据
+const displayedQuotaList = computed(() => {
+  const start = (quotaCurrentPage.value - 1) * quotaPageSize;
+  return filteredQuotaList.value.slice(start, start + quotaPageSize);
+});
+
+// 切换定额分类
+const handleCategoryTabClick = (catKey: WaterCategoryKey | 'all') => {
+  quotaFilter.category = catKey;
+  quotaCurrentPage.value = 1;
+  if (catKey !== 'all') {
+    currentCategory.value = catKey;
+    const targetFormRef = activeFormTab.value === 'actual' ? actualFormRef.value : planFormRef.value;
+    if (targetFormRef && typeof targetFormRef.selectCategory === 'function') {
+      targetFormRef.selectCategory(catKey);
+    }
+    if (catKey === 'industry') {
+      quotaFilter.keyword = currentProduct.value || '高纯多晶硅';
+    } else if (catKey === 'agriculture') {
+      quotaFilter.keyword = '小麦';
+    } else {
+      quotaFilter.keyword = '';
+    }
+  } else {
+    quotaFilter.keyword = '';
+  }
+};
+
+// 清空当前筛选词，查看该类型全部
+const clearKeyword = () => {
+  quotaFilter.keyword = '';
+  quotaFilter.industryCategory = '全部';
+  quotaFilter.efficiencyGrade = '全部';
+  quotaFilter.method = '全部';
+  quotaFilter.efficiency = '全部';
+  quotaFilter.topography = '全部';
+  quotaCurrentPage.value = 1;
+};
+
+// 左侧表单分类改变时，右侧定额面板同步切换
+const handleCategoryChanged = (cat: WaterCategoryKey) => {
+  currentCategory.value = cat;
+  quotaFilter.category = cat;
+  activeRightTab.value = 'water_quota';
+  quotaCurrentPage.value = 1;
+  if (cat === 'industry') {
+    quotaFilter.keyword = currentProduct.value || '高纯多晶硅';
+  } else if (cat === 'agriculture') {
+    quotaFilter.keyword = '小麦';
+  } else if (cat === 'living') {
+    quotaFilter.keyword = '生活';
+  } else if (cat === 'livestock') {
+    quotaFilter.keyword = '牛';
+  } else if (cat === 'power') {
+    quotaFilter.keyword = '发电';
+  } else if (cat === 'service') {
+    quotaFilter.keyword = '服务';
+  }
+};
+
+// 左侧表单选择产品/作物时，右侧定额面板联动搜索并高亮对应条目
+const handleProductSelected = (payload: { category: WaterCategoryKey; productName: string; rowIndex: number; row: any }) => {
+  currentCategory.value = payload.category;
+  quotaFilter.category = payload.category;
+  currentProduct.value = payload.productName || '';
+  currentActiveRowIndex.value = payload.rowIndex ?? 0;
+  quotaFilter.keyword = payload.productName || '';
+  activeRightTab.value = 'water_quota';
+  quotaCurrentPage.value = 1;
+};
+
+// 弹窗中针对当前激活产品或搜索词智能匹配出的工业用水定额列表（一个产品对应多个定额）
+const matchedIndustrialQuotas = computed(() => {
+  const kw = (quotaFilter.keyword || currentProduct.value || '').trim().toLowerCase();
+  const industrialItems = allQuotaList.value.filter((q) => q.type === 'industry');
+  if (!kw) {
+    return industrialItems;
+  }
+  const matched = industrialItems.filter(
+    (item) =>
+      (item.cleanProductName && item.cleanProductName.toLowerCase().includes(kw)) ||
+      (item.productName && item.productName.toLowerCase().includes(kw)) ||
+      (item.category && item.category.toLowerCase().includes(kw)) ||
+      (item.industryCode && item.industryCode.toLowerCase().includes(kw)) ||
+      (item.industryName && item.industryName.toLowerCase().includes(kw)) ||
+      (item.regionScope && item.regionScope.toLowerCase().includes(kw))
+  );
+  return matched.length > 0 ? matched : industrialItems;
+});
+
+// 打开定额气泡弹窗
+const handleOpenQuotaBubble = (payload?: { productName?: string; rowIndex?: number; category?: WaterCategoryKey }) => {
+  if (payload) {
+    if (payload.category) {
+      currentCategory.value = payload.category;
+      quotaFilter.category = payload.category;
+    }
+    if (payload.productName) {
+      currentProduct.value = payload.productName;
+      quotaFilter.keyword = payload.productName;
+    }
+    if (typeof payload.rowIndex === 'number') {
+      currentActiveRowIndex.value = payload.rowIndex;
+    }
+  }
+  quotaBubbleModalVisible.value = true;
+};
+
+// 右侧定额或弹窗定额一键回填到左侧表单指定行
+const handleApplyQuota = (item: QuotaCardItem, targetRowIndex?: number) => {
+  const rowIdx = typeof targetRowIndex === 'number' ? targetRowIndex : currentActiveRowIndex.value;
+  const targetFormRef = activeFormTab.value === 'actual' ? actualFormRef.value : planFormRef.value;
+  if (targetFormRef && typeof targetFormRef.applyQuotaToActiveRow === 'function') {
+    targetFormRef.applyQuotaToActiveRow({
+      category: item.type,
+      productName: item.cleanProductName || item.productName,
+      quota: item.standardQuota,
+      method: item.method,
+      rowIndex: rowIdx,
+      quotaParam: item.quotaParam,
+      industryCode: item.industryCode,
+      industryName: item.industryName,
+      regionScope: item.regionScope
+    });
+    MessagePlugin.success(`已选用【${item.productName}】定额 (${item.quotaParam}) 并填充至第 ${(rowIdx ?? 0) + 1} 行工业定额！`);
+  } else {
+    // 兼容回退
+    const targetForm = activeFormTab.value === 'actual' ? actualQuotaForm.value : planQuotaForm.value;
+    if (item.type === 'industry' && targetForm.industryWaterRows?.length) {
+      const idx = rowIdx >= 0 && rowIdx < targetForm.industryWaterRows.length ? rowIdx : 0;
+      targetForm.industryWaterRows[idx].productName = item.cleanProductName || item.productName;
+      targetForm.industryWaterRows[idx].quota = item.standardQuota;
+    } else if (item.type === 'agriculture' && targetForm.agricultureWaterRows?.length) {
+      const idx = rowIdx >= 0 && rowIdx < targetForm.agricultureWaterRows.length ? rowIdx : 0;
+      targetForm.agricultureWaterRows[idx].crops = item.cleanProductName || item.productName;
+      targetForm.agricultureWaterRows[idx].quota = item.standardQuota;
+      if (item.method) {
+        targetForm.agricultureWaterRows[idx].method = item.method;
+      }
+    }
+    MessagePlugin.success(`已将【${item.productName}】核定标准 (${item.quotaValue}) 快捷填入左侧申报表格！`);
+  }
+};
+
+// 气泡弹窗中选择定额并关闭弹窗
+const handleApplyQuotaAndCloseBubble = (item: QuotaCardItem, targetRowIndex?: number) => {
+  handleApplyQuota(item, targetRowIndex);
+  quotaBubbleModalVisible.value = false;
+};
 
 // 附件列表与在线预览 (与计量设施档案列表查看一致)
 const attachments = ref([
@@ -2082,7 +3080,7 @@ watch(
       form.value.permitVolume = rec.permitVolume || 2345.87;
       form.value.year = rec.year || '2026';
       form.value.detailedAddress = `青海省西宁市${rec.district}重点产业园区`;
-      activeRightTab.value = 'plan_application';
+      activeRightTab.value = 'water_quota';
       auditOpinion.value = `经对【${rec.unitName}】${rec.year}年度用水计划进行合规核查，指标测算合理，准予核定通过。`;
 
       // 重置或自适应数据

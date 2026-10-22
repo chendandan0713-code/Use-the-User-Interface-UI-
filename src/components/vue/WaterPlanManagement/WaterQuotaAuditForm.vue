@@ -9,16 +9,11 @@
         <slot name="tabs"></slot>
       </div>
 
-      <!-- 2. 表单名称栏 (表单顶部名称摘要与右侧核定总计) -->
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-slate-100">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-3.5 bg-[#1677ff] rounded-full"></span>
-          <h4 class="text-[13px] font-bold text-slate-800 tracking-tight">
-            {{ title }}
-          </h4>
-          <span v-if="badgeText" class="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-600 border border-blue-200">
-            {{ badgeText }}
-          </span>
+      <!-- 2. 表单核定总计栏 (已去除表单一/表单二标题文字) -->
+      <div class="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-100">
+        <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <span class="w-1.5 h-3 bg-[#1677ff] rounded-full"></span>
+          <span>指标核定汇总</span>
         </div>
 
         <!-- 右侧核定总计（增加地表、地下、非常规、总计四个，单位展示一个） -->
@@ -39,12 +34,12 @@
         </div>
       </div>
 
-      <!-- 3. 用水类型勾选栏（生活用水、工业用水、农业用水、牲畜饲养用水、发电用水、服务业用水六个，前面带复选框，勾选表示必填） -->
+      <!-- 3. 用水类型勾选栏（生活用水、工业用水、农业用水、牲畜饲养用水、发电用水、服务业用水六个，前面带复选框，去除水量数据） -->
       <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-lg border border-slate-200/80 overflow-x-auto custom-scrollbar">
         <div
           v-for="cat in categoryList"
           :key="cat.key"
-          @click="activeCategory = cat.key"
+          @click="selectCategory(cat.key)"
           class="px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer flex items-center gap-2 whitespace-nowrap border select-none"
           :class="[
             activeCategory === cat.key
@@ -70,13 +65,6 @@
               class="text-[11px] text-rose-500 font-bold ml-0.5"
               title="必填项目"
             >*</span>
-          </span>
-          <!-- 切换按钮中的数值 -->
-          <span
-            class="text-[10.5px] font-mono px-1 py-0.2 rounded"
-            :class="activeCategory === cat.key ? 'bg-blue-50 text-[#1677ff]' : 'bg-slate-100 text-slate-500'"
-          >
-            {{ cat.total }}
           </span>
         </div>
       </div>
@@ -230,14 +218,41 @@
           <div class="flex items-center gap-1.5">
             <span class="w-1.5 h-3 bg-emerald-500 rounded-full"></span>
             <span class="text-xs font-semibold text-slate-800">工业用水核定</span>
+            <span class="text-[11px] text-slate-400">（选择或填报产品后，右侧自动检索对应定额参数）</span>
           </div>
         </div>
+
+        <!-- 工业常用产品快捷选择标签 -->
+        <div v-if="!readonly" class="flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-50 border border-slate-200/80 rounded-md text-[11px]">
+          <span class="text-slate-500 font-medium shrink-0 flex items-center gap-1">
+            <span class="w-1 h-1 rounded-full bg-[#1677ff]"></span>
+            常用工业产品：
+          </span>
+          <button
+            v-for="p in commonIndustryProducts"
+            :key="p"
+            type="button"
+            @click="quickSelectProduct('industry', p, activeRowIndex)"
+            class="px-2 py-0.5 rounded border text-[11px] transition cursor-pointer"
+            :class="[
+              activeProductName === p || (formData.industryWaterRows[activeRowIndex]?.productName === p)
+                ? 'bg-blue-50 text-[#1677ff] border-blue-300 font-semibold shadow-2xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200 hover:border-slate-300'
+            ]"
+          >
+            {{ p }}
+          </button>
+        </div>
+
+        <datalist id="industry-product-options">
+          <option v-for="p in commonIndustryProducts" :key="p" :value="p">{{ p }}</option>
+        </datalist>
 
         <div class="overflow-x-auto custom-scrollbar border border-[#b8cde6] rounded-md bg-white shadow-2xs">
           <table class="w-full text-xs text-left border-collapse min-w-[720px]">
             <thead class="bg-[#eaf1fb] text-slate-800 font-semibold border-b border-[#b8cde6] text-center text-[11px]">
               <tr class="divide-x divide-[#b8cde6]">
-                <th rowspan="2" class="px-1.5 py-1.5 min-w-[75px] border-r border-b border-[#b8cde6] text-slate-800 font-semibold">主要产品</th>
+                <th rowspan="2" class="px-1.5 py-1.5 min-w-[125px] border-r border-b border-[#b8cde6] text-slate-800 font-semibold">主要产品</th>
                 <th rowspan="2" class="px-1.5 py-1.5 min-w-[65px] border-r border-b border-[#b8cde6] text-slate-800 font-semibold">定额</th>
                 <th rowspan="2" class="px-1.5 py-1.5 min-w-[60px] border-r border-b border-[#b8cde6] text-slate-800 font-semibold">年产量</th>
                 <th rowspan="2" class="px-1.5 py-1.5 min-w-[60px] border-r border-b border-[#b8cde6] text-slate-800 font-semibold">产品水量</th>
@@ -259,18 +274,42 @@
               <tr
                 v-for="(row, idx) in formData.industryWaterRows"
                 :key="idx"
-                class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
+                class="divide-x divide-[#b8cde6] transition-all duration-300"
+                :class="[
+                  flashingRowIndex === idx
+                    ? 'bg-emerald-100/70 ring-2 ring-emerald-500'
+                    : (activeRowIndex === idx && activeCategory === 'industry' ? 'bg-blue-50/40' : 'hover:bg-[#f5f8fd]')
+                ]"
+                @click="activeRowIndex = idx"
               >
                 <!-- 主要产品 -->
                 <td class="p-0.5 font-sans border-r border-b border-[#b8cde6]">
-                  <input
-                    v-if="!readonly"
-                    type="text"
-                    v-model="row.productName"
-                    placeholder="产品名称"
-                    class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs text-slate-800 focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100"
-                  />
-                  <span v-else class="text-slate-800">{{ row.productName }}</span>
+                  <div class="flex items-center gap-1">
+                    <input
+                      v-if="!readonly"
+                      type="text"
+                      v-model="row.productName"
+                      list="industry-product-options"
+                      @focus="handleProductFocus('industry', row.productName, idx, row)"
+                      @input="handleProductInput('industry', row.productName, idx, row)"
+                      placeholder="产品名称"
+                      class="flex-1 h-6.5 px-1 bg-white border rounded text-center text-xs text-slate-800 focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100"
+                      :class="activeProductName === row.productName ? 'border-blue-400 font-medium' : 'border-[#dce6f5]'"
+                    />
+                    <span v-else class="flex-1 text-slate-800 truncate">{{ row.productName }}</span>
+                    <button
+                      type="button"
+                      @click.stop="triggerProductSync('industry', row.productName, idx, row, true)"
+                      class="shrink-0 px-1.5 py-0.5 text-[11px] bg-blue-50 text-[#1677ff] hover:bg-[#1677ff] hover:text-white border border-blue-200 rounded transition cursor-pointer flex items-center gap-0.5"
+                      title="在右侧与气泡弹窗中匹配检索此产品定额并选用填充"
+                    >
+                      <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                      <span>查定额</span>
+                    </button>
+                  </div>
                 </td>
                 <!-- 产品定额 -->
                 <td class="p-0.5 border-r border-b border-[#b8cde6]">
@@ -448,8 +487,35 @@
           <div class="flex items-center gap-1.5">
             <span class="w-1.5 h-3 bg-amber-500 rounded-full"></span>
             <span class="text-xs font-semibold text-slate-800">农业用水核定</span>
+            <span class="text-[11px] text-slate-400">（选择或填报作物后，右侧自动检索对应农业定额参数）</span>
           </div>
         </div>
+
+        <!-- 农业常用作物快捷选择标签 -->
+        <div v-if="!readonly" class="flex flex-wrap items-center gap-1.5 p-1.5 bg-amber-50/50 border border-amber-200/80 rounded-md text-[11px]">
+          <span class="text-amber-800 font-medium shrink-0 flex items-center gap-1">
+            <span class="w-1 h-1 rounded-full bg-amber-500"></span>
+            常用农作物：
+          </span>
+          <button
+            v-for="c in commonAgriCrops"
+            :key="c"
+            type="button"
+            @click="quickSelectProduct('agriculture', c, activeRowIndex)"
+            class="px-2 py-0.5 rounded border text-[11px] transition cursor-pointer"
+            :class="[
+              activeProductName === c || (formData.agricultureWaterRows[activeRowIndex]?.crops === c)
+                ? 'bg-amber-100/90 text-amber-800 border-amber-400 font-semibold shadow-2xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200 hover:border-slate-300'
+            ]"
+          >
+            {{ c }}
+          </button>
+        </div>
+
+        <datalist id="agri-crop-options">
+          <option v-for="c in commonAgriCrops" :key="c" :value="c">{{ c }}</option>
+        </datalist>
 
         <div class="overflow-x-auto custom-scrollbar border border-[#b8cde6] rounded-md bg-white shadow-2xs">
           <table class="w-full text-xs text-left border-collapse min-w-[700px]">
@@ -458,7 +524,7 @@
                 <th class="py-2 px-2 min-w-[90px] border-r border-b border-[#b8cde6]">实际灌溉面积</th>
                 <th class="py-2 px-2 min-w-[75px] border-r border-b border-[#b8cde6]">年灌溉次数</th>
                 <th class="py-2 px-2 min-w-[80px] border-r border-b border-[#b8cde6]">定额</th>
-                <th class="py-2 px-2 min-w-[85px] border-r border-b border-[#b8cde6]">主要作物</th>
+                <th class="py-2 px-2 min-w-[120px] border-r border-b border-[#b8cde6]">主要作物</th>
                 <th class="py-2 px-2 min-w-[80px] border-r border-b border-[#b8cde6]">灌溉方式</th>
                 <th class="py-2 px-2 min-w-[70px] border-r border-b border-[#b8cde6]">地表水</th>
                 <th class="py-2 px-2 min-w-[70px] border-r border-b border-[#b8cde6]">地下水</th>
@@ -470,7 +536,9 @@
               <tr
                 v-for="(row, idx) in formData.agricultureWaterRows"
                 :key="idx"
-                class="divide-x divide-[#b8cde6] hover:bg-[#f5f8fd] transition-colors"
+                class="divide-x divide-[#b8cde6] transition-colors"
+                :class="activeRowIndex === idx && activeCategory === 'agriculture' ? 'bg-amber-50/40' : 'hover:bg-[#f5f8fd]'"
+                @click="activeRowIndex = idx"
               >
                 <!-- 灌溉面积 -->
                 <td class="p-0.5 border-r border-b border-[#b8cde6]">
@@ -507,14 +575,31 @@
                 </td>
                 <!-- 主要作物 -->
                 <td class="p-0.5 font-sans border-r border-b border-[#b8cde6]">
-                  <input
-                    v-if="!readonly"
-                    type="text"
-                    v-model="row.crops"
-                    placeholder="例: 小麦"
-                    class="w-full h-6.5 px-1 bg-white border border-[#dce6f5] rounded text-center text-xs text-slate-800 focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100"
-                  />
-                  <span v-else class="text-slate-800">{{ row.crops }}</span>
+                  <div class="flex items-center gap-1">
+                    <input
+                      v-if="!readonly"
+                      type="text"
+                      v-model="row.crops"
+                      list="agri-crop-options"
+                      @focus="handleProductFocus('agriculture', row.crops, idx, row)"
+                      @input="handleProductInput('agriculture', row.crops, idx, row)"
+                      placeholder="例: 小麦"
+                      class="flex-1 h-6.5 px-1 bg-white border rounded text-center text-xs text-slate-800 focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100"
+                      :class="activeProductName === row.crops ? 'border-amber-400 font-medium' : 'border-[#dce6f5]'"
+                    />
+                    <span v-else class="flex-1 text-slate-800 truncate">{{ row.crops }}</span>
+                    <button
+                      type="button"
+                      @click.stop="triggerProductSync('agriculture', row.crops, idx, row)"
+                      class="shrink-0 p-1 text-slate-400 hover:text-amber-700 hover:bg-amber-50 rounded transition cursor-pointer"
+                      title="在右侧定额库中匹配检索此作物定额"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                    </button>
+                  </div>
                 </td>
                 <!-- 灌溉方式 -->
                 <td class="p-0.5 font-sans border-r border-b border-[#b8cde6]">
@@ -1214,7 +1299,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type {
   FormQuotaData,
   LivingWaterRow,
@@ -1238,22 +1323,235 @@ const props = withDefaults(
     modelValue: FormQuotaData;
     readonly?: boolean;
     defaultExpanded?: boolean;
+    activeCategory?: WaterCategoryKey;
+    activeProductName?: string;
   }>(),
   {
     badgeText: '',
     theme: 'blue',
     readonly: false,
-    defaultExpanded: true
+    defaultExpanded: true,
+    activeCategory: undefined,
+    activeProductName: ''
   }
 );
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: FormQuotaData): void;
+  (e: 'update:activeCategory', value: WaterCategoryKey): void;
+  (e: 'category-change', value: WaterCategoryKey): void;
+  (e: 'product-select', payload: { category: WaterCategoryKey; productName: string; rowIndex: number; row: any }): void;
+  (e: 'open-quota-bubble', payload: { category: WaterCategoryKey; productName: string; rowIndex: number; row: any }): void;
 }>();
 
 export type WaterCategoryKey = 'living' | 'industry' | 'agriculture' | 'livestock' | 'power' | 'service';
 
-const activeCategory = ref<WaterCategoryKey>('living');
+const activeCategory = ref<WaterCategoryKey>(props.activeCategory || 'industry');
+const activeRowIndex = ref<number>(0);
+const flashingRowIndex = ref<number | null>(null);
+
+watch(
+  () => props.activeCategory,
+  (val) => {
+    if (val && val !== activeCategory.value) {
+      activeCategory.value = val;
+    }
+  }
+);
+
+const commonIndustryProducts = [
+  '高纯多晶硅',
+  '单晶硅拉棒',
+  '太阳能电池片',
+  '动力及储能锂电池材料',
+  '重熔电解铝',
+  '高碳硅铁合金',
+  '特殊钢及合金线材',
+  '通用硅酸盐水泥',
+  '啤酒制造',
+  '烧碱 (30%离子膜)',
+  '合成氨'
+];
+
+const commonAgriCrops = [
+  '小麦',
+  '冬小麦',
+  '高原青稞',
+  '春油菜',
+  '温室大棚蔬菜',
+  '优质马铃薯',
+  '紫花苜蓿饲草',
+  '高原枸杞'
+];
+
+const selectCategory = (key: WaterCategoryKey) => {
+  activeCategory.value = key;
+  emit('update:activeCategory', key);
+  emit('category-change', key);
+
+  let pName = '';
+  let rowObj: any = null;
+  if (key === 'industry') {
+    const r = formData.value.industryWaterRows?.[activeRowIndex.value] || formData.value.industryWaterRows?.[0];
+    pName = r?.productName || '高纯多晶硅';
+    rowObj = r;
+  } else if (key === 'agriculture') {
+    const r = formData.value.agricultureWaterRows?.[activeRowIndex.value] || formData.value.agricultureWaterRows?.[0];
+    pName = r?.crops || '小麦';
+    rowObj = r;
+  } else if (key === 'living') {
+    const r = formData.value.livingWaterRows?.[0];
+    pName = r?.type || '城镇居民生活';
+    rowObj = r;
+  } else if (key === 'livestock') {
+    const r = formData.value.livestockWaterRows?.[0];
+    pName = r?.livestockType || '肉牛/奶牛';
+    rowObj = r;
+  } else if (key === 'power') {
+    const r = formData.value.powerWaterRows?.[0];
+    pName = '火力发电';
+    rowObj = r;
+  } else if (key === 'service') {
+    const r = formData.value.serviceWaterRows?.[0];
+    pName = r?.industryName || '综合办公与餐饮接待';
+    rowObj = r;
+  }
+  emit('product-select', { category: key, productName: pName, rowIndex: activeRowIndex.value, row: rowObj });
+};
+
+const handleProductFocus = (category: WaterCategoryKey, productName: string, rowIndex: number, row: any) => {
+  activeRowIndex.value = rowIndex;
+  emit('product-select', { category, productName, rowIndex, row });
+};
+
+const handleProductInput = (category: WaterCategoryKey, productName: string, rowIndex: number, row: any) => {
+  activeRowIndex.value = rowIndex;
+  emit('update:modelValue', formData.value);
+  emit('product-select', { category, productName, rowIndex, row });
+};
+
+const triggerProductSync = (category: WaterCategoryKey, productName: string, rowIndex: number, row: any, openBubble: boolean = false) => {
+  activeRowIndex.value = rowIndex;
+  emit('product-select', { category, productName, rowIndex, row });
+  if (openBubble) {
+    emit('open-quota-bubble', { category, productName, rowIndex, row });
+  }
+};
+
+const quickSelectProduct = (category: WaterCategoryKey, productName: string, rowIndex: number = 0) => {
+  activeRowIndex.value = rowIndex;
+  if (category === 'industry') {
+    if (!formData.value.industryWaterRows) {
+      formData.value.industryWaterRows = [];
+    }
+    if (!formData.value.industryWaterRows[rowIndex]) {
+      formData.value.industryWaterRows[rowIndex] = {
+        productName,
+        quota: 14.5,
+        output: '2.4万吨',
+        productVolume: '34.80',
+        surfaceWater: 7.5,
+        groundwater: 8.6,
+        recycledWater: 9.5,
+        rainWater: 10.2,
+        mineWater: 0.0,
+        brackishWater: 0.0
+      };
+    } else {
+      formData.value.industryWaterRows[rowIndex].productName = productName;
+    }
+    emit('product-select', { category, productName, rowIndex, row: formData.value.industryWaterRows[rowIndex] });
+  } else if (category === 'agriculture') {
+    if (!formData.value.agricultureWaterRows) {
+      formData.value.agricultureWaterRows = [];
+    }
+    if (!formData.value.agricultureWaterRows[rowIndex]) {
+      formData.value.agricultureWaterRows[rowIndex] = {
+        area: 21500,
+        times: 4,
+        quota: 260,
+        crops: productName,
+        method: '常规灌溉',
+        surfaceWater: 0.18,
+        groundwater: 0.19,
+        total: 21.85
+      };
+    } else {
+      formData.value.agricultureWaterRows[rowIndex].crops = productName;
+    }
+    emit('product-select', { category, productName, rowIndex, row: formData.value.agricultureWaterRows[rowIndex] });
+  }
+  emit('update:modelValue', formData.value);
+};
+
+const applyQuotaToActiveRow = (quotaData: {
+  category: string;
+  productName?: string;
+  cleanProductName?: string;
+  quota?: number;
+  method?: string;
+  rowIndex?: number;
+}) => {
+  const targetCategory = (quotaData.category || activeCategory.value) as WaterCategoryKey;
+  const targetIndex = quotaData.rowIndex !== undefined ? quotaData.rowIndex : activeRowIndex.value;
+  if (targetCategory === 'industry') {
+    const rows = formData.value.industryWaterRows || [];
+    const idx = targetIndex >= 0 && targetIndex < rows.length ? targetIndex : 0;
+    if (rows[idx]) {
+      if (quotaData.cleanProductName || quotaData.productName) {
+        rows[idx].productName = quotaData.cleanProductName || quotaData.productName || rows[idx].productName;
+      }
+      if (quotaData.quota !== undefined) {
+        rows[idx].quota = quotaData.quota;
+        // 自动重算产品取水量 (quota * output)
+        const outputNum = parseFloat(rows[idx].output) || 1.0;
+        rows[idx].productVolume = (rows[idx].quota * outputNum).toFixed(2);
+      }
+      flashingRowIndex.value = idx;
+      setTimeout(() => {
+        if (flashingRowIndex.value === idx) {
+          flashingRowIndex.value = null;
+        }
+      }, 2000);
+    }
+  } else if (targetCategory === 'agriculture') {
+    const rows = formData.value.agricultureWaterRows || [];
+    const idx = targetIndex >= 0 && targetIndex < rows.length ? targetIndex : 0;
+    if (rows[idx]) {
+      if (quotaData.productName) rows[idx].crops = quotaData.productName;
+      if (quotaData.quota !== undefined) rows[idx].quota = quotaData.quota;
+      if (quotaData.method) rows[idx].method = quotaData.method;
+      flashingRowIndex.value = idx;
+      setTimeout(() => {
+        if (flashingRowIndex.value === idx) {
+          flashingRowIndex.value = null;
+        }
+      }, 2000);
+    }
+  } else if (targetCategory === 'living') {
+    const rows = formData.value.livingWaterRows || [];
+    const idx = targetIndex >= 0 && targetIndex < rows.length ? targetIndex : 0;
+    if (rows[idx]) {
+      if (quotaData.productName) rows[idx].type = quotaData.productName;
+      if (quotaData.quota !== undefined) rows[idx].quota = quotaData.quota;
+    }
+  } else if (targetCategory === 'livestock') {
+    const rows = formData.value.livestockWaterRows || [];
+    const idx = targetIndex >= 0 && targetIndex < rows.length ? targetIndex : 0;
+    if (rows[idx]) {
+      if (quotaData.productName) rows[idx].livestockType = quotaData.productName;
+      if (quotaData.quota !== undefined) rows[idx].quota = quotaData.quota;
+    }
+  } else if (targetCategory === 'service') {
+    const rows = formData.value.serviceWaterRows || [];
+    const idx = targetIndex >= 0 && targetIndex < rows.length ? targetIndex : 0;
+    if (rows[idx]) {
+      if (quotaData.productName) rows[idx].industryName = quotaData.productName;
+      if (quotaData.quota !== undefined) rows[idx].quota = quotaData.quota;
+    }
+  }
+  emit('update:modelValue', formData.value);
+};
 
 const formData = computed(() => {
   return props.modelValue || {
@@ -1315,7 +1613,7 @@ const toggleCategoryRequired = (key: WaterCategoryKey) => {
   } else {
     formData.value.requiredCategories.push(key);
     // 勾选后自动定位查看
-    activeCategory.value = key;
+    selectCategory(key);
   }
   emit('update:modelValue', formData.value);
 };
@@ -1821,6 +2119,10 @@ const deleteServiceRow = (idx: number) => {
 };
 
 defineExpose({
+  activeCategory,
+  activeRowIndex,
+  applyQuotaToActiveRow,
+  selectCategory,
   livingSurfaceTotal,
   livingGroundTotal,
   industrySurfaceTotal,

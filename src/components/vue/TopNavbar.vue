@@ -60,6 +60,17 @@
       >
         管理端
       </button>
+
+      <!-- 综合大屏快速入口 -->
+      <button
+        type="button"
+        @click="$emit('navigate', 'scenarios')"
+        class="ml-2 px-2.5 py-1 text-xs font-semibold rounded-md bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500 text-white border border-cyan-400/50 transition cursor-pointer flex items-center gap-1.5 shadow-xs"
+        title="进入西宁市综合应用场景大屏"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></span>
+        <span>综合场景大屏</span>
+      </button>
     </div>
 
     <!-- Right: Search & Notifications & User Profile -->
@@ -120,6 +131,7 @@ defineProps<{
 
 defineEmits<{
   (e: 'switch-platform', platform: 'water' | 'mes'): void;
+  (e: 'navigate', menu: string): void;
   (e: 'open-notifications'): void;
 }>();
 

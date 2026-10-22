@@ -676,10 +676,10 @@
       @click.self="handleModalVisible = false"
     >
       <div
-        class="bg-white rounded-xl shadow-2xl border border-slate-200/90 w-full max-w-[1160px] h-[720px] max-h-[92vh] my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col"
+        class="bg-white rounded-xl shadow-2xl border border-slate-200/90 w-full max-w-[1040px] max-h-[88vh] my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col"
       >
         <!-- 1. 浅色顶部标题栏 (Light Header)：浅灰蓝背景、精致徽标与底边分割线，完全统一计量设施管理风格 -->
-        <div class="px-6 py-3.5 bg-[#f8fafc] border-b border-slate-200/80 flex items-center justify-between shrink-0">
+        <div class="px-5 py-3 bg-[#f8fafc] border-b border-slate-200/80 flex items-center justify-between shrink-0">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#1677ff] shadow-2xs">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -743,15 +743,15 @@
         </div>
 
         <!-- 2. 内容滚动区：与计量设施管理卡片及网格布局完全同构 -->
-        <div class="p-4 overflow-y-auto space-y-3.5 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
-          <div class="grid grid-cols-12 gap-4">
+        <div class="p-3.5 overflow-y-auto space-y-3 text-xs text-slate-800 custom-scrollbar flex-1 bg-[#f8fafc]/50">
+          <div class="grid grid-cols-12 gap-3.5 items-start">
             <!-- 左侧卡片：工单基本参数及设施信息 -->
-            <div class="col-span-5 bg-white rounded-lg border border-slate-200/80 p-4 shadow-2xs flex flex-col justify-between space-y-3">
+            <div class="col-span-5 bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-2.5">
               <div>
-                <div class="flex items-center border-b border-slate-100 pb-2.5 mb-3">
+                <div class="flex items-center border-b border-slate-100 pb-2 mb-2.5">
                   <div class="flex items-center gap-2">
                     <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[14px] font-bold text-slate-800">工单基本信息</span>
+                    <span class="text-[13.5px] font-bold text-slate-800">工单基本信息</span>
                   </div>
                 </div>
 
@@ -850,98 +850,111 @@
                     </span>
                   </div>
 
-                  <!-- 告警内容 -->
-                  <div class="flex items-start">
-                    <span class="w-24 shrink-0 text-slate-400 font-normal pt-0.5">告警内容</span>
-                    <span class="text-slate-700 leading-relaxed text-[11.5px] bg-[#f8fafc] p-2.5 rounded border border-slate-200/80 w-full">
+                  <!-- 告警内容 (紧凑文本展示框，优化高度与滚动) -->
+                  <div class="flex items-start pt-0.5">
+                    <span class="w-22 shrink-0 text-slate-400 font-normal pt-1">告警内容</span>
+                    <div class="text-slate-700 leading-relaxed text-[11px] bg-[#f8fafc] px-2.5 py-1.5 rounded border border-slate-200/80 flex-1 max-h-[58px] overflow-y-auto">
                       {{ currentSelectedOrder.alarmContentDesc || '未上报、系统自动补0;缺报、系统自动补空' }}
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
             </div>
 
-            <!-- 右侧卡片：处理信息与业务表单联动 (根据产生告警原因动态切换) -->
-            <div class="col-span-7 bg-white rounded-lg border border-slate-200/80 p-4 shadow-2xs flex flex-col justify-between space-y-3.5">
-              <div class="space-y-3">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
-                    <span class="text-[14px] font-bold text-slate-800">工单处置信息</span>
-                  </div>
-                  <span class="text-[11px] text-slate-400">
-                    处理责任人：
-                    <span class="text-slate-700 font-medium">{{ currentSelectedOrder.assignee || '马建国' }}</span>
-                  </span>
+            <!-- 右侧卡片：处理信息与业务表单联动 (根据产生告警原因动态切换，下半部框体精简紧凑) -->
+            <div class="col-span-7 bg-white rounded-lg border border-slate-200/80 p-3.5 shadow-2xs space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
+                  <span class="text-[13.5px] font-bold text-slate-800">工单处置信息</span>
                 </div>
+                <span class="text-[11px] text-slate-400">
+                  处理责任人：
+                  <span class="text-slate-700 font-medium">{{ currentSelectedOrder.assignee || '马建国' }}</span>
+                </span>
+              </div>
 
-                <!-- 产生告警原因下拉框 -->
-                <div class="space-y-1.5">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-1 font-medium text-xs text-slate-700">
-                      <span class="text-red-500">*</span>
-                      <span>产生告警原因</span>
+              <!-- 产生告警原因下拉框 -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1 font-medium text-xs text-slate-700">
+                    <span class="text-red-500">*</span>
+                    <span>产生告警原因</span>
+                  </div>
+                  <span class="text-[10.5px] text-slate-400 font-normal">切换原因联动对应处置表单</span>
+                </div>
+                <select
+                  v-model="handleForm.alarmReason"
+                  @change="onAlarmReasonChange"
+                  class="w-full h-8.5 px-2.5 rounded-md border border-[#dce6f5] text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 bg-white transition cursor-pointer font-medium"
+                >
+                  <option value="用户水户停产未报">1、用户水户停产未报（需提交停用申请）</option>
+                  <option value="计量设施故障">2、计量设施故障（需提交故障上报）</option>
+                  <option value="传输设备故障">3、传输设备故障（需提交故障上报）</option>
+                  <option value="传输网络中断">4、传输网络中断（需提交故障上报）</option>
+                  <option value="供电故障或停电检修">5、供电故障或停电检修（需提交故障上报）</option>
+                  <option value="产能减少、阶段性取水">6、产能减少、阶段性取水（需填写处理情况+证明图片）</option>
+                  <option value="产能增大、用水量增加">7、产能增大、用水量增加（需填写处理情况+证明图片）</option>
+                  <option value="计量设备安装不当">8、计量设备安装不当（需填写处理情况+证明图片）</option>
+                  <option value="管道未安装止回阀">9、管道未安装止回阀（需填写处理情况+证明图片）</option>
+                  <option value="其他">10、其他（需填写原因）</option>
+                </select>
+              </div>
+
+              <!-- ================= 1. 用户水户停产未报 -> 停用申请 (优化下半部框体：精简紧凑，无冗余留白) ================= -->
+              <div v-if="handleForm.alarmReason === '用户水户停产未报'" class="pt-0.5">
+                <!-- 无记录时：优雅紧凑的操作栏框体 -->
+                <div v-if="decommissionRecords.length === 0" class="p-3 rounded-lg bg-[#f8fafc] border border-dashed border-[#b8cde6] flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0 shadow-2xs">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="10" y1="15" x2="10" y2="9"></line>
+                        <line x1="14" y1="15" x2="14" y2="9"></line>
+                      </svg>
                     </div>
-                    <span class="text-[11px] text-slate-400 font-normal">切换原因联动对应处置表单</span>
+                    <div class="min-w-0">
+                      <div class="font-medium text-slate-800 text-xs">暂无停用申请备案</div>
+                      <div class="text-[11px] text-slate-400 truncate mt-0.5">水户停产未报需补办停用申请并审核备案</div>
+                    </div>
                   </div>
-                  <select
-                    v-model="handleForm.alarmReason"
-                    @change="onAlarmReasonChange"
-                    class="w-full h-9 px-3 rounded-lg border border-[#dce6f5] text-slate-800 text-xs focus:outline-none focus:border-[#1677ff] focus:ring-2 focus:ring-blue-50 bg-white transition cursor-pointer font-medium"
+                  <button
+                    type="button"
+                    @click="openDecommissionModal"
+                    class="px-3.5 py-1.5 bg-[#1677ff] hover:bg-blue-600 text-white rounded-md text-xs cursor-pointer font-medium shadow-xs transition flex items-center gap-1.5 active:scale-98 shrink-0"
                   >
-                    <option value="用户水户停产未报">1、用户水户停产未报（需提交停用申请）</option>
-                    <option value="计量设施故障">2、计量设施故障（需提交故障上报）</option>
-                    <option value="传输设备故障">3、传输设备故障（需提交故障上报）</option>
-                    <option value="传输网络中断">4、传输网络中断（需提交故障上报）</option>
-                    <option value="供电故障或停电检修">5、供电故障或停电检修（需提交故障上报）</option>
-                    <option value="产能减少、阶段性取水">6、产能减少、阶段性取水（需填写处理情况+证明图片）</option>
-                    <option value="产能增大、用水量增加">7、产能增大、用水量增加（需填写处理情况+证明图片）</option>
-                    <option value="计量设备安装不当">8、计量设备安装不当（需填写处理情况+证明图片）</option>
-                    <option value="管道未安装止回阀">9、管道未安装止回阀（需填写处理情况+证明图片）</option>
-                    <option value="其他">10、其他（需填写原因）</option>
-                  </select>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>停用申请</span>
+                  </button>
                 </div>
 
-                <!-- ================= 1. 用户水户停产未报 -> 停用申请 ================= -->
-                <div v-if="handleForm.alarmReason === '用户水户停产未报'" class="pt-0.5">
-                  <div v-if="decommissionRecords.length === 0" class="py-12 flex flex-col items-center justify-center">
+                <div v-else class="space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                      <span>停用申请记录列表</span>
+                      <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-50 text-blue-600 font-mono border border-blue-200">
+                        {{ decommissionRecords.length }} 条
+                      </span>
+                    </span>
                     <button
                       type="button"
                       @click="openDecommissionModal"
-                      class="px-5 py-2.5 bg-[#1677ff] hover:bg-blue-600 text-white rounded-md text-xs cursor-pointer font-medium shadow-xs transition flex items-center gap-2 active:scale-98"
+                      class="px-2.5 py-1 bg-[#1677ff] hover:bg-blue-600 text-white rounded text-xs cursor-pointer font-medium shadow-2xs transition flex items-center gap-1 active:scale-98"
                     >
-                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                       </svg>
-                      <span>停用申请</span>
+                      <span>新增申请</span>
                     </button>
                   </div>
 
-                  <div v-else class="space-y-2">
-                    <div class="flex items-center justify-between">
-                      <span class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
-                        <span>停用申请记录列表</span>
-                        <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-50 text-blue-600 font-mono border border-blue-200">
-                          {{ decommissionRecords.length }} 条
-                        </span>
-                      </span>
-                      <button
-                        type="button"
-                        @click="openDecommissionModal"
-                        class="px-3 py-1 bg-[#1677ff] hover:bg-blue-600 text-white rounded-md text-xs cursor-pointer font-medium shadow-2xs transition flex items-center gap-1 active:scale-98"
-                      >
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>停用申请</span>
-                      </button>
-                    </div>
-
-                    <!-- 停用申请表格 (样式同列表一致) -->
-                    <div class="border border-[#b4c7e0] rounded overflow-hidden">
+                  <!-- 停用申请表格 (样式紧凑，限制最大高度) -->
+                  <div class="border border-[#b4c7e0] rounded overflow-hidden max-h-[160px] overflow-y-auto">
                       <table class="w-full text-[11px] border-collapse border-l border-t border-[#b8cde6]">
                         <thead class="bg-[#eaf1fb] text-gray-800 font-semibold border-b border-[#a6c1e2]">
                           <tr>
@@ -996,15 +1009,27 @@
                   </div>
                 </div>
 
-                <!-- ================= 2-5. 故障类：计量/传输/网络/供电 -> 故障上报 ================= -->
+                <!-- ================= 2-5. 故障类：计量/传输/网络/供电 -> 故障上报 (优化下半部框体：精简紧凑) ================= -->
                 <div v-else-if="['计量设施故障', '传输设备故障', '传输网络中断', '供电故障或停电检修'].includes(handleForm.alarmReason)" class="pt-0.5">
-                  <div v-if="currentFaultRecords.length === 0" class="py-12 flex flex-col items-center justify-center">
+                  <!-- 无记录时：优雅紧凑的操作栏框体，取代原先过大的空白框 -->
+                  <div v-if="currentFaultRecords.length === 0" class="p-3 rounded-lg bg-[#f8fafc] border border-dashed border-[#b8cde6] flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-[#1677ff] shrink-0 shadow-2xs">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                        </svg>
+                      </div>
+                      <div class="min-w-0">
+                        <div class="font-medium text-slate-800 text-xs">暂无关联故障记录</div>
+                        <div class="text-[11px] text-slate-400 truncate mt-0.5">该告警原因需上报现场故障并启动维保闭环流程</div>
+                      </div>
+                    </div>
                     <button
                       type="button"
                       @click="openFaultReportModal"
-                      class="px-5 py-2.5 bg-[#1677ff] hover:bg-blue-600 text-white rounded-md text-xs cursor-pointer font-medium shadow-xs transition flex items-center gap-2 active:scale-98"
+                      class="px-3.5 py-1.5 bg-[#1677ff] hover:bg-blue-600 text-white rounded-md text-xs cursor-pointer font-medium shadow-xs transition flex items-center gap-1.5 active:scale-98 shrink-0"
                     >
-                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                       </svg>
@@ -1012,7 +1037,7 @@
                     </button>
                   </div>
 
-                  <div v-else class="space-y-2">
+                  <div v-else class="space-y-1.5">
                     <div class="flex items-center justify-between">
                       <span class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
                         <span>故障记录列表</span>
@@ -1023,9 +1048,9 @@
                       <button
                         type="button"
                         @click="openFaultReportModal"
-                        class="px-3 py-1 bg-[#1677ff] hover:bg-blue-600 text-white rounded-md text-xs cursor-pointer font-medium shadow-2xs transition flex items-center gap-1 active:scale-98"
+                        class="px-2.5 py-1 bg-[#1677ff] hover:bg-blue-600 text-white rounded text-xs cursor-pointer font-medium shadow-2xs transition flex items-center gap-1 active:scale-98"
                       >
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <line x1="12" y1="5" x2="12" y2="19"></line>
                           <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
@@ -1033,20 +1058,20 @@
                       </button>
                     </div>
 
-                    <!-- 故障记录表格 (样式同列表一致) -->
-                    <div class="border border-[#b4c7e0] rounded overflow-hidden">
+                    <!-- 故障记录表格 (样式紧凑，限制最大高度) -->
+                    <div class="border border-[#b4c7e0] rounded overflow-hidden max-h-[160px] overflow-y-auto">
                       <table class="w-full text-[11px] border-collapse border-l border-t border-[#b8cde6]">
                         <thead class="bg-[#eaf1fb] text-gray-800 font-semibold border-b border-[#a6c1e2]">
                           <tr>
-                            <th class="py-2 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">序号</th>
-                            <th class="py-2 px-2.5 text-left border-r border-b border-[#b8cde6] bg-[#eaf1fb]">计量设施名称</th>
-                            <th class="py-2 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">故障类型</th>
-                            <th class="py-2 px-2.5 text-left border-r border-b border-[#b8cde6] bg-[#eaf1fb]">故障情况</th>
-                            <th class="py-2 px-1.5 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">佐证照片</th>
-                            <th class="py-2 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">上报人</th>
-                            <th class="py-2 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">上报时间</th>
-                            <th class="py-2 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">状态</th>
-                            <th class="py-2 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">流程</th>
+                            <th class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">序号</th>
+                            <th class="py-1.5 px-2 text-left border-r border-b border-[#b8cde6] bg-[#eaf1fb]">计量设施名称</th>
+                            <th class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">故障类型</th>
+                            <th class="py-1.5 px-2 text-left border-r border-b border-[#b8cde6] bg-[#eaf1fb]">故障情况</th>
+                            <th class="py-1.5 px-1.5 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">佐证照片</th>
+                            <th class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">上报人</th>
+                            <th class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">上报时间</th>
+                            <th class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">状态</th>
+                            <th class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] bg-[#eaf1fb] whitespace-nowrap">流程</th>
                           </tr>
                         </thead>
                         <tbody class="text-gray-800 bg-white">
@@ -1055,17 +1080,17 @@
                             :key="rec.id"
                             class="hover:bg-[#f5f8fd] transition-colors"
                           >
-                            <td class="py-2 px-2 text-center border-r border-b border-[#b8cde6] text-gray-500 font-mono">{{ rIdx + 1 }}</td>
-                            <td class="py-2 px-2.5 text-slate-800 border-r border-b border-[#b8cde6] truncate max-w-[105px]" :title="rec.facilityName">
+                            <td class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] text-gray-500 font-mono">{{ rIdx + 1 }}</td>
+                            <td class="py-1.5 px-2 text-slate-800 border-r border-b border-[#b8cde6] truncate max-w-[100px]" :title="rec.facilityName">
                               {{ rec.facilityName }}
                             </td>
-                            <td class="py-2 px-2 text-center text-slate-700 border-r border-b border-[#b8cde6] whitespace-nowrap">
+                            <td class="py-1.5 px-2 text-center text-slate-700 border-r border-b border-[#b8cde6] whitespace-nowrap">
                               {{ rec.faultType }}
                             </td>
-                            <td class="py-2 px-2.5 text-slate-600 border-r border-b border-[#b8cde6] truncate max-w-[105px]" :title="rec.faultDesc">
+                            <td class="py-1.5 px-2 text-slate-600 border-r border-b border-[#b8cde6] truncate max-w-[100px]" :title="rec.faultDesc">
                               {{ rec.faultDesc }}
                             </td>
-                            <td class="py-2 px-1.5 text-center border-r border-b border-[#b8cde6] whitespace-nowrap">
+                            <td class="py-1.5 px-1.5 text-center border-r border-b border-[#b8cde6] whitespace-nowrap">
                               <button
                                 v-if="rec.faultImage"
                                 type="button"
@@ -1076,13 +1101,13 @@
                               </button>
                               <span v-else class="text-slate-400">-</span>
                             </td>
-                            <td class="py-2 px-2 text-center text-slate-700 border-r border-b border-[#b8cde6] whitespace-nowrap">
+                            <td class="py-1.5 px-2 text-center text-slate-700 border-r border-b border-[#b8cde6] whitespace-nowrap">
                               {{ rec.reporter }}
                             </td>
-                            <td class="py-2 px-2 text-center font-mono text-slate-600 border-r border-b border-[#b8cde6] whitespace-nowrap">
+                            <td class="py-1.5 px-2 text-center font-mono text-slate-600 border-r border-b border-[#b8cde6] whitespace-nowrap">
                               {{ rec.faultTime }}
                             </td>
-                            <td class="py-2 px-2 text-center border-r border-b border-[#b8cde6] whitespace-nowrap">
+                            <td class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] whitespace-nowrap">
                               <span
                                 :class="[
                                   'px-1.5 py-0.5 rounded text-[10px] font-medium border',
@@ -1094,7 +1119,7 @@
                                 {{ rec.status }}
                               </span>
                             </td>
-                            <td class="py-2 px-2 text-center border-r border-b border-[#b8cde6] whitespace-nowrap">
+                            <td class="py-1.5 px-2 text-center border-r border-b border-[#b8cde6] whitespace-nowrap">
                               <button
                                 type="button"
                                 @click="viewProcess(rec)"
@@ -1110,11 +1135,11 @@
                   </div>
                 </div>
 
-                <!-- ================= 6-9. 填写原因（处理情况 + 证明图片） ================= -->
-                <div v-else-if="['产能减少、阶段性取水', '产能增大、用水量增加', '计量设备安装不当', '管道未安装止回阀'].includes(handleForm.alarmReason)" class="space-y-3 pt-0.5">
+                <!-- ================= 6-9. 填写原因（处理情况 + 证明图片） (优化下半部框体：精简文本框与上传框尺寸) ================= -->
+                <div v-else-if="['产能减少、阶段性取水', '产能增大、用水量增加', '计量设备安装不当', '管道未安装止回阀'].includes(handleForm.alarmReason)" class="space-y-2.5 pt-0.5">
                   <!-- 处理情况 -->
                   <div>
-                    <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center justify-between mb-1">
                       <label class="font-medium text-xs text-slate-700 flex items-center gap-1">
                         <span class="text-red-500">*</span>
                         <span>处理情况</span>
@@ -1132,38 +1157,38 @@
                     </div>
                     <textarea
                       v-model="handleForm.handlingDesc"
-                      rows="3"
+                      rows="2"
                       placeholder="请详细记录现场核查的处理情况、用水特征分析及整改防范措施..."
-                      class="w-full p-2.5 rounded-lg border border-[#dce6f5] focus:border-[#1677ff] focus:ring-2 focus:ring-blue-50 text-slate-800 text-xs bg-white outline-none leading-relaxed"
+                      class="w-full p-2 rounded-md border border-[#dce6f5] focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 text-slate-800 text-xs bg-white outline-none leading-relaxed resize-none"
                     ></textarea>
                   </div>
 
                   <!-- 证明图片 -->
-                  <div class="space-y-1.5">
+                  <div class="space-y-1">
                     <div class="flex items-center justify-between">
                       <label class="font-medium text-xs text-slate-700 flex items-center gap-1">
                         <span class="text-red-500">*</span>
-                        <span>证明图片 (现场工况照片/生产排班表/管网整改照片)</span>
+                        <span>证明图片 (现场工况/排班表/管网整改)</span>
                       </label>
-                      <span class="text-[11px] text-slate-400">已上传 {{ handleForm.proofImages.length }} 张照片</span>
+                      <span class="text-[10.5px] text-slate-400">已上传 {{ handleForm.proofImages.length }} 张照片</span>
                     </div>
 
-                    <div class="grid grid-cols-4 gap-2.5">
+                    <div class="grid grid-cols-4 gap-2">
                       <!-- 已上传图片 -->
                       <div
                         v-for="(img, idx) in handleForm.proofImages"
                         :key="idx"
-                        class="group relative h-20 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs"
+                        class="group relative h-16 rounded-md overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs"
                       >
                         <img :src="img" alt="佐证照片" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
-                        <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
                           <button
                             type="button"
                             @click.stop="previewProofImage(img)"
                             class="p-1 rounded bg-white/90 text-slate-800 hover:bg-white text-xs cursor-pointer"
                             title="放大查验"
                           >
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <circle cx="11" cy="11" r="8"></circle>
                               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                               <line x1="11" y1="8" x2="11" y2="14"></line>
@@ -1176,38 +1201,38 @@
                             class="p-1 rounded bg-white/90 text-rose-600 hover:bg-white text-xs cursor-pointer"
                             title="删除"
                           >
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <polyline points="3 6 5 6 21 6"></polyline>
                               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                             </svg>
                           </button>
                         </div>
-                        <div class="absolute bottom-0 left-0 right-0 bg-slate-900/60 text-white text-[9.5px] px-1 py-0.5 truncate text-center pointer-events-none">
-                          佐证图片 {{ idx + 1 }}
+                        <div class="absolute bottom-0 left-0 right-0 bg-slate-900/60 text-white text-[9px] px-1 py-0.2 truncate text-center pointer-events-none">
+                          图片 {{ idx + 1 }}
                         </div>
                       </div>
 
-                      <!-- 上传照片卡片 -->
+                      <!-- 上传照片卡片 (紧凑卡片，高度从 h-20 减为 h-16) -->
                       <div
                         @click="triggerUploadProofImage"
-                        class="h-20 border-2 border-dashed border-[#b8cde6] hover:border-[#1677ff] rounded-lg flex flex-col items-center justify-center p-1.5 text-center bg-blue-50/20 hover:bg-blue-50/40 cursor-pointer transition group"
+                        class="h-16 border border-dashed border-[#b8cde6] hover:border-[#1677ff] rounded-md flex flex-col items-center justify-center p-1 text-center bg-blue-50/20 hover:bg-blue-50/40 cursor-pointer transition group"
                       >
-                        <svg class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg class="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                           <circle cx="8.5" cy="8.5" r="1.5"></circle>
                           <polyline points="21 15 16 10 5 21"></polyline>
                         </svg>
-                        <span class="text-[11px] font-medium text-blue-600">点击上传佐证</span>
+                        <span class="text-[10.5px] font-medium text-blue-600">点击上传佐证</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- ================= 10. 其他：填写原因 ================= -->
-                <div v-else-if="handleForm.alarmReason === '其他'" class="space-y-3 pt-0.5">
+                <!-- ================= 10. 其他：填写原因 (优化下半部框体：精简文本框与上传框尺寸) ================= -->
+                <div v-else-if="handleForm.alarmReason === '其他'" class="space-y-2.5 pt-0.5">
                   <!-- 原因及处理情况说明 -->
                   <div>
-                    <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center justify-between mb-1">
                       <label class="font-medium text-xs text-slate-700 flex items-center gap-1">
                         <span class="text-red-500">*</span>
                         <span>原因及处置情况说明</span>
@@ -1225,36 +1250,36 @@
                     </div>
                     <textarea
                       v-model="handleForm.handlingDesc"
-                      rows="4"
+                      rows="2.5"
                       placeholder="请详细填写其他产生告警的具体原因、现场排查结论及处理情况..."
-                      class="w-full p-2.5 rounded-lg border border-[#dce6f5] focus:border-[#1677ff] focus:ring-2 focus:ring-blue-50 text-slate-800 text-xs bg-white outline-none leading-relaxed"
+                      class="w-full p-2 rounded-md border border-[#dce6f5] focus:border-[#1677ff] focus:ring-1 focus:ring-blue-100 text-slate-800 text-xs bg-white outline-none leading-relaxed resize-none"
                     ></textarea>
                   </div>
 
                   <!-- 证明图片（选填） -->
-                  <div class="space-y-1.5">
+                  <div class="space-y-1">
                     <div class="flex items-center justify-between">
                       <label class="font-medium text-xs text-slate-700 flex items-center gap-1">
                         <span>证明图片 / 佐证材料 (选填)</span>
                       </label>
-                      <span class="text-[11px] text-slate-400">已上传 {{ handleForm.proofImages.length }} 张照片</span>
+                      <span class="text-[10.5px] text-slate-400">已上传 {{ handleForm.proofImages.length }} 张照片</span>
                     </div>
 
-                    <div class="grid grid-cols-4 gap-2.5">
+                    <div class="grid grid-cols-4 gap-2">
                       <div
                         v-for="(img, idx) in handleForm.proofImages"
                         :key="idx"
-                        class="group relative h-20 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs"
+                        class="group relative h-16 rounded-md overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs"
                       >
                         <img :src="img" alt="佐证照片" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
-                        <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <div class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
                           <button
                             type="button"
                             @click.stop="previewProofImage(img)"
                             class="p-1 rounded bg-white/90 text-slate-800 hover:bg-white text-xs cursor-pointer"
                             title="放大查验"
                           >
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <circle cx="11" cy="11" r="8"></circle>
                               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                               <line x1="11" y1="8" x2="11" y2="14"></line>
@@ -1267,27 +1292,27 @@
                             class="p-1 rounded bg-white/90 text-rose-600 hover:bg-white text-xs cursor-pointer"
                             title="删除"
                           >
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <polyline points="3 6 5 6 21 6"></polyline>
                               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                             </svg>
                           </button>
                         </div>
-                        <div class="absolute bottom-0 left-0 right-0 bg-slate-900/60 text-white text-[9.5px] px-1 py-0.5 truncate text-center pointer-events-none">
-                          佐证图片 {{ idx + 1 }}
+                        <div class="absolute bottom-0 left-0 right-0 bg-slate-900/60 text-white text-[9px] px-1 py-0.2 truncate text-center pointer-events-none">
+                          图片 {{ idx + 1 }}
                         </div>
                       </div>
 
                       <div
                         @click="triggerUploadProofImage"
-                        class="h-20 border-2 border-dashed border-[#b8cde6] hover:border-[#1677ff] rounded-lg flex flex-col items-center justify-center p-1.5 text-center bg-blue-50/20 hover:bg-blue-50/40 cursor-pointer transition group"
+                        class="h-16 border border-dashed border-[#b8cde6] hover:border-[#1677ff] rounded-md flex flex-col items-center justify-center p-1 text-center bg-blue-50/20 hover:bg-blue-50/40 cursor-pointer transition group"
                       >
-                        <svg class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg class="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                           <circle cx="8.5" cy="8.5" r="1.5"></circle>
                           <polyline points="21 15 16 10 5 21"></polyline>
                         </svg>
-                        <span class="text-[11px] font-medium text-blue-600">点击上传佐证</span>
+                        <span class="text-[10.5px] font-medium text-blue-600">点击上传佐证</span>
                       </div>
                     </div>
                   </div>
@@ -1295,21 +1320,20 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 3. 浅色底部操作栏 (Light Footer)：操作按钮，样式与计量设施管理完全一致 -->
-        <div class="px-5 py-3 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-end gap-2.5 shrink-0">
+        <!-- 3. 浅色底部操作栏 (Light Footer)：紧凑精细操作按钮 -->
+        <div class="px-5 py-2.5 bg-[#f8fafc] border-t border-slate-200/80 flex items-center justify-end gap-2 shrink-0">
           <button
             type="button"
             @click="handleModalVisible = false"
-            class="px-4 py-1.5 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-800 transition cursor-pointer"
+            class="px-3.5 py-1.5 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-800 transition cursor-pointer"
           >
             取消
           </button>
           <button
             type="button"
             @click="submitWorkOrderResolution"
-            class="px-4.5 py-1.5 rounded-md text-xs font-medium text-white bg-[#1677ff] hover:bg-blue-600 transition shadow-xs cursor-pointer flex items-center gap-1.5 active:scale-98"
+            class="px-4 py-1.5 rounded-md text-xs font-medium text-white bg-[#1677ff] hover:bg-blue-600 transition shadow-xs cursor-pointer flex items-center gap-1.5 active:scale-98"
           >
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
@@ -1907,8 +1931,8 @@
             </div>
           </div>
 
-          <!-- 右侧卡片：告警处置流程 (美化样式，清晰展示已完成状态与当前节点) -->
-          <div class="w-[410px] shrink-0 bg-white rounded-lg border border-slate-200/80 p-4 shadow-2xs flex flex-col space-y-3.5">
+          <!-- 右侧卡片：告警处置流程 (支持工单处置中的故障处理二级节点子流程) -->
+          <div class="w-[440px] shrink-0 bg-white rounded-lg border border-slate-200/80 p-4 shadow-2xs flex flex-col space-y-3.5">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <div class="flex items-center gap-2">
                 <span class="w-1 h-3.5 bg-[#1677ff] rounded-full"></span>
@@ -1916,16 +1940,16 @@
               </div>
               <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                已推进至第 2 步
+                已推进至第 {{ getWorkflowStepNumber(currentSelectedOrder?.orderStatus) }} 步
               </span>
             </div>
 
             <!-- 垂直流程时间轴 -->
-            <div class="relative flex-1 pt-1 space-y-3.5">
+            <div class="relative flex-1 pt-1 space-y-4">
               <!-- 节点 1：转工单 (展示为已完成状态) -->
               <div class="relative flex items-start gap-3">
                 <!-- 纵向导轨连线 (绿色完成态) -->
-                <div class="absolute top-[26px] bottom-[-14px] left-[11px] w-[2px] bg-emerald-500 z-0"></div>
+                <div class="absolute top-[26px] bottom-[-16px] left-[11px] w-[2px] bg-emerald-500 z-0"></div>
 
                 <!-- 左列：序号与状态徽标 + 节点标题 -->
                 <div class="w-[96px] shrink-0 z-10">
@@ -1948,7 +1972,7 @@
                 <div class="flex-1 bg-slate-50/90 rounded-md p-2.5 border border-slate-200/70 text-[11.5px] text-slate-600 space-y-1 shadow-2xs">
                   <div class="flex items-center justify-between">
                     <span class="text-slate-400">转工单时间</span>
-                    <span class="font-mono text-slate-700">2026-06-26 08:00:00</span>
+                    <span class="font-mono text-slate-700">{{ currentSelectedOrder?.createTime || '2026-06-26 08:00:00' }}</span>
                   </div>
                   <div class="flex items-center justify-between">
                     <span class="text-slate-400">告警时间</span>
@@ -1956,26 +1980,58 @@
                   </div>
                   <div class="flex items-center justify-between">
                     <span class="text-slate-400">告警类型</span>
-                    <span class="text-slate-700 font-medium">缺报,未上报</span>
+                    <span class="text-slate-700 font-medium truncate max-w-[140px]" :title="currentSelectedOrder?.alarmTypeDesc || '缺报,未上报'">
+                      {{ currentSelectedOrder?.alarmTypeDesc || '缺报,未上报' }}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <!-- 节点 2：工单处置 (展示为已完成状态) -->
+              <!-- 节点 2：工单处置 (包含故障处理二级节点子流程) -->
               <div class="relative flex items-start gap-3">
-                <!-- 纵向导轨连线 (过渡至下一步未进行) -->
-                <div class="absolute top-[26px] bottom-[-14px] left-[11px] w-[2px] bg-slate-200 z-0"></div>
+                <!-- 纵向导轨连线 -->
+                <div
+                  :class="[
+                    'absolute top-[26px] bottom-[-16px] left-[11px] w-[2px] z-0',
+                    getWorkflowStepNumber(currentSelectedOrder?.orderStatus) >= 3 ? 'bg-emerald-500' : 'bg-slate-200'
+                  ]"
+                ></div>
 
                 <!-- 左列：序号与状态徽标 + 节点标题 -->
                 <div class="w-[96px] shrink-0 z-10">
                   <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-emerald-100">
+                    <span
+                      v-if="currentSelectedOrder?.orderStatus === '待处置'"
+                      class="w-6 h-6 rounded-full border border-slate-300 text-slate-400 bg-slate-50 flex items-center justify-center text-xs font-sans shrink-0"
+                    >
+                      2
+                    </span>
+                    <span
+                      v-else-if="currentSelectedOrder?.orderStatus === '工单处理中'"
+                      class="w-6 h-6 rounded-full bg-[#1677ff] text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-blue-100 animate-pulse"
+                    >
+                      2
+                    </span>
+                    <span
+                      v-else
+                      class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-emerald-100"
+                    >
                       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                     </span>
-                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10.5px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">
-                      已完成
+
+                    <span
+                      :class="[
+                        'inline-flex items-center px-1.5 py-0.5 rounded text-[10.5px] font-medium border whitespace-nowrap',
+                        currentSelectedOrder?.orderStatus === '待处置'
+                          ? 'bg-slate-50 text-slate-500 border-slate-200'
+                          : currentSelectedOrder?.orderStatus === '工单处理中'
+                          ? 'bg-blue-50 text-[#1677ff] border-blue-200'
+                          : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                      ]"
+                    >
+                      {{ currentSelectedOrder?.orderStatus === '待处置' ? '待处置' : (currentSelectedOrder?.orderStatus === '工单处理中' ? '处置中' : '已完成') }}
                     </span>
                   </div>
                   <div class="pl-8 mt-1 text-slate-800 font-semibold text-xs">
@@ -1983,37 +2039,310 @@
                   </div>
                 </div>
 
-                <!-- 右列：属性明细卡片 -->
-                <div class="flex-1 bg-slate-50/90 rounded-md p-2.5 border border-slate-200/70 text-[11.5px] text-slate-600 space-y-1 shadow-2xs">
-                  <div class="flex items-center justify-between">
-                    <span class="text-slate-400">处置时间</span>
-                    <span class="font-mono text-slate-700">2026-09-07 08:00:00</span>
+                <!-- 右列：属性明细卡片 + 故障处理二级节点面板 -->
+                <div class="flex-1 bg-slate-50/90 rounded-md p-2.5 border border-slate-200/70 text-[11.5px] text-slate-600 space-y-2 shadow-2xs">
+                  <!-- 顶层概要信息 -->
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">处置时间</span>
+                      <span class="font-mono text-slate-700">2026-06-26 12:00:00</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">运维单位</span>
+                      <span class="text-slate-700 font-medium truncate max-w-[140px]" :title="currentSelectedOrder?.assignUnit || '北京金水'">
+                        {{ currentSelectedOrder?.assignUnit || '北京金水信息技术' }}
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">处置人员</span>
+                      <span class="text-slate-700 font-medium">{{ currentSelectedOrder?.assignee || '罗杰' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">联系电话</span>
+                      <span class="font-mono text-slate-700">18888888888</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">告警原因</span>
+                      <span class="text-blue-700 font-medium truncate max-w-[140px]" :title="(currentSelectedOrder?.faultRecords && currentSelectedOrder?.faultRecords.length > 0) ? currentSelectedOrder.faultRecords[0].faultType : '计量设施硬件故障'">
+                        {{ (currentSelectedOrder?.faultRecords && currentSelectedOrder?.faultRecords.length > 0) ? currentSelectedOrder.faultRecords[0].faultType : '计量设施硬件故障' }}
+                      </span>
+                    </div>
                   </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-slate-400">运维单位</span>
-                    <span class="text-slate-700 font-medium">北京金水</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-slate-400">处置人员</span>
-                    <span class="text-slate-700 font-medium">罗杰</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-slate-400">联系电话</span>
-                    <span class="font-mono text-slate-700">18888888888</span>
+
+                  <!-- ==================== 二级节点：故障处理过程 (Sub-workflow) ==================== -->
+                  <div class="mt-2 pt-2 border-t border-slate-200/80">
+                    <!-- 二级节点头部：标题与折叠切换 -->
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#1677ff]"></span>
+                        <span class="text-[11.5px] font-bold text-slate-800">故障处理过程 (二级节点)</span>
+                        <span class="px-1.5 py-0.2 rounded text-[10px] bg-blue-50 text-[#1677ff] border border-blue-200 font-medium">
+                          4个二级节点
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        @click="toggleFaultSubSteps"
+                        class="text-[10.5px] text-[#1677ff] hover:text-blue-700 font-medium flex items-center gap-0.5 cursor-pointer"
+                      >
+                        <span>{{ faultSubStepsExpanded ? '收起流程' : '展开流程' }}</span>
+                        <svg
+                          :class="['w-3 h-3 transition-transform duration-200', faultSubStepsExpanded ? 'rotate-180' : '']"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                        >
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- 二级子流程节点时间轴 -->
+                    <div v-show="faultSubStepsExpanded" class="relative pl-3 ml-1 border-l-2 border-dashed border-blue-300 space-y-2.5 pt-1 pb-0.5">
+                      <!-- 2.1 现场排查与故障上报 -->
+                      <div class="relative bg-white p-2 rounded border border-blue-100 shadow-2xs space-y-1">
+                        <!-- 子导轨节点小徽标 -->
+                        <span class="absolute -left-[19px] top-2 w-3.5 h-3.5 rounded-full bg-[#1677ff] text-white flex items-center justify-center text-[9px] font-bold ring-2 ring-blue-100 shadow-2xs">
+                          1
+                        </span>
+
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-1 text-[11px] font-bold text-slate-800">
+                            <span class="text-[#1677ff]">2.1</span>
+                            <span>现场排查与故障上报</span>
+                          </div>
+                          <span class="px-1.5 py-0.2 rounded text-[9.5px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-200">
+                            已上报
+                          </span>
+                        </div>
+                        <div class="text-[11px] text-slate-600 space-y-0.5">
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">上报人员：</span>
+                            <span class="text-slate-700 font-medium">
+                              {{ (currentSelectedOrder?.faultRecords && currentSelectedOrder?.faultRecords[0]?.reporter) || currentSelectedOrder?.assignee || '马建国 (基层网格员)' }}
+                            </span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">上报时间：</span>
+                            <span class="font-mono text-slate-600">
+                              {{ (currentSelectedOrder?.faultRecords && currentSelectedOrder?.faultRecords[0]?.faultTime) || '2026-06-26 09:30' }}
+                            </span>
+                          </div>
+                          <div class="flex justify-between items-start gap-1">
+                            <span class="text-slate-400 shrink-0">故障类型：</span>
+                            <span class="text-slate-700 text-right truncate">
+                              {{ (currentSelectedOrder?.faultRecords && currentSelectedOrder?.faultRecords[0]?.faultType) || '超声波流量探头损坏' }}
+                            </span>
+                          </div>
+                          <div class="pt-0.5 text-slate-500 bg-slate-50 p-1 rounded text-[10.5px] leading-relaxed border border-slate-100">
+                            {{ (currentSelectedOrder?.faultRecords && currentSelectedOrder?.faultRecords[0]?.faultDesc) || '现场流量计供电正常但无脉冲信号输出，疑似传感器探头损坏或内部受潮，已启动停机上报。' }}
+                          </div>
+                          <!-- 佐证照片 -->
+                          <div class="pt-0.5 flex items-center justify-between">
+                            <span class="text-slate-400 text-[10px]">现场佐证材料</span>
+                            <button
+                              type="button"
+                              @click="previewImage((currentSelectedOrder?.faultRecords && currentSelectedOrder?.faultRecords[0]?.faultImage) || undefined)"
+                              class="text-[#1677ff] hover:text-blue-700 text-[10.5px] flex items-center gap-0.5 cursor-pointer font-medium"
+                            >
+                              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <line x1="11" y1="8" x2="11" y2="14"></line>
+                                <line x1="8" y1="11" x2="14" y2="11"></line>
+                              </svg>
+                              <span>查验现场照片</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 2.2 运维中心受理派工 -->
+                      <div class="relative bg-white p-2 rounded border border-blue-100 shadow-2xs space-y-1">
+                        <span class="absolute -left-[19px] top-2 w-3.5 h-3.5 rounded-full bg-[#1677ff] text-white flex items-center justify-center text-[9px] font-bold ring-2 ring-blue-100 shadow-2xs">
+                          2
+                        </span>
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-1 text-[11px] font-bold text-slate-800">
+                            <span class="text-[#1677ff]">2.2</span>
+                            <span>运维中心受理派工</span>
+                          </div>
+                          <span class="px-1.5 py-0.2 rounded text-[9.5px] font-medium bg-blue-50 text-blue-600 border border-blue-200">
+                            已派发
+                          </span>
+                        </div>
+                        <div class="text-[11px] text-slate-600 space-y-0.5">
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">派工时间：</span>
+                            <span class="font-mono text-slate-600">2026-06-26 10:00:00</span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">承接单位：</span>
+                            <span class="text-slate-700 font-medium">北京金水运维保障组</span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">主责技师：</span>
+                            <span class="text-slate-700">罗杰 (高级工程师 · 18888888888)</span>
+                          </div>
+                          <div class="pt-0.5 text-slate-500 bg-slate-50 p-1 rounded text-[10.5px] leading-relaxed border border-slate-100">
+                            下派紧急消缺任务，携带全新超声波探头与DTU模组，限时2小时内赶赴现场排障。
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 2.3 现场检修与消缺 -->
+                      <div class="relative bg-white p-2 rounded border border-blue-100 shadow-2xs space-y-1">
+                        <span
+                          :class="[
+                            'absolute -left-[19px] top-2 w-3.5 h-3.5 rounded-full text-white flex items-center justify-center text-[9px] font-bold ring-2 shadow-2xs',
+                            currentSelectedOrder?.orderStatus === '工单处理中'
+                              ? 'bg-amber-500 ring-amber-100 animate-pulse'
+                              : 'bg-[#1677ff] ring-blue-100'
+                          ]"
+                        >
+                          3
+                        </span>
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-1 text-[11px] font-bold text-slate-800">
+                            <span class="text-[#1677ff]">2.3</span>
+                            <span>现场排障检修与消缺</span>
+                          </div>
+                          <span
+                            :class="[
+                              'px-1.5 py-0.2 rounded text-[9.5px] font-medium border',
+                              currentSelectedOrder?.orderStatus === '工单处理中'
+                                ? 'bg-amber-50 text-amber-600 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            ]"
+                          >
+                            {{ currentSelectedOrder?.orderStatus === '工单处理中' ? '检修中' : '已修复' }}
+                          </span>
+                        </div>
+                        <div class="text-[11px] text-slate-600 space-y-0.5">
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">检修时间：</span>
+                            <span class="font-mono text-slate-600">2026-06-26 11:20:00</span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">更换备件：</span>
+                            <span class="text-slate-700">超声波传感器探头1组、通信模块1块</span>
+                          </div>
+                          <div class="pt-0.5 text-slate-500 bg-slate-50 p-1 rounded text-[10.5px] leading-relaxed border border-slate-100">
+                            现场拆解清洗换能器接线端子，更换探头并调校零点；重新打胶密封并铅封固化。
+                          </div>
+                          <div class="pt-0.5 flex items-center justify-between">
+                            <span class="text-slate-400 text-[10px]">检修现场照片</span>
+                            <button
+                              type="button"
+                              @click="previewImage('https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop')"
+                              class="text-[#1677ff] hover:text-blue-700 text-[10.5px] flex items-center gap-0.5 cursor-pointer font-medium"
+                            >
+                              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <line x1="11" y1="8" x2="11" y2="14"></line>
+                                <line x1="8" y1="11" x2="14" y2="11"></line>
+                              </svg>
+                              <span>查验检修照片</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 2.4 修复验收与恢复确认 -->
+                      <div class="relative bg-white p-2 rounded border border-blue-100 shadow-2xs space-y-1">
+                        <span
+                          :class="[
+                            'absolute -left-[19px] top-2 w-3.5 h-3.5 rounded-full text-white flex items-center justify-center text-[9px] font-bold ring-2 shadow-2xs',
+                            ['待处置', '工单处理中'].includes(currentSelectedOrder?.orderStatus || '')
+                              ? 'bg-slate-300 ring-slate-100'
+                              : 'bg-emerald-500 ring-emerald-100'
+                          ]"
+                        >
+                          4
+                        </span>
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-1 text-[11px] font-bold text-slate-800">
+                            <span class="text-[#1677ff]">2.4</span>
+                            <span>修复验收与恢复确认</span>
+                          </div>
+                          <span
+                            :class="[
+                              'px-1.5 py-0.2 rounded text-[9.5px] font-medium border',
+                              ['待处置', '工单处理中'].includes(currentSelectedOrder?.orderStatus || '')
+                                ? 'bg-slate-50 text-slate-400 border-slate-200'
+                                : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            ]"
+                          >
+                            {{ ['待处置', '工单处理中'].includes(currentSelectedOrder?.orderStatus || '') ? '待验收' : '已复核结单' }}
+                          </span>
+                        </div>
+                        <div class="text-[11px] text-slate-600 space-y-0.5">
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">恢复时间：</span>
+                            <span class="font-mono text-slate-600">2026-06-26 12:00:00</span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span class="text-slate-400">验收人员：</span>
+                            <span class="text-slate-700 font-medium">李海平 (县水资源监控所)</span>
+                          </div>
+                          <div class="pt-0.5 text-slate-500 bg-slate-50 p-1 rounded text-[10.5px] leading-relaxed border border-slate-100">
+                            连续在线报送30分钟脉冲信号无跳变，瞬时流量与机械表头比对一致，确认故障闭环解除，同意流转至水量修订节点。
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- 节点 3：水量数据修订 (未进行) -->
+              <!-- 节点 3：水量数据修订 (根据工单进度动态展示状态) -->
               <div class="relative flex items-start gap-3">
                 <!-- 纵向导轨连线 -->
-                <div class="absolute top-[26px] bottom-[-14px] left-[11px] w-[2px] bg-slate-200 z-0"></div>
+                <div
+                  :class="[
+                    'absolute top-[26px] bottom-[-16px] left-[11px] w-[2px] z-0',
+                    getWorkflowStepNumber(currentSelectedOrder?.orderStatus) >= 4 ? 'bg-emerald-500' : 'bg-slate-200'
+                  ]"
+                ></div>
 
                 <!-- 左列：序号与状态 + 节点标题 -->
                 <div class="w-[96px] shrink-0 z-10">
                   <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full border border-slate-300 text-slate-400 bg-slate-50 flex items-center justify-center text-xs font-sans shrink-0">3</span>
-                    <span class="text-slate-400 text-[11px] whitespace-nowrap">未进行</span>
+                    <span
+                      v-if="getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 3"
+                      class="w-6 h-6 rounded-full border border-slate-300 text-slate-400 bg-slate-50 flex items-center justify-center text-xs font-sans shrink-0"
+                    >
+                      3
+                    </span>
+                    <span
+                      v-else-if="getWorkflowStepNumber(currentSelectedOrder?.orderStatus) === 3"
+                      class="w-6 h-6 rounded-full bg-[#1677ff] text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-blue-100 animate-pulse"
+                    >
+                      3
+                    </span>
+                    <span
+                      v-else
+                      class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-emerald-100"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </span>
+
+                    <span
+                      :class="[
+                        'text-[10.5px] whitespace-nowrap',
+                        getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 3
+                          ? 'text-slate-400'
+                          : getWorkflowStepNumber(currentSelectedOrder?.orderStatus) === 3
+                          ? 'text-[#1677ff] font-medium'
+                          : 'text-emerald-600 font-medium'
+                      ]"
+                    >
+                      {{ getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 3 ? '未进行' : (getWorkflowStepNumber(currentSelectedOrder?.orderStatus) === 3 ? '进行中' : '已完成') }}
+                    </span>
                   </div>
                   <div class="pl-8 mt-1 text-slate-600 font-medium text-xs">
                     水量数据修订
@@ -2041,16 +2370,52 @@
                 </div>
               </div>
 
-              <!-- 节点 4：数据修订审核 (未进行) -->
+              <!-- 节点 4：数据修订审核 -->
               <div class="relative flex items-start gap-3">
                 <!-- 纵向导轨连线 -->
-                <div class="absolute top-[26px] bottom-[-14px] left-[11px] w-[2px] bg-slate-200 z-0"></div>
+                <div
+                  :class="[
+                    'absolute top-[26px] bottom-[-16px] left-[11px] w-[2px] z-0',
+                    getWorkflowStepNumber(currentSelectedOrder?.orderStatus) >= 5 ? 'bg-emerald-500' : 'bg-slate-200'
+                  ]"
+                ></div>
 
                 <!-- 左列：序号与状态 + 节点标题 -->
                 <div class="w-[96px] shrink-0 z-10">
                   <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full border border-slate-300 text-slate-400 bg-slate-50 flex items-center justify-center text-xs font-sans shrink-0">4</span>
-                    <span class="text-slate-400 text-[11px] whitespace-nowrap">未进行</span>
+                    <span
+                      v-if="getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 4"
+                      class="w-6 h-6 rounded-full border border-slate-300 text-slate-400 bg-slate-50 flex items-center justify-center text-xs font-sans shrink-0"
+                    >
+                      4
+                    </span>
+                    <span
+                      v-else-if="getWorkflowStepNumber(currentSelectedOrder?.orderStatus) === 4"
+                      class="w-6 h-6 rounded-full bg-[#1677ff] text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-blue-100 animate-pulse"
+                    >
+                      4
+                    </span>
+                    <span
+                      v-else
+                      class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-emerald-100"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </span>
+
+                    <span
+                      :class="[
+                        'text-[10.5px] whitespace-nowrap',
+                        getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 4
+                          ? 'text-slate-400'
+                          : getWorkflowStepNumber(currentSelectedOrder?.orderStatus) === 4
+                          ? 'text-[#1677ff] font-medium'
+                          : 'text-emerald-600 font-medium'
+                      ]"
+                    >
+                      {{ getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 4 ? '未进行' : (getWorkflowStepNumber(currentSelectedOrder?.orderStatus) === 4 ? '待审核' : '已完成') }}
+                    </span>
                   </div>
                   <div class="pl-8 mt-1 text-slate-600 font-medium text-xs">
                     数据修订审核
@@ -2082,13 +2447,34 @@
                 </div>
               </div>
 
-              <!-- 节点 5：告警数据处理完成 (未进行) -->
+              <!-- 节点 5：告警数据处理完成 -->
               <div class="relative flex items-start gap-3">
                 <!-- 左列：序号与状态 + 节点标题 -->
                 <div class="w-full z-10">
                   <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full border border-slate-300 text-slate-400 bg-slate-50 flex items-center justify-center text-xs font-sans shrink-0">5</span>
-                    <span class="text-slate-400 text-[11px] whitespace-nowrap">未进行</span>
+                    <span
+                      v-if="getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 5"
+                      class="w-6 h-6 rounded-full border border-slate-300 text-slate-400 bg-slate-50 flex items-center justify-center text-xs font-sans shrink-0"
+                    >
+                      5
+                    </span>
+                    <span
+                      v-else
+                      class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 ring-3 ring-emerald-100"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </span>
+
+                    <span
+                      :class="[
+                        'text-[10.5px] whitespace-nowrap',
+                        getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 5 ? 'text-slate-400' : 'text-emerald-600 font-medium'
+                      ]"
+                    >
+                      {{ getWorkflowStepNumber(currentSelectedOrder?.orderStatus) < 5 ? '未进行' : '已完成' }}
+                    </span>
                   </div>
                   <div class="pl-8 mt-1 text-slate-600 font-medium text-xs">
                     告警数据处理完成
@@ -3101,8 +3487,35 @@ const submitWorkOrderResolution = () => {
 };
 
 // 点击“详情”
+// 详情弹窗：工单处置流程中的“故障处理二级节点”展开/折叠控制
+const faultSubStepsExpanded = ref(true);
+
+const toggleFaultSubSteps = () => {
+  faultSubStepsExpanded.value = !faultSubStepsExpanded.value;
+};
+
+// 获取当前工单处置流程主步骤进度
+const getWorkflowStepNumber = (status?: string) => {
+  if (!status) return 2;
+  switch (status) {
+    case '待处置':
+      return 1;
+    case '工单处理中':
+      return 2;
+    case '待修订水量':
+      return 3;
+    case '待审核':
+      return 4;
+    case '工单处置完成':
+      return 5;
+    default:
+      return 2;
+  }
+};
+
 const viewDetail = (order: AlarmWorkOrder) => {
   currentSelectedOrder.value = order;
+  faultSubStepsExpanded.value = true;
   detailModalVisible.value = true;
 };
 

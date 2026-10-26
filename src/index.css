@@ -125,6 +125,7 @@ select option:checked {
   font-weight: 600;
 }
 
+
 /* Hide scrollbar while preserving scroll functionality */
 .no-scrollbar::-webkit-scrollbar {
   display: none !important;
@@ -136,4 +137,165 @@ select option:checked {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* ==========================================================================
+   Design Spec: 大屏 UI 设计方案 · 科技质感外边框与设计系统
+   ========================================================================== */
+:root {
+  --spec-bg: #0b2648;
+  --spec-bg2: #103762;
+  --spec-panel: rgba(14, 48, 82, 0.62);
+  --spec-cyan: #3FD0FF;
+  --spec-cyan-d: #1E7BE8;
+  --spec-cyan-l: #9BEAFF;
+  --spec-text: #DCF2FF;
+  --spec-text2: #8FB6D4;
+  --spec-text3: #5D8AAA;
+  --spec-gold: #FFC65C;
+  --spec-green: #3DDC97;
+  --spec-red: #FF6B7A;
+  --spec-line: rgba(70, 180, 235, 0.22);
+  --spec-line2: rgba(70, 180, 235, 0.42);
+  --spec-num: "Bahnschrift", "DIN Alternate", "Segoe UI", -apple-system, monospace, sans-serif;
+  --spec-cn: "HarmonyOS Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.font-spec-num {
+  font-family: var(--spec-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.font-spec-cn {
+  font-family: var(--spec-cn);
+}
+
+/* Spec Card / Panel Container with 12px L-shape corners */
+.spec-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(16, 56, 96, 0.68), rgba(10, 34, 62, 0.45));
+  border: 1px solid var(--spec-line);
+  box-shadow: 0 8px 30px rgba(4, 20, 38, 0.5), inset 0 0 24px rgba(30, 140, 230, 0.12);
+}
+
+.spec-card::before,
+.spec-card::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid rgba(90, 220, 255, 0.55);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.spec-card::before {
+  left: -1px;
+  top: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.spec-card::after {
+  right: -1px;
+  bottom: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Spec Header Bar Divider with 64px Glow Segment */
+.spec-header-divider {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(63, 208, 255, 0.65) 0%, rgba(30, 123, 232, 0.3) 60%, transparent 100%);
+}
+
+.spec-header-divider::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 64px;
+  height: 3px;
+  background: #9BEAFF;
+  filter: blur(1.5px);
+  opacity: 0.9;
+}
+
+/* Spec Numeric Gradient for large KPI values */
+.spec-kpi-val {
+  font-family: var(--spec-num);
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #FFFFFF 0%, #79D8FF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Spec Tooltip Container (Section 07) */
+.spec-tooltip {
+  position: relative;
+  background: rgba(6, 26, 46, 0.96);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(63, 208, 255, 0.45);
+  box-shadow: 0 12px 30px rgba(0, 10, 20, 0.70), inset 0 0 24px rgba(30, 120, 200, 0.10);
+}
+
+.spec-tooltip::before,
+.spec-tooltip::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid rgba(90, 220, 255, 0.65);
+  pointer-events: none;
+}
+
+.spec-tooltip::before {
+  left: -1px;
+  top: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.spec-tooltip::after {
+  right: -1px;
+  bottom: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.spec-tooltip .tooltip-bar {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: 2px;
+  background: linear-gradient(180deg, #7FE6FF, #1E7BE8);
+}
+
+.spec-tooltip.warn {
+  border-color: rgba(255, 107, 122, 0.5);
+  box-shadow: 0 12px 30px rgba(0, 10, 20, 0.7), inset 0 0 24px rgba(200, 50, 63, 0.10);
+}
+
+.spec-tooltip.warn .tooltip-bar {
+  background: linear-gradient(180deg, #FF9AA4, #C8323F);
+}
+
+.spec-tooltip.warn::before,
+.spec-tooltip.warn::after {
+  border-color: rgba(255, 154, 164, 0.7);
+}
+
+.spec-tag {
+  font-size: 11.5px;
+  border: 1px solid rgba(63, 208, 255, 0.4);
+  color: #8FD8F5;
+  padding: 1.5px 7px;
+  background: rgba(10, 36, 58, 0.5);
+  border-radius: 2px;
+  letter-spacing: 0.3px;
+}
+
 

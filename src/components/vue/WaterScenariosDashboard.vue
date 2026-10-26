@@ -1,92 +1,226 @@
 <template>
-  <div class="fixed inset-0 z-50 w-screen h-screen bg-[#071328] text-white flex flex-col overflow-hidden font-sans select-none">
-    
-    <!-- ================= 1. TOP GLOBAL NAVIGATION HEADER ================= -->
-    <header class="h-14 bg-gradient-to-b from-[#091a36] via-[#091b38] to-[#071328] border-b border-[#163665]/60 flex items-center justify-between px-5 shrink-0 z-40 relative shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+  <div
+    class="fixed inset-0 z-50 w-screen h-screen text-[#DCF2FF] flex flex-col overflow-hidden select-none transition-all duration-500"
+    :style="{
+      background: scenarioMode === 'comprehensive'
+        ? 'radial-gradient(1200px 650px at 50% -10%, rgba(56,189,248,0.45), transparent 75%), radial-gradient(1400px 850px at 50% 50%, rgba(14,116,204,0.38), transparent 80%), radial-gradient(1600px 950px at 50% 45%, #184c82 0%, #103762 50%, #0b2648 100%)'
+        : 'radial-gradient(1200px 650px at 50% -10%, rgba(56,189,248,0.38), transparent 75%), radial-gradient(1400px 850px at 50% 50%, rgba(14,116,204,0.30), transparent 80%), radial-gradient(1600px 950px at 50% 45%, #154476 0%, #0e3158 50%, #092240 100%)',
+      fontFamily: 'var(--spec-cn)'
+    }"
+  >
+
+    <!-- ================= 0. TECH SCREEN OUTER FRAME OVERLAY (Design Spec Section 02) ================= -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none z-30" viewBox="0 0 1920 1080" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <defs>
+        <!-- Left Wing Gradient -->
+        <linearGradient id="specSwL" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0"/>
+          <stop offset="40%" stop-color="#3FD0FF" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#9BEAFF" stop-opacity=".95"/>
+        </linearGradient>
+        <!-- Right Wing Gradient -->
+        <linearGradient id="specSwR" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0"/>
+          <stop offset="40%" stop-color="#3FD0FF" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#9BEAFF" stop-opacity=".95"/>
+        </linearGradient>
+        <!-- Title Plate Gradient -->
+        <linearGradient id="specPl" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#144d82"/>
+          <stop offset="100%" stop-color="#0a284a"/>
+        </linearGradient>
+        <!-- Horizontal Tick Pattern for Wings -->
+        <pattern id="specTk" width="16" height="6" patternUnits="userSpaceOnUse">
+          <rect width="1.5" height="6" fill="#3FD0FF" opacity=".6"/>
+        </pattern>
+        <!-- Vertical Tick Pattern for Side Combs -->
+        <pattern id="specTkv" width="6" height="16" patternUnits="userSpaceOnUse">
+          <rect width="6" height="1.5" fill="#3FD0FF" opacity=".5"/>
+        </pattern>
+      </defs>
+
+      <!-- 6. 外发光层 (Outer Glow Path) -->
+      <path d="M 38 18 H 1882 L 1902 38 V 1042 L 1882 1062 H 38 L 18 1042 V 38 Z" stroke="#2BA8E8" stroke-width="7" opacity=".18"/>
+
+      <!-- 3. 主框线 (Outer Main Border - 22px Chamfers) -->
+      <path d="M 38 18 H 1882 L 1902 38 V 1042 L 1882 1062 H 38 L 18 1042 V 38 Z" stroke="#60D6FF" stroke-opacity=".75" stroke-width="1.4"/>
+
+      <!-- 3. 内框线 (Inner Secondary Border - 9px Offset) -->
+      <path d="M 44 27 H 1876 L 1893 44 V 1036 L 1876 1053 H 44 L 27 1036 V 44 Z" stroke="#60D6FF" stroke-opacity=".28" stroke-width="1"/>
+
+      <!-- 4. L形角标 (Outer Layer 2px, stroke-opacity .8) -->
+      <g stroke="#7FE3FF" stroke-opacity=".8" stroke-width="2">
+        <path d="M 8 78 V 8 H 78" />
+        <path d="M 1842 8 H 1912 V 78" />
+        <path d="M 8 1002 V 1072 H 78" />
+        <path d="M 1912 1002 V 1072 H 1842" />
+      </g>
+
+      <!-- 4. 内侧辅助角线 (Inner Layer 1px, stroke-opacity .35) -->
+      <g stroke="#7FE3FF" stroke-opacity=".35" stroke-width="1">
+        <path d="M 8 118 V 8 M 8 8 H 118" />
+        <path d="M 1802 8 H 1912 M 1912 8 V 118" />
+        <path d="M 8 962 V 1072 M 8 1072 H 118" />
+        <path d="M 1912 962 V 1072 M 1802 1072 H 1912" />
+      </g>
+
+      <!-- 4. 切角斜边高亮 (Chamfer Highlight Lines) -->
+      <g stroke="#8CE8FF" stroke-width="2.6" stroke-linecap="round" stroke-opacity=".95">
+        <path d="M 35 21 L 21 35" />
+        <path d="M 1885 21 L 1899 35" />
+        <path d="M 21 1045 L 35 1059" />
+        <path d="M 1899 1045 L 1885 1059" />
+      </g>
+
+      <!-- 4. 四角端头高光点 (Corner Terminal Dots) -->
+      <g fill="#B7F2FF">
+        <circle cx="12" cy="12" r="2.2" />
+        <circle cx="1908" cy="12" r="2.2" />
+        <circle cx="12" cy="1068" r="2.2" />
+        <circle cx="1908" cy="1068" r="2.2" />
+      </g>
+
+      <!-- 5. 侧边梳齿与刻度 (Side Comb Ticks - 节距 16px) -->
+      <rect x="9" y="452" width="5" height="176" fill="url(#specTkv)" />
+      <rect x="1906" y="452" width="5" height="176" fill="url(#specTkv)" />
+      <g stroke="#7FE3FF" stroke-opacity=".35" stroke-width="1">
+        <path d="M 17 172 H 28 M 17 196 H 28 M 17 220 H 28" />
+        <path d="M 1903 172 H 1892 M 1903 196 H 1892 M 1903 220 H 1892" />
+      </g>
+
+      <!-- 2. 双侧翼 (Top Dual Wings) -->
+      <!-- Left Wing -->
+      <line x1="56" y1="36" x2="664" y2="36" stroke="url(#specSwL)" stroke-width="1.8" />
+      <line x1="120" y1="44" x2="664" y2="44" stroke="url(#specSwL)" stroke-width="1" opacity=".45" />
+      <rect x="150" y="30" width="300" height="6" fill="url(#specTk)" opacity=".8" />
+      <path d="M 650 32 L 656 36 L 650 40 L 644 36 Z" fill="#B7F2FF" />
+
+      <!-- Right Wing -->
+      <line x1="1864" y1="36" x2="1256" y2="36" stroke="url(#specSwR)" stroke-width="1.8" />
+      <line x1="1800" y1="44" x2="1256" y2="44" stroke="url(#specSwR)" stroke-width="1" opacity=".45" />
+      <rect x="1470" y="30" width="300" height="6" fill="url(#specTk)" opacity=".8" />
+      <path d="M 1270 32 L 1276 36 L 1270 40 L 1264 36 Z" fill="#B7F2FF" />
+
+      <!-- 1. 六角名匾 (Title Plate) - 560×62px, 居中 -->
+      <path d="M 698 8 H 1222 L 1256 38 L 1222 68 H 698 L 664 38 Z" fill="url(#specPl)" stroke="#54DAFF" stroke-width="1.8" stroke-opacity=".95" />
+      <path d="M 708 16 H 1212 L 1238 38 L 1212 60 H 708 L 682 38 Z" stroke="#7FE3FF" stroke-opacity=".38" stroke-width="1" />
+      <!-- 名匾底部亮线 -->
+      <line x1="820" y1="69" x2="1100" y2="69" stroke="#B7F2FF" stroke-width="2" stroke-opacity=".95" />
+
+      <!-- 底部收口构件 (Bottom Chin) -->
+      <path d="M 858 1062 H 1062 L 1042 1046 H 878 Z" fill="#08243E" stroke="#4FD8FF" stroke-opacity=".6" stroke-width="1.2" />
+      <line x1="900" y1="1054" x2="1020" y2="1054" stroke="#9BEAFF" stroke-width="1.6" stroke-opacity=".85" />
+      <circle cx="960" cy="1054" r="2.2" fill="#D8F8FF" />
+    </svg>
+
+    <!-- ================= 1. TOP GLOBAL NAVIGATION & TITLE BAR ================= -->
+    <header
+      id="dev-anno-1"
+      class="relative px-8 xl:px-12 2xl:px-16 pt-2 pb-1.5 shrink-0 z-40 flex items-center justify-between pointer-events-auto transition-all duration-300"
+      :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 1 }"
+    >
+      <!-- Numbered Point 1 Badge (顶部标签栏 / 全局控制) -->
+      <div
+        v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+        class="absolute top-1.5 left-2 z-50 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+        :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 1 }"
+        @mouseenter="activeAnnotationId = 1"
+        @mouseleave="activeAnnotationId = null"
+        @click="scrollToAnnotation(1)"
+        title="开发标注 #1: 顶部标签栏 / 全局控制 (点击查看说明)"
+      >
+        1
+      </div>
       
-      <!-- Top Left: Logo & Platform Title -->
+      <!-- Top Center: 六角名匾平台标题 (绝对居中于名匾内) -->
+      <div class="absolute top-2 inset-x-0 flex flex-col items-center justify-center pointer-events-none z-50">
+        <div class="flex items-center gap-2 drop-shadow-[0_2px_8px_rgba(63,208,255,0.7)]">
+          <span class="w-2 h-2 rounded-full bg-[#9BEAFF] animate-pulse"></span>
+          <h1 class="text-xl 2xl:text-2xl font-bold tracking-[4px] bg-gradient-to-b from-white via-[#DCF2FF] to-[#79D8FF] bg-clip-text text-transparent">
+            西宁市取用水管理平台
+          </h1>
+        </div>
+        <div class="text-[10px] text-[#8FB6D4] font-spec-num tracking-[2px] -mt-0.5 opacity-90">
+          COMPREHENSIVE SCENARIO COMMAND CENTER
+        </div>
+      </div>
+
+      <!-- Top Left: 平台Logo + 5大核心导航 Tab -->
       <div class="flex items-center gap-3">
-        <!-- Glowing Water Drop Hex Icon -->
-        <div class="relative w-9 h-9 flex items-center justify-center">
-          <div class="absolute inset-0 bg-cyan-500/20 rounded-xl blur-xs"></div>
-          <div class="relative w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white shadow-md">
-            <svg class="w-5 h-5 text-white filter drop-shadow" viewBox="0 0 24 24" fill="currentColor">
+        <!-- Glowing Hexagon Droplet Logo -->
+        <div class="relative w-8 h-8 flex items-center justify-center shrink-0">
+          <div class="absolute inset-0 bg-[#3FD0FF]/25 rounded-md blur-xs"></div>
+          <div class="relative w-7 h-7 rounded-md bg-gradient-to-br from-[#3FD0FF] to-[#1E7BE8] flex items-center justify-center text-white shadow-md border border-[#9BEAFF]/60">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" opacity="0.9" />
               <path d="M12 7l2.8 2.8a3.8 3.8 0 1 1-5.6 0z" fill="#ffffff" />
             </svg>
           </div>
         </div>
 
-        <h1 class="text-xl font-bold tracking-wider text-white font-sans drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-          西宁市取用水管理平台
-        </h1>
-      </div>
-
-      <!-- Top Center: 5 Master Navigation Tabs -->
-      <div class="flex items-center gap-2">
-        <!-- Tab 1: 综合应用场景 (Active Glowing Shape) -->
-        <div class="relative group cursor-pointer">
-          <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-md blur-xs opacity-80"></div>
-          <div class="relative px-6 py-2 bg-gradient-to-b from-[#1956a6] to-[#0f3b79] border-t border-b border-cyan-400 text-white font-bold text-sm tracking-wide rounded shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)] flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-cyan-300 animate-pulse"></span>
+        <!-- 5 Master Navigation Tabs (Sleek Tech Bar) -->
+        <nav class="flex items-center gap-1.5 bg-[#06182c]/80 p-1 rounded border border-[#46B4EB]/25 backdrop-blur-md">
+          <!-- Tab 1: 综合应用场景 (Active Glowing Spec Tag) -->
+          <div class="relative px-3.5 py-1 rounded bg-[#0b2b4c] border border-[#3FD0FF] text-[#E4F6FF] font-semibold text-xs tracking-wide shadow-[0_0_12px_rgba(63,208,255,0.45)] flex items-center gap-1.5 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#3FD0FF] shadow-[0_0_6px_#3FD0FF]"></span>
             <span>综合应用场景</span>
           </div>
-        </div>
 
-        <!-- Tab 2: 取用水量核算 -->
-        <button
-          type="button"
-          @click="navigate('irrigation_accounting')"
-          class="px-5 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded text-sm font-medium transition cursor-pointer"
-        >
-          取用水量核算
-        </button>
+          <!-- Tab 2: 取用水量核算 -->
+          <button
+            type="button"
+            @click="navigate('irrigation_accounting')"
+            class="px-3 py-1 text-[#8FB6D4] hover:text-[#DCF2FF] hover:bg-white/5 rounded text-xs font-medium transition cursor-pointer"
+          >
+            取用水量核算
+          </button>
 
-        <!-- Tab 3: 数据归集 -->
-        <button
-          type="button"
-          @click="navigate('manual_collection')"
-          class="px-5 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded text-sm font-medium transition cursor-pointer"
-        >
-          数据归集
-        </button>
+          <!-- Tab 3: 数据归集 -->
+          <button
+            type="button"
+            @click="navigate('manual_collection')"
+            class="px-3 py-1 text-[#8FB6D4] hover:text-[#DCF2FF] hover:bg-white/5 rounded text-xs font-medium transition cursor-pointer"
+          >
+            数据归集
+          </button>
 
-        <!-- Tab 4: 取用水户数据资源规范化整合 -->
-        <button
-          type="button"
-          @click="navigate('enterprise_dossier')"
-          class="px-5 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded text-sm font-medium transition cursor-pointer"
-        >
-          取用水户数据资源规范化整合
-        </button>
+          <!-- Tab 4: 取用水户数据资源规范化整合 -->
+          <button
+            type="button"
+            @click="navigate('enterprise_dossier')"
+            class="px-3 py-1 text-[#8FB6D4] hover:text-[#DCF2FF] hover:bg-white/5 rounded text-xs font-medium transition cursor-pointer"
+          >
+            数据资源规范化整合
+          </button>
 
-        <!-- Tab 5: 数据治理及质量控制 -->
-        <button
-          type="button"
-          @click="navigate('violation_national')"
-          class="px-5 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded text-sm font-medium transition cursor-pointer"
-        >
-          数据治理及质量控制
-        </button>
+          <!-- Tab 5: 数据治理及质量控制 -->
+          <button
+            type="button"
+            @click="navigate('violation_national')"
+            class="px-3 py-1 text-[#8FB6D4] hover:text-[#DCF2FF] hover:bg-white/5 rounded text-xs font-medium transition cursor-pointer"
+          >
+            数据治理与质控
+          </button>
+        </nav>
       </div>
 
       <!-- Top Right: Notification & Weather & Realtime Clock & Actions -->
-      <div class="flex items-center gap-4 text-xs font-mono text-slate-200">
+      <div class="flex items-center gap-3 text-xs font-spec-num text-[#8FB6D4] z-50">
         
         <!-- Notifications Bell with Red Badge 12 -->
-        <div class="relative cursor-pointer hover:opacity-80 transition" @click="showWarningModal = true">
-          <svg class="w-5 h-5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="relative cursor-pointer hover:opacity-85 transition p-1" @click="showWarningModal = true" title="常态化预警与工单调度">
+          <svg class="w-4 h-4 text-[#8FB6D4]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
-          <span class="absolute -top-1.5 -right-2 px-1.5 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-bold border border-[#091a36]">
+          <span class="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-[#FF6B7A] text-white text-[9.5px] font-bold border border-[#061423] font-spec-num shadow-[0_0_8px_rgba(255,107,122,0.8)]">
             12
           </span>
         </div>
 
-        <!-- Weather: 18℃ -->
-        <div class="flex items-center gap-1.5 text-slate-300">
-          <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Weather Chip -->
+        <div class="spec-tag flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-[#FFC65C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -95,27 +229,27 @@
             <line x1="1" y1="12" x2="3" y2="12"></line>
             <line x1="21" y1="12" x2="23" y2="12"></line>
           </svg>
-          <span class="font-sans font-medium text-white">18℃</span>
+          <span class="font-bold text-[#DCF2FF]">18℃</span>
         </div>
 
-        <!-- Time & Date -->
-        <div class="flex items-center gap-2 pl-1 border-l border-slate-700/60">
-          <span class="text-sm font-bold text-white tracking-wider">{{ currentTimeStr }}</span>
-          <div class="flex flex-col text-[10px] leading-tight text-slate-400 font-sans">
+        <!-- Realtime Clock & Date -->
+        <div class="spec-tag flex items-center gap-2">
+          <span class="font-bold text-[#DCF2FF] tracking-wider">{{ currentTimeStr }}</span>
+          <div class="flex items-center gap-1 text-[10.5px] text-[#8FB6D4] font-spec-cn">
             <span>2025-05-20</span>
             <span>星期二</span>
           </div>
         </div>
 
         <!-- Fullscreen / Return Workbench Icon Buttons -->
-        <div class="flex items-center gap-2 pl-2 border-l border-slate-700/60">
+        <div class="flex items-center gap-1.5 pl-1">
           <button
             type="button"
             @click="toggleFullscreen"
-            class="p-1 text-slate-400 hover:text-white transition cursor-pointer"
+            class="spec-tag p-1.5 text-[#8FB6D4] hover:text-[#DCF2FF] transition cursor-pointer"
             title="全屏切换"
           >
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
             </svg>
           </button>
@@ -124,10 +258,10 @@
           <button
             type="button"
             @click="navigate('home')"
-            class="px-2 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-[11px] font-sans transition cursor-pointer flex items-center gap-1"
+            class="spec-tag px-2.5 py-1 text-[#DCF2FF] hover:bg-[#3FD0FF]/15 transition cursor-pointer flex items-center gap-1 font-spec-cn"
             title="返回标准工作台"
           >
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="w-3 h-3 text-[#3FD0FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -140,16 +274,27 @@
     </header>
 
     <!-- ================= 2. MAIN WORKSPACE: 3 COLUMNS + CENTRAL GIS DIGITAL TWIN ================= -->
-    <main class="flex-1 relative min-h-0 overflow-hidden flex">
+    <main class="flex-1 relative min-h-0 overflow-hidden flex gap-3 xl:gap-4 2xl:gap-6 px-6 xl:px-10 2xl:px-14 pb-5 xl:pb-6 2xl:pb-7 pt-1">
       
       <!-- Central GIS Satellite Vector & Contour Map (Background Layer) -->
-      <div class="absolute inset-0 z-0 bg-[#061224] overflow-hidden">
+      
+      <!-- Central GIS Satellite Vector & Contour Map (Background Layer) -->
+      <div class="absolute inset-0 z-0 bg-[#092548] overflow-hidden">
         
-        <!-- Dark Satellite Terrain Gradients & Contours -->
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0c2445] via-[#08182f] to-[#040c1a]"></div>
+        <!-- Satellite Terrain Gradients & Contours (大屏背景亮蓝色质感提升) -->
+        <div
+          class="absolute inset-0 transition-all duration-500"
+          :class="scenarioMode === 'comprehensive'
+            ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1c5a98] via-[#123e6d] to-[#0b284a]'
+            : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#184e85] via-[#0f3660] to-[#092342]'"
+        ></div>
         
-        <!-- Subtle Topographic Contour Lines -->
-        <svg class="absolute inset-0 w-full h-full opacity-15 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Subtle Topographic Contour Lines (大屏等高线纹理提亮) -->
+        <svg
+          class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-500"
+          :class="scenarioMode === 'comprehensive' ? 'opacity-45' : 'opacity-30'"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <pattern id="topo-grid" width="120" height="120" patternUnits="userSpaceOnUse">
             <path d="M 0 60 Q 30 10 60 60 T 120 60" fill="none" stroke="#38bdf8" stroke-width="0.6" />
             <path d="M 0 20 Q 30 70 60 20 T 120 20" fill="none" stroke="#0284c7" stroke-width="0.6" />
@@ -189,11 +334,11 @@
                 <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.9" />
               </linearGradient>
 
-              <!-- Terrain Elevation Texture Pattern -->
+              <!-- Terrain Elevation Texture Pattern (大屏背景亮蓝色质感提升) -->
               <radialGradient id="terrainGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#14345c" stop-opacity="0.9" />
-                <stop offset="45%" stop-color="#0d284a" stop-opacity="0.8" />
-                <stop offset="100%" stop-color="#061c36" stop-opacity="0.9" />
+                <stop offset="0%" :stop-color="scenarioMode === 'comprehensive' ? '#2e75bc' : '#225d98'" :stop-opacity="scenarioMode === 'comprehensive' ? '0.95' : '0.9'" />
+                <stop offset="45%" :stop-color="scenarioMode === 'comprehensive' ? '#1f5791' : '#174778'" :stop-opacity="scenarioMode === 'comprehensive' ? '0.9' : '0.85'" />
+                <stop offset="100%" :stop-color="scenarioMode === 'comprehensive' ? '#154272' : '#10375f'" :stop-opacity="scenarioMode === 'comprehensive' ? '0.95' : '0.9'" />
               </radialGradient>
             </defs>
 
@@ -704,24 +849,43 @@
       </div>
 
       <!-- ================= 3. LEFT COLUMN (区域用水态势分析) ================= -->
-      <aside class="relative z-20 w-[430px] 2xl:w-[470px] h-full p-2.5 flex flex-col gap-2.5 pointer-events-auto shrink-0 overflow-y-auto custom-dark-scrollbar">
+      <aside class="relative z-20 w-[395px] xl:w-[415px] 2xl:w-[440px] h-full p-1 xl:p-1.5 flex flex-col gap-2.5 pointer-events-auto shrink-0 overflow-y-auto custom-dark-scrollbar">
         
         <!-- A. 综合应用场景 -->
         <template v-if="scenarioMode === 'comprehensive'">
         <!-- ================= Card 1: 行政区域用水对比 (独立卡片 1) ================= -->
-        <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[220px] flex flex-col justify-between">
+        <div
+          id="dev-anno-2"
+          class="spec-card rounded-lg p-3 flex-1 min-h-[220px] flex flex-col justify-between relative transition-all duration-300"
+          :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 2 }"
+        >
+          <!-- Numbered Point 2 Badge (行政区域用水对比 - 左1) -->
+          <div
+            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+            class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 2 }"
+            @mouseenter="activeAnnotationId = 2"
+            @mouseleave="activeAnnotationId = null"
+            @click="scrollToAnnotation(2)"
+            title="开发标注 #2: 行政区域用水对比 (左1)"
+          >
+            2
+          </div>
           <!-- Card Header & Filter -->
-          <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
+          <div class="flex items-center justify-between pb-1.5">
             <div class="flex items-center gap-2">
-              <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">行政区域用水对比</h2>
-              <span class="text-xs text-slate-300 font-medium">(万m³)</span>
+              <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2" stroke-width="1.8" />
+                <polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5 12 6" stroke-width="1.2" stroke-opacity="0.6" />
+              </svg>
+              <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">行政区域用水对比</h2>
+              <span class="text-xs text-[#8FB6D4] font-medium">(万m³)</span>
             </div>
             
             <div class="flex items-center gap-1.5">
               <select
                 v-model="filterParams.district"
-                class="bg-[#0b2447] border border-[#1b4372] rounded-md px-2 py-1 text-slate-100 text-xs focus:outline-none focus:border-cyan-400 cursor-pointer"
+                class="bg-[#0b2447] border border-[#1b4372] rounded px-2 py-0.5 text-[#DCF2FF] text-xs focus:outline-none focus:border-[#3FD0FF] cursor-pointer"
               >
                 <option value="西宁市">全域西宁</option>
                 <option value="城东区">城东区</option>
@@ -735,7 +899,7 @@
 
               <select
                 v-model="filterParams.timeRange"
-                class="bg-[#0b2447] border border-[#1b4372] rounded-md px-2 py-1 text-slate-100 text-xs focus:outline-none focus:border-cyan-400 cursor-pointer"
+                class="bg-[#0b2447] border border-[#1b4372] rounded px-2 py-0.5 text-[#DCF2FF] text-xs focus:outline-none focus:border-[#3FD0FF] cursor-pointer"
               >
                 <option value="curr">2025年度</option>
                 <option value="1y">近1年</option>
@@ -743,58 +907,60 @@
               </select>
             </div>
           </div>
+          <!-- 标题底线 (规范 64px 高亮带外发光) -->
+          <div class="spec-header-divider mb-2"></div>
 
           <!-- Total KPIs Quick Strip inside Card 1 (5项参数：水蓝系柱族 + 金白管控线族) -->
-          <div class="bg-[#0a2244]/60 rounded-lg p-1.5 my-1.5 border border-[#143b6b]/60">
+          <div class="bg-[rgba(10,36,58,0.5)] rounded p-1.5 my-1 border border-[rgba(70,180,235,0.16)]">
             <div class="grid grid-cols-5 gap-1">
               <div class="text-center">
-                <div class="text-[10px] text-slate-300">计量水量</div>
-                <div class="text-xs font-bold font-mono text-cyan-300 mt-0.5">{{ districtTotals.metered.toLocaleString() }}</div>
+                <div class="text-[10.5px] text-[#8FB6D4]">计量水量</div>
+                <div class="text-xs font-bold font-spec-num text-[#3FD0FF] mt-0.5">{{ districtTotals.metered.toLocaleString() }}</div>
               </div>
               <div class="text-center">
-                <div class="text-[10px] text-slate-300">直报水量</div>
-                <div class="text-xs font-bold font-mono text-sky-300 mt-0.5">{{ districtTotals.reported.toLocaleString() }}</div>
+                <div class="text-[10.5px] text-[#8FB6D4]">直报水量</div>
+                <div class="text-xs font-bold font-spec-num text-[#9BEAFF] mt-0.5">{{ districtTotals.reported.toLocaleString() }}</div>
               </div>
               <div class="text-center">
-                <div class="text-[10px] text-slate-300">税务水量</div>
-                <div class="text-xs font-bold font-mono text-blue-300 mt-0.5">{{ districtTotals.taxWater.toLocaleString() }}</div>
+                <div class="text-[10.5px] text-[#8FB6D4]">税务水量</div>
+                <div class="text-xs font-bold font-spec-num text-[#60a5fa] mt-0.5">{{ districtTotals.taxWater.toLocaleString() }}</div>
               </div>
               <div class="text-center">
-                <div class="text-[10px] text-slate-300">许可水量</div>
-                <div class="text-xs font-bold font-mono text-amber-300 mt-0.5">{{ districtTotals.licensed.toLocaleString() }}</div>
+                <div class="text-[10.5px] text-[#8FB6D4]">许可水量</div>
+                <div class="text-xs font-bold font-spec-num text-[#FFC65C] mt-0.5">{{ districtTotals.licensed.toLocaleString() }}</div>
               </div>
               <div class="text-center">
-                <div class="text-[10px] text-slate-300">计划水量</div>
-                <div class="text-xs font-bold font-mono text-slate-200 mt-0.5">{{ districtTotals.planned.toLocaleString() }}</div>
+                <div class="text-[10.5px] text-[#8FB6D4]">计划水量</div>
+                <div class="text-xs font-bold font-spec-num text-[#DCF2FF] mt-0.5">{{ districtTotals.planned.toLocaleString() }}</div>
               </div>
             </div>
           </div>
 
           <!-- 5 Legends Bar (减少杂色，归拢为水蓝柱族与管控线族) -->
           <div class="flex items-center justify-between px-1 mb-1">
-            <span class="text-xs font-medium text-slate-400">统计参数:</span>
+            <span class="text-xs font-medium text-[#5D8AAA]">统计参数:</span>
             <div class="flex items-center gap-2.5 text-[11px] flex-wrap">
               <!-- 水蓝柱族 -->
               <div class="flex items-center gap-1">
-                <span class="w-2.5 h-2.5 rounded-xs bg-[#00e5ff]"></span>
-                <span class="text-slate-200">计量水量</span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-[#3FD0FF]"></span>
+                <span class="text-[#8FB6D4]">计量水量</span>
               </div>
               <div class="flex items-center gap-1">
-                <span class="w-2.5 h-2.5 rounded-xs bg-[#38bdf8]"></span>
-                <span class="text-slate-200">直报水量</span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-[#9BEAFF]"></span>
+                <span class="text-[#8FB6D4]">直报水量</span>
               </div>
               <div class="flex items-center gap-1">
                 <span class="w-2.5 h-2.5 rounded-xs bg-[#60a5fa]"></span>
-                <span class="text-slate-200">税务水量</span>
+                <span class="text-[#8FB6D4]">税务水量</span>
               </div>
               <!-- 管控线族 -->
               <div class="flex items-center gap-1">
-                <span class="inline-flex items-center text-[#f59e0b] font-bold text-xs tracking-tighter">―●―</span>
-                <span class="text-amber-300">许可水量</span>
+                <span class="inline-flex items-center text-[#FFC65C] font-bold text-xs tracking-tighter">―●―</span>
+                <span class="text-[#FFC65C]">许可水量</span>
               </div>
               <div class="flex items-center gap-1">
-                <span class="inline-flex items-center text-slate-300 font-bold text-xs tracking-tighter">┄○┄</span>
-                <span class="text-slate-300">计划水量</span>
+                <span class="inline-flex items-center text-[#DCF2FF] font-bold text-xs tracking-tighter">┄○┄</span>
+                <span class="text-[#DCF2FF]">计划水量</span>
               </div>
             </div>
           </div>
@@ -803,22 +969,22 @@
           <div class="w-full flex-1 min-h-[145px] relative">
             <svg viewBox="0 0 380 120" class="w-full h-full overflow-visible">
               <!-- Horizontal grids -->
-              <g stroke="#163866" stroke-width="0.8">
+              <g stroke="rgba(70,180,235,0.14)" stroke-width="0.8">
                 <line x1="34" y1="18" x2="375" y2="18" />
                 <line x1="34" y1="44" x2="375" y2="44" />
                 <line x1="34" y1="70" x2="375" y2="70" />
-                <line x1="34" y1="96" x2="375" y2="96" stroke="#1f4b82" stroke-width="1.2" />
+                <line x1="34" y1="96" x2="375" y2="96" stroke="rgba(70,180,235,0.25)" stroke-width="1.2" />
               </g>
 
               <!-- Y-Axis labels (font-size 10, monospace) -->
-              <g fill="#94a3b8" font-size="10" font-family="monospace" text-anchor="end">
+              <g fill="#5D8AAA" font-size="10" font-family="var(--spec-num)" text-anchor="end">
                 <text x="30" y="21">35k</text>
                 <text x="30" y="47">25k</text>
                 <text x="30" y="73">12k</text>
                 <text x="30" y="99">0</text>
               </g>
 
-              <!-- 1. 7 Districts Grouped 3 Bars: 计量水量 (青 #00e5ff), 直报水量 (天蓝 #38bdf8), 税务水量 (柔蓝 #60a5fa) -->
+              <!-- 1. 7 Districts Grouped 3 Bars: 计量水量 (青 #3FD0FF), 直报水量 (天蓝 #9BEAFF), 税务水量 (柔蓝 #60a5fa) -->
               <g
                 v-for="(item, idx) in districtBarData"
                 :key="item.name"
@@ -833,32 +999,32 @@
                   y="16"
                   width="33"
                   height="82"
-                  fill="#00e5ff"
-                  :fill-opacity="filterParams.district === item.name ? 0.09 : 0"
-                  class="group-hover:fill-opacity-10 transition-all rounded"
+                  fill="#3FD0FF"
+                  :fill-opacity="filterParams.district === item.name ? 0.12 : 0"
+                  class="group-hover:fill-opacity-15 transition-all rounded"
                   rx="3"
                 />
 
-                <!-- 1. 计量水量 Bar (Cyan #00e5ff) -->
+                <!-- 1. 计量水量 Bar (Cyan #3FD0FF) -->
                 <rect
                   :x="41.5 + idx * 46"
                   :y="96 - Math.max(3, (item.metered / 35000) * 78)"
                   width="7.5"
                   :height="Math.max(3, (item.metered / 35000) * 78)"
-                  fill="#00e5ff"
+                  fill="#3FD0FF"
                   rx="1"
                   class="transition-opacity group-hover:opacity-90"
                 >
                   <title>{{ item.name }} 计量水量: {{ item.metered }} 万m³</title>
                 </rect>
 
-                <!-- 2. 直报水量 Bar (Sky #38bdf8) -->
+                <!-- 2. 直报水量 Bar (Light Cyan #9BEAFF) -->
                 <rect
                   :x="50.5 + idx * 46"
                   :y="96 - Math.max(3, (item.reported / 35000) * 78)"
                   width="7.5"
                   :height="Math.max(3, (item.reported / 35000) * 78)"
-                  fill="#38bdf8"
+                  fill="#9BEAFF"
                   rx="1"
                   class="transition-opacity group-hover:opacity-90"
                 >
@@ -885,22 +1051,22 @@
                   text-anchor="middle"
                   font-size="11"
                   font-weight="bold"
-                  :fill="filterParams.district === item.name ? '#00e5ff' : '#cbd5e1'"
-                  class="group-hover:fill-cyan-300 transition-colors"
+                  :fill="filterParams.district === item.name ? '#3FD0FF' : '#8FB6D4'"
+                  class="group-hover:fill-[#9BEAFF] transition-colors"
                 >
                   {{ item.name }}
                 </text>
               </g>
 
-              <!-- 2. 许可水量折线 (金黄暖色 #f59e0b) -->
+              <!-- 2. 许可水量折线 (金黄暖色 #FFC65C) -->
               <path
                 :d="licensedLinePath"
                 fill="none"
-                stroke="#f59e0b"
+                stroke="#FFC65C"
                 stroke-width="2.2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="pointer-events-none drop-shadow-[0_0_4px_rgba(245,158,11,0.6)]"
+                class="pointer-events-none drop-shadow-[0_0_4px_rgba(255,198,92,0.6)]"
               />
 
               <!-- 许可水量数据节点 (Circles) -->
@@ -916,7 +1082,7 @@
                   :cx="54.5 + idx * 46"
                   :cy="96 - (item.licensed / 35000) * 78"
                   r="3.2"
-                  fill="#f59e0b"
+                  fill="#FFC65C"
                   stroke="#ffffff"
                   stroke-width="1.6"
                   class="hover:scale-125 transition-transform"
@@ -925,11 +1091,11 @@
                 </circle>
               </g>
 
-              <!-- 3. 计划水量折线 (银白虚线 #cbd5e1) -->
+              <!-- 3. 计划水量折线 (银白虚线 #DCF2FF) -->
               <path
                 :d="plannedLinePath"
                 fill="none"
-                stroke="#cbd5e1"
+                stroke="#DCF2FF"
                 stroke-width="1.8"
                 stroke-dasharray="4 3"
                 stroke-linecap="round"
@@ -951,7 +1117,7 @@
                   :cy="96 - (item.planned / 35000) * 78"
                   r="2.8"
                   fill="#ffffff"
-                  stroke="#94a3b8"
+                  stroke="#5D8AAA"
                   stroke-width="1.4"
                   class="hover:scale-125 transition-transform"
                 >
@@ -960,34 +1126,35 @@
               </g>
             </svg>
 
-            <!-- Hover Popover Tooltip for District 5 Parameters -->
+            <!-- Hover Popover Tooltip for District 5 Parameters (Design Spec Section 07 Tooltip) -->
             <div
               v-if="hoveredBarDistrict"
-              class="absolute top-1 right-2 bg-[#06182e]/95 border border-cyan-500/60 rounded-lg p-2.5 text-xs shadow-2xl pointer-events-none z-30 min-w-[175px]"
+              class="spec-tooltip absolute top-1 right-2 p-2.5 text-xs shadow-2xl pointer-events-none z-30 min-w-[180px]"
             >
-              <div class="font-bold text-cyan-300 mb-1.5 border-b border-cyan-500/30 pb-1 flex items-center justify-between">
+              <i class="tooltip-bar"></i>
+              <div class="font-bold text-[#DCF2FF] mb-1.5 border-b border-[rgba(70,180,235,0.18)] pb-1 flex items-center justify-between">
                 <span>{{ hoveredBarDistrict.name }} 水量明细</span>
-                <span class="text-[10px] text-slate-400 font-normal">万m³</span>
+                <span class="text-[10px] text-[#5D8AAA] font-normal">万m³</span>
               </div>
-              <div class="space-y-1 font-mono text-[11px]">
-                <div class="text-cyan-300 flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-xs bg-[#00e5ff]"></span>计量水量:</span>
+              <div class="space-y-1 font-spec-num text-[11px]">
+                <div class="text-[#3FD0FF] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-2 rounded-xs bg-[#3FD0FF]"></span>计量水量:</span>
                   <span class="font-bold text-white">{{ hoveredBarDistrict.metered.toLocaleString() }}</span>
                 </div>
-                <div class="text-sky-300 flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-xs bg-[#38bdf8]"></span>直报水量:</span>
+                <div class="text-[#9BEAFF] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-2 rounded-xs bg-[#9BEAFF]"></span>直报水量:</span>
                   <span class="font-bold text-white">{{ hoveredBarDistrict.reported.toLocaleString() }}</span>
                 </div>
-                <div class="text-blue-300 flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-xs bg-[#60a5fa]"></span>税务水量:</span>
+                <div class="text-[#60a5fa] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-2 rounded-xs bg-[#60a5fa]"></span>税务水量:</span>
                   <span class="font-bold text-white">{{ hoveredBarDistrict.taxWater.toLocaleString() }}</span>
                 </div>
-                <div class="text-amber-300 flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 bg-[#f59e0b]"></span>许可水量:</span>
+                <div class="text-[#FFC65C] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2.5 h-0.5 bg-[#FFC65C]"></span>许可水量:</span>
                   <span class="font-bold text-white">{{ hoveredBarDistrict.licensed.toLocaleString() }}</span>
                 </div>
-                <div class="text-slate-200 flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 border-t border-dashed border-slate-300"></span>计划水量:</span>
+                <div class="text-[#DCF2FF] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2.5 h-0.5 border-t border-dashed border-[#DCF2FF]"></span>计划水量:</span>
                   <span class="font-bold text-white">{{ hoveredBarDistrict.planned.toLocaleString() }}</span>
                 </div>
               </div>
@@ -996,43 +1163,69 @@
         </div>
 
         <!-- ================= Card 2: 用水时间变化趋势 (独立卡片 2: 实际取水[渐变面积] / 历史同期 / 许可水量) ================= -->
-        <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[220px] flex flex-col justify-between">
-          <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
+        <div
+          id="dev-anno-3"
+          class="spec-card rounded-lg p-3 flex-1 min-h-[220px] flex flex-col justify-between relative transition-all duration-300"
+          :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 3 }"
+        >
+          <!-- Numbered Point 3 Badge (用水时间变化趋势 - 左2) -->
+          <div
+            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+            class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 3 }"
+            @mouseenter="activeAnnotationId = 3"
+            @mouseleave="activeAnnotationId = null"
+            @click="scrollToAnnotation(3)"
+            title="开发标注 #3: 用水时间变化趋势 (左2)"
+          >
+            3
+          </div>
+          <div class="flex items-center justify-between pb-1.5">
             <div class="flex items-center gap-2">
-              <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">用水时间变化趋势</h2>
-              <span class="text-xs text-slate-300 font-medium">(万m³)</span>
+              <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2" stroke-width="1.8" />
+                <polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5 12 6" stroke-width="1.2" stroke-opacity="0.6" />
+              </svg>
+              <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">用水时间变化趋势</h2>
+              <span class="text-xs text-[#8FB6D4] font-medium">(万m³)</span>
             </div>
 
-            <!-- 3 Trend Legend Items -->
-            <div class="flex items-center gap-3 text-xs">
+            <!-- 4 Trend Legend Items -->
+            <div class="flex items-center gap-2.5 text-xs">
               <!-- 实际取水 (带面积渐变) -->
               <div class="flex items-center gap-1.5">
-                <span class="w-3.5 h-2 bg-gradient-to-r from-cyan-400 to-cyan-500 rounded-xs shadow-[0_0_5px_#00e5ff]"></span>
-                <span class="text-cyan-300 font-medium">实际取水</span>
+                <span class="w-3.5 h-2 bg-gradient-to-r from-[#3FD0FF] to-[#1E7BE8] rounded-xs shadow-[0_0_5px_#3FD0FF]"></span>
+                <span class="text-[#3FD0FF] font-medium">实际取水</span>
+              </div>
+              <!-- 月计划 (金黄虚线) -->
+              <div class="flex items-center gap-1.5">
+                <span class="w-3.5 h-0.5 border-t-2 border-dashed border-[#FFC65C]"></span>
+                <span class="text-[#FFC65C] font-medium">月计划</span>
               </div>
               <!-- 历史同期 (深蓝实线) -->
               <div class="flex items-center gap-1.5">
                 <span class="w-3.5 h-0.5 bg-[#3b82f6] rounded-xs"></span>
-                <span class="text-slate-200 font-medium">历史同期</span>
+                <span class="text-[#8FB6D4] font-medium">历史同期</span>
               </div>
               <!-- 许可水量 (绿色虚线) -->
               <div class="flex items-center gap-1.5">
-                <span class="w-3.5 h-0.5 border-t border-dashed border-[#10b981]"></span>
-                <span class="text-slate-200 font-medium">许可水量</span>
+                <span class="w-3.5 h-0.5 border-t border-dashed border-[#3DDC97]"></span>
+                <span class="text-[#3DDC97] font-medium">许可水量</span>
               </div>
             </div>
           </div>
+          <div class="spec-header-divider mb-2"></div>
 
           <!-- Highlight Metric Strip inside Card 2 -->
-          <div class="flex items-center justify-between px-2 py-1.5 bg-[#0a2244]/60 rounded-lg border border-[#143b6b]/60 my-1 text-xs">
+          <div class="flex items-center justify-between px-2 py-1.5 bg-[rgba(10,36,58,0.5)] rounded border border-[rgba(70,180,235,0.16)] my-1 text-xs">
             <div class="flex items-center gap-1.5">
-              <span class="text-slate-300 font-medium">当前月份(5月):</span>
-              <span class="text-base font-bold font-mono text-cyan-300">12,850 万m³</span>
+              <span class="text-[#8FB6D4] font-medium">当前月份(5月):</span>
+              <span class="text-base font-bold font-spec-num text-[#9BEAFF]">12,850 万m³</span>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="text-amber-400 font-mono font-medium">同期比 +3.6% ↑</span>
-              <span class="text-emerald-400 font-mono font-medium">许可红线 15,600</span>
+            <div class="flex items-center gap-2.5">
+              <span class="text-[#FFC65C] font-spec-num font-medium">月计划 13,200</span>
+              <span class="text-[#3FD0FF] font-spec-num font-medium">同比 +3.6% ↑</span>
+              <span class="text-[#3DDC97] font-spec-num font-medium">许可 15,600</span>
             </div>
           </div>
 
@@ -1042,9 +1235,9 @@
               <defs>
                 <!-- Area gradient for 实际取水 -->
                 <linearGradient id="actualAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.45" />
-                  <stop offset="50%" stop-color="#00b4d8" stop-opacity="0.20" />
-                  <stop offset="100%" stop-color="#0284c7" stop-opacity="0.0" />
+                  <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0.45" />
+                  <stop offset="50%" stop-color="#1E7BE8" stop-opacity="0.18" />
+                  <stop offset="100%" stop-color="#02070E" stop-opacity="0.0" />
                 </linearGradient>
                 <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
                   <feGaussianBlur stdDeviation="2.5" result="blur" />
@@ -1056,15 +1249,15 @@
               </defs>
 
               <!-- Horizontal Grid Lines -->
-              <g stroke="#163866" stroke-width="0.8">
+              <g stroke="rgba(70,180,235,0.14)" stroke-width="0.8">
                 <line x1="36" y1="16" x2="368" y2="16" />
                 <line x1="36" y1="42" x2="368" y2="42" />
                 <line x1="36" y1="68" x2="368" y2="68" />
-                <line x1="36" y1="94" x2="368" y2="94" stroke="#1f4b82" stroke-width="1.2" />
+                <line x1="36" y1="94" x2="368" y2="94" stroke="rgba(70,180,235,0.25)" stroke-width="1.2" />
               </g>
 
               <!-- Y-Axis labels (font-size 10) -->
-              <g fill="#94a3b8" font-size="10" font-family="monospace" text-anchor="end">
+              <g fill="#5D8AAA" font-size="10" font-family="var(--spec-num)" text-anchor="end">
                 <text x="32" y="19">18k</text>
                 <text x="32" y="45">12k</text>
                 <text x="32" y="71">6k</text>
@@ -1078,30 +1271,40 @@
                 class="transition-all duration-300"
               />
 
-              <!-- 2. 许可水量 Line (Green Dashed Baseline #10b981) -->
+              <!-- 2. 许可水量 Line (Green Dashed Baseline #3DDC97) -->
               <path
                 :d="trendChartData.licensedLine"
                 fill="none"
-                stroke="#10b981"
+                stroke="#3DDC97"
                 stroke-width="1.8"
                 stroke-dasharray="4 3"
-                opacity="0.85"
+                opacity="0.8"
               />
 
-              <!-- 3. 历史同期 Line (Blue Solid Line #3b82f6) -->
+              <!-- 3. 月计划水量 Line (Amber Dashed Line #FFC65C) -->
+              <path
+                :d="trendChartData.plannedLine"
+                fill="none"
+                stroke="#FFC65C"
+                stroke-width="1.8"
+                stroke-dasharray="4 2"
+                opacity="0.9"
+              />
+
+              <!-- 4. 历史同期 Line (Blue Solid Line #3b82f6) -->
               <path
                 :d="trendChartData.historyLine"
                 fill="none"
                 stroke="#3b82f6"
-                stroke-width="2"
-                opacity="0.85"
+                stroke-width="1.8"
+                opacity="0.75"
               />
 
-              <!-- 4. 实际取水 Line (Glowing Cyan #00e5ff) -->
+              <!-- 5. 实际取水 Line (Glowing Cyan #3FD0FF) -->
               <path
                 :d="trendChartData.actualLine"
                 fill="none"
-                stroke="#00e5ff"
+                stroke="#3FD0FF"
                 stroke-width="2.5"
                 filter="url(#cyanGlow)"
               />
@@ -1121,7 +1324,7 @@
                   text-anchor="middle"
                   font-size="10.5"
                   font-weight="bold"
-                  :fill="hoveredTrendIdx === idx ? '#00e5ff' : '#cbd5e1'"
+                  :fill="hoveredTrendIdx === idx ? '#3FD0FF' : '#8FB6D4'"
                 >
                   {{ item.month }}
                 </text>
@@ -1132,33 +1335,51 @@
                   :cy="94 - (item.actual / 18000) * 78"
                   :r="hoveredTrendIdx === idx ? 4.5 : 2.5"
                   fill="#ffffff"
-                  stroke="#00e5ff"
+                  stroke="#3FD0FF"
                   :stroke-width="hoveredTrendIdx === idx ? 2.5 : 1.5"
+                  class="transition-all"
+                />
+
+                <!-- Data point dot on 月计划 line when hovered -->
+                <circle
+                  v-if="hoveredTrendIdx === idx"
+                  :cx="36 + idx * (332 / 11)"
+                  :cy="94 - (item.planned / 18000) * 78"
+                  r="3.5"
+                  fill="#FFC65C"
+                  stroke="#ffffff"
+                  stroke-width="1.5"
                   class="transition-all"
                 />
               </g>
             </svg>
 
-            <!-- Hover Month Tooltip -->
+            <!-- Hover Month Tooltip (Spec 07 Tooltip) -->
             <div
               v-if="hoveredTrendIdx !== null"
-              class="absolute top-1 right-2 bg-[#06182e]/95 border border-cyan-500/60 rounded-lg p-2 text-xs shadow-xl pointer-events-none z-30"
+              class="spec-tooltip absolute top-1 right-2 p-2.5 text-xs shadow-2xl pointer-events-none z-30 min-w-[170px]"
             >
-              <div class="font-bold text-cyan-300 mb-1 border-b border-cyan-500/30 pb-0.5">
-                {{ monthlyTrendData[hoveredTrendIdx].month }} 用水情况
+              <i class="tooltip-bar"></i>
+              <div class="font-bold text-[#DCF2FF] mb-1.5 border-b border-[rgba(70,180,235,0.18)] pb-1 flex items-center justify-between">
+                <span>{{ monthlyTrendData[hoveredTrendIdx].month }} 用水情况</span>
+                <span class="text-[10px] text-[#5D8AAA] font-normal">趋势研判</span>
               </div>
-              <div class="space-y-0.5 font-mono">
-                <div class="text-[#00e5ff] flex justify-between gap-3">
-                  <span>实际取水:</span>
-                  <span class="font-bold">{{ monthlyTrendData[hoveredTrendIdx].actual }} 万m³</span>
+              <div class="space-y-1 font-spec-num text-[11px]">
+                <div class="text-[#3FD0FF] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#3FD0FF]"></i>实际取水:</span>
+                  <span class="font-bold text-[#E4F6FF]">{{ monthlyTrendData[hoveredTrendIdx].actual }} <small class="text-[#5D8AAA] text-[10px] font-normal">万m³</small></span>
                 </div>
-                <div class="text-[#3b82f6] flex justify-between gap-3">
-                  <span>历史同期:</span>
-                  <span>{{ monthlyTrendData[hoveredTrendIdx].history }} 万m³</span>
+                <div class="text-[#FFC65C] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#FFC65C]"></i>月计划:</span>
+                  <span class="font-bold text-[#FFC65C]">{{ monthlyTrendData[hoveredTrendIdx].planned }} <small class="text-[#5D8AAA] text-[10px] font-normal">万m³</small></span>
                 </div>
-                <div class="text-[#10b981] flex justify-between gap-3">
-                  <span>许可水量:</span>
-                  <span>{{ monthlyTrendData[hoveredTrendIdx].licensed }} 万m³</span>
+                <div class="text-[#60a5fa] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#1E7BE8]"></i>历史同期:</span>
+                  <span class="text-[#DCF2FF]">{{ monthlyTrendData[hoveredTrendIdx].history }} <small class="text-[#5D8AAA] text-[10px] font-normal">万m³</small></span>
+                </div>
+                <div class="text-[#3DDC97] flex justify-between gap-3 items-center">
+                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#3DDC97]"></i>许可水量:</span>
+                  <span class="text-[#3DDC97] font-semibold">{{ monthlyTrendData[hoveredTrendIdx].licensed }} <small class="text-[#5D8AAA] text-[10px] font-normal">万m³</small></span>
                 </div>
               </div>
             </div>
@@ -1166,107 +1387,127 @@
         </div>
 
         <!-- ================= Card 3: 行业用水结构占比 (独立卡片 3) ================= -->
-        <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[220px] flex flex-col justify-between">
-          <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
+        <div
+          id="dev-anno-4"
+          class="spec-card rounded-lg p-3 flex-1 min-h-[220px] flex flex-col justify-between relative transition-all duration-300"
+          :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 4 }"
+        >
+          <!-- Numbered Point 4 Badge (行业用水结构占比 - 左3) -->
+          <div
+            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+            class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 4 }"
+            @mouseenter="activeAnnotationId = 4"
+            @mouseleave="activeAnnotationId = null"
+            @click="scrollToAnnotation(4)"
+            title="开发标注 #4: 行业用水结构占比 (左3)"
+          >
+            4
+          </div>
+          <div class="flex items-center justify-between pb-1.5">
             <div class="flex items-center gap-2">
-              <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">行业用水结构占比</h2>
+              <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2" stroke-width="1.8" />
+                <polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5 12 6" stroke-width="1.2" stroke-opacity="0.6" />
+              </svg>
+              <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">行业用水结构占比</h2>
             </div>
-            <div class="text-xs text-cyan-300 font-mono font-bold">
+            <div class="text-xs text-[#9BEAFF] font-spec-num font-bold">
               全域总额: 61,327 万m³
             </div>
           </div>
+          <div class="spec-header-divider mb-2"></div>
 
           <!-- Donut Chart & Detailed Industry Breakdown (统一水蓝渐变色系，减少杂色) -->
           <div class="flex items-center gap-4 my-auto py-1">
             <!-- Left: Donut Chart with center total -->
             <div class="w-32 h-32 relative shrink-0 flex items-center justify-center">
               <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
-                <!-- 农业 38.60% (circumference ~ 226) #00e5ff -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#00e5ff" stroke-width="15" stroke-dasharray="87.2 138.8" stroke-dashoffset="0" />
-                <!-- 工业 31.78% #0284c7 -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#0284c7" stroke-width="15" stroke-dasharray="71.8 154.2" stroke-dashoffset="-87.2" />
-                <!-- 城镇公共 12.35% #38bdf8 -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#38bdf8" stroke-width="15" stroke-dasharray="27.9 198.1" stroke-dashoffset="-159.0" />
+                <!-- 农业 38.60% (circumference ~ 226) #3FD0FF -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#3FD0FF" stroke-width="15" stroke-dasharray="87.2 138.8" stroke-dashoffset="0" />
+                <!-- 工业 31.78% #1E7BE8 -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#1E7BE8" stroke-width="15" stroke-dasharray="71.8 154.2" stroke-dashoffset="-87.2" />
+                <!-- 城镇公共 12.35% #9BEAFF -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#9BEAFF" stroke-width="15" stroke-dasharray="27.9 198.1" stroke-dashoffset="-159.0" />
                 <!-- 居民生活 7.02% #60a5fa -->
                 <circle cx="50" cy="50" r="36" fill="transparent" stroke="#60a5fa" stroke-width="15" stroke-dasharray="15.9 210.1" stroke-dashoffset="-186.9" />
-                <!-- 生态环境 6.85% #818cf8 -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#818cf8" stroke-width="15" stroke-dasharray="15.5 210.5" stroke-dashoffset="-202.8" />
-                <!-- 其他 3.40% #94a3b8 -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#94a3b8" stroke-width="15" stroke-dasharray="7.7 218.3" stroke-dashoffset="-218.3" />
+                <!-- 生态环境 6.85% #9B8CFF (Spec 第四类目) -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#9B8CFF" stroke-width="15" stroke-dasharray="15.5 210.5" stroke-dashoffset="-202.8" />
+                <!-- 其他 3.40% #5D8AAA -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#5D8AAA" stroke-width="15" stroke-dasharray="7.7 218.3" stroke-dashoffset="-218.3" />
               </svg>
               <!-- Center Text Inside Donut -->
               <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span class="text-[11px] text-slate-300 font-medium">全行业</span>
-                <span class="text-sm font-bold font-mono text-cyan-300">100%</span>
+                <span class="text-[11px] text-[#8FB6D4] font-medium">全行业</span>
+                <span class="text-sm font-bold font-spec-num text-[#9BEAFF]">100%</span>
               </div>
             </div>
 
             <!-- Right: 6 Industry Items List with Volumes & Percentages -->
             <div class="flex-1 space-y-1.5 text-xs">
-              <div class="flex items-center justify-between pb-1 border-b border-[#143b6b]/40">
+              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#00e5ff]"></span>
-                  <span class="text-slate-200 font-medium">农业用水</span>
+                  <span class="w-2.5 h-2.5 rounded-xs bg-[#3FD0FF]"></span>
+                  <span class="text-[#DCF2FF] font-medium">农业用水</span>
                 </div>
-                <div class="flex items-center gap-2 font-mono">
-                  <span class="text-slate-300">23,672万m³</span>
-                  <span class="font-bold text-cyan-300">38.60%</span>
+                <div class="flex items-center gap-2 font-spec-num">
+                  <span class="text-[#8FB6D4]">23,672万m³</span>
+                  <span class="font-bold text-[#3FD0FF]">38.60%</span>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between pb-1 border-b border-[#143b6b]/40">
+              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#0284c7]"></span>
-                  <span class="text-slate-200 font-medium">工业用水</span>
+                  <span class="w-2.5 h-2.5 rounded-xs bg-[#1E7BE8]"></span>
+                  <span class="text-[#DCF2FF] font-medium">工业用水</span>
                 </div>
-                <div class="flex items-center gap-2 font-mono">
-                  <span class="text-slate-300">19,490万m³</span>
-                  <span class="font-bold text-sky-300">31.78%</span>
+                <div class="flex items-center gap-2 font-spec-num">
+                  <span class="text-[#8FB6D4]">19,490万m³</span>
+                  <span class="font-bold text-[#9BEAFF]">31.78%</span>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between pb-1 border-b border-[#143b6b]/40">
+              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#38bdf8]"></span>
-                  <span class="text-slate-200 font-medium">城镇公共</span>
+                  <span class="w-2.5 h-2.5 rounded-xs bg-[#9BEAFF]"></span>
+                  <span class="text-[#DCF2FF] font-medium">城镇公共</span>
                 </div>
-                <div class="flex items-center gap-2 font-mono">
-                  <span class="text-slate-300">7,574万m³</span>
-                  <span class="font-bold text-sky-200">12.35%</span>
+                <div class="flex items-center gap-2 font-spec-num">
+                  <span class="text-[#8FB6D4]">7,574万m³</span>
+                  <span class="font-bold text-[#DCF2FF]">12.35%</span>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between pb-1 border-b border-[#143b6b]/40">
+              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-xs bg-[#60a5fa]"></span>
-                  <span class="text-slate-200 font-medium">居民生活</span>
+                  <span class="text-[#DCF2FF] font-medium">居民生活</span>
                 </div>
-                <div class="flex items-center gap-2 font-mono">
-                  <span class="text-slate-300">4,305万m³</span>
-                  <span class="font-bold text-blue-200">7.02%</span>
+                <div class="flex items-center gap-2 font-spec-num">
+                  <span class="text-[#8FB6D4]">4,305万m³</span>
+                  <span class="font-bold text-[#60a5fa]">7.02%</span>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between pb-1 border-b border-[#143b6b]/40">
+              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#818cf8]"></span>
-                  <span class="text-slate-200 font-medium">生态环境</span>
+                  <span class="w-2.5 h-2.5 rounded-xs bg-[#9B8CFF]"></span>
+                  <span class="text-[#DCF2FF] font-medium">生态环境</span>
                 </div>
-                <div class="flex items-center gap-2 font-mono">
-                  <span class="text-slate-300">4,201万m³</span>
-                  <span class="font-bold text-indigo-200">6.85%</span>
+                <div class="flex items-center gap-2 font-spec-num">
+                  <span class="text-[#8FB6D4]">4,201万m³</span>
+                  <span class="font-bold text-[#9B8CFF]">6.85%</span>
                 </div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#94a3b8]"></span>
-                  <span class="text-slate-200 font-medium">其他用水</span>
+                  <span class="w-2.5 h-2.5 rounded-xs bg-[#5D8AAA]"></span>
+                  <span class="text-[#DCF2FF] font-medium">其他用水</span>
                 </div>
-                <div class="flex items-center gap-2 font-mono">
-                  <span class="text-slate-300">2,085万m³</span>
-                  <span class="font-bold text-slate-300">3.40%</span>
+                <div class="flex items-center gap-2 font-spec-num">
+                  <span class="text-[#8FB6D4]">2,085万m³</span>
+                  <span class="font-bold text-[#8FB6D4]">3.40%</span>
                 </div>
               </div>
             </div>
@@ -1277,196 +1518,412 @@
         <!-- B. 专项业务应用场景 (左侧模块 1: 计量设施总体情况 & 模块 2: 重点取水户概况 - 紧凑合理布局，消除空白) -->
         <template v-else>
           <!-- ================= 专项 Card 1: 计量设施总体情况 ================= -->
-          <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 flex flex-col gap-2">
+          <div class="spec-card rounded-lg p-3 flex-1 min-h-0 flex flex-col gap-2 overflow-hidden">
             <!-- Card Header -->
-            <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80 shrink-0">
+            <div class="flex items-center justify-between pb-1.5 shrink-0">
               <div class="flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-                <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">计量设施总体情况</h2>
+                <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2" stroke-width="1.8" />
+                  <polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5 12 6" stroke-width="1.2" stroke-opacity="0.6" />
+                </svg>
+                <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">计量设施总体情况</h2>
               </div>
-              <div class="flex items-center gap-1.5 text-xs text-cyan-300 font-mono">
-                <span class="text-slate-400 font-sans">全域在线率:</span>
-                <span class="font-bold text-cyan-300 font-mono">{{ meterDeviceOverview.onlineRate }}</span>
-                <span class="text-[10px] text-cyan-400/80 bg-cyan-950/40 px-1 py-0.2 rounded border border-cyan-500/20 font-sans">运行良好</span>
+              <div class="flex items-center gap-1.5 text-xs text-[#3FD0FF] font-spec-num">
+                <span class="text-[#8FB6D4] font-spec-cn">全域正常率:</span>
+                <span class="font-bold text-[#3FD0FF]">{{ meterDeviceOverview.onlineRate }}</span>
+                <span class="spec-tag text-[10px] text-[#3DDC97] border-[#3DDC97]/40 bg-[#3DDC97]/10 font-spec-cn">运行良好</span>
               </div>
             </div>
+            <div class="spec-header-divider mb-1"></div>
 
-            <!-- 5 Status Badges: 设备总数、在线、离线、故障、待检定数量 -->
+            <!-- 5 Status Badges: 站点总数、正常站点、停用站点、故障异常、待检定 -->
             <div class="grid grid-cols-5 gap-1.5 shrink-0">
-              <!-- 总数 -->
-              <div class="bg-[#0b2447] border border-[#1b4372] rounded-lg p-2 text-center">
-                <span class="text-[10px] text-slate-400 block font-medium">设备总数</span>
-                <span class="text-base 2xl:text-lg font-bold font-mono text-white mt-0.5 block">{{ meterDeviceOverview.total }}</span>
-                <span class="text-[9px] text-slate-400 block">全网纳管</span>
+              <!-- 站点总数 -->
+              <div class="bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.16)] rounded p-2 text-center">
+                <span class="text-[10px] text-[#8FB6D4] block font-medium">站点总数</span>
+                <span class="text-base 2xl:text-lg font-bold font-spec-num text-white mt-0.5 block">{{ meterDeviceOverview.total }}</span>
+                <span class="text-[9px] text-[#5D8AAA] block">全网纳管</span>
               </div>
-              <!-- 在线 (水蓝稳定态) -->
-              <div class="bg-cyan-950/30 border border-cyan-500/35 rounded-lg p-2 text-center">
-                <span class="text-[10px] text-cyan-300 block font-medium">在线运行</span>
-                <span class="text-base 2xl:text-lg font-bold font-mono text-cyan-300 mt-0.5 block">{{ meterDeviceOverview.online }}</span>
-                <span class="text-[9px] text-cyan-300/80 block">实时传输</span>
+              <!-- 正常站点 -->
+              <div class="bg-cyan-950/30 border border-[#3FD0FF]/35 rounded p-2 text-center">
+                <span class="text-[10px] text-[#9BEAFF] block font-medium">正常站点</span>
+                <span class="text-base 2xl:text-lg font-bold font-spec-num text-[#3FD0FF] mt-0.5 block">{{ meterDeviceOverview.online }}</span>
+                <span class="text-[9px] text-[#3FD0FF]/80 block">实时传输</span>
               </div>
-              <!-- 离线 (中性灰) -->
-              <div class="bg-slate-800/40 border border-slate-600/35 rounded-lg p-2 text-center">
-                <span class="text-[10px] text-slate-300 block font-medium">离线脱网</span>
-                <span class="text-base 2xl:text-lg font-bold font-mono text-slate-300 mt-0.5 block">{{ meterDeviceOverview.offline }}</span>
-                <span class="text-[9px] text-slate-400 block">信号弱/断电</span>
+              <!-- 停用站点 -->
+              <div class="bg-slate-800/40 border border-slate-600/35 rounded p-2 text-center">
+                <span class="text-[10px] text-[#8FB6D4] block font-medium">停用站点</span>
+                <span class="text-base 2xl:text-lg font-bold font-spec-num text-[#8FB6D4] mt-0.5 block">{{ meterDeviceOverview.offline }}</span>
+                <span class="text-[9px] text-[#5D8AAA] block">按需停用</span>
               </div>
-              <!-- 故障 (警示红) -->
-              <div class="bg-rose-950/25 border border-rose-500/35 rounded-lg p-2 text-center">
-                <span class="text-[10px] text-rose-300 block font-medium">故障异常</span>
-                <span class="text-base 2xl:text-lg font-bold font-mono text-rose-400 mt-0.5 block">{{ meterDeviceOverview.fault }}</span>
-                <span class="text-[9px] text-rose-300/80 block">需抢修</span>
+              <!-- 故障异常 -->
+              <div class="bg-rose-950/25 border border-[#FF6B7A]/40 rounded p-2 text-center">
+                <span class="text-[10px] text-[#FF6B7A] block font-medium">故障异常</span>
+                <span class="text-base 2xl:text-lg font-bold font-spec-num text-[#FF6B7A] mt-0.5 block">{{ meterDeviceOverview.fault }}</span>
+                <span class="text-[9px] text-[#FF6B7A]/80 block">需抢修</span>
               </div>
-              <!-- 待检定 (告警橙) -->
-              <div class="bg-amber-950/25 border border-amber-500/35 rounded-lg p-2 text-center">
-                <span class="text-[10px] text-amber-300 block font-medium">待检定</span>
-                <span class="text-base 2xl:text-lg font-bold font-mono text-amber-400 mt-0.5 block">{{ meterDeviceOverview.pending }}</span>
-                <span class="text-[9px] text-amber-300/80 block">周期到期</span>
+              <!-- 待检定 -->
+              <div class="bg-amber-950/25 border border-[#FFC65C]/40 rounded p-2 text-center">
+                <span class="text-[10px] text-[#FFC65C] block font-medium">待检定</span>
+                <span class="text-base 2xl:text-lg font-bold font-spec-num text-[#FFC65C] mt-0.5 block">{{ meterDeviceOverview.pending }}</span>
+                <span class="text-[9px] text-[#FFC65C]/80 block">周期到期</span>
               </div>
             </div>
 
-            <!-- 区域计量设施在线分析与分布列表 (紧凑合理布局，消除空白) -->
-            <div class="flex-1 flex flex-col gap-1.5 min-h-0">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 shrink-0">
-                <span class="flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
+            <!-- 区域计量设施在线分析 (按 国控监控、自建/自计量、中央资金、省级资金 4大来源统计) -->
+            <div class="flex-1 flex flex-col gap-2 min-h-0">
+              <div class="flex items-center justify-between text-xs font-semibold text-[#DCF2FF] shrink-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[#3FD0FF] font-bold">|</span>
                   <span>区域计量设施在线分析</span>
-                </span>
-                <span class="text-[11px] text-cyan-300 font-normal">7区县全域接入</span>
+                  <span class="text-[10px] text-[#8FB6D4] font-normal">(分类统计)</span>
+                </div>
+                <!-- 统计图切换: 对比柱状图 / 占比环形图 -->
+                <div class="flex items-center bg-[#071932] p-0.5 rounded border border-[rgba(70,180,235,0.25)] text-[10px]">
+                  <button
+                    type="button"
+                    class="px-2 py-0.5 rounded cursor-pointer transition font-spec-cn"
+                    :class="facilityChartMode === 'bar'
+                      ? 'bg-[#00E5FF]/25 text-[#9BEAFF] font-bold shadow-[0_0_6px_rgba(0,229,255,0.3)]'
+                      : 'text-[#8AAEC8] hover:text-white'"
+                    @click="facilityChartMode = 'bar'"
+                  >
+                    对比柱状图
+                  </button>
+                  <button
+                    type="button"
+                    class="px-2 py-0.5 rounded cursor-pointer transition font-spec-cn"
+                    :class="facilityChartMode === 'donut'
+                      ? 'bg-[#00E5FF]/25 text-[#9BEAFF] font-bold shadow-[0_0_6px_rgba(0,229,255,0.3)]'
+                      : 'text-[#8AAEC8] hover:text-white'"
+                    @click="facilityChartMode = 'donut'"
+                  >
+                    占比环形图
+                  </button>
+                </div>
               </div>
 
-              <div class="space-y-1.5 text-xs flex-1 overflow-y-auto custom-dark-scrollbar pr-0.5">
+              <!-- 4大资金与建设分类指标概览 (国控监控、自建/自计量、中央资金、省级资金) -->
+              <div class="grid grid-cols-4 gap-1.5 shrink-0">
                 <div
-                  v-for="d in districtDeviceStats"
-                  :key="'dev-' + d.district"
-                  class="flex items-center justify-between p-1.5 rounded-lg bg-[#091f3d]/60 border border-[#163b66]/60 hover:bg-[#0d2a52] transition cursor-pointer"
-                  @click="filterParams.district = d.district"
+                  v-for="cat in facilitySourceStats"
+                  :key="'cat-card-' + cat.id"
+                  class="p-2 rounded-lg border transition-all duration-200 cursor-pointer flex flex-col justify-between"
+                  :class="hoveredFacilityCategory === cat.id
+                    ? 'bg-[rgba(16,52,86,0.95)] border-[#3FD0FF] shadow-[0_0_12px_rgba(63,208,255,0.4)] scale-[1.02]'
+                    : 'bg-[rgba(10,36,58,0.55)] border-[rgba(70,180,235,0.18)] hover:border-[#3FD0FF]/60 hover:bg-[rgba(14,44,74,0.7)]'"
+                  @mouseenter="hoveredFacilityCategory = cat.id"
+                  @mouseleave="hoveredFacilityCategory = null"
                 >
-                  <!-- 区县名称 -->
-                  <div class="w-16 font-medium text-white flex items-center gap-1.5 shrink-0">
-                    <span class="w-1.5 h-1.5 rounded-full" :class="d.rate >= 90 ? 'bg-cyan-400' : 'bg-amber-400'"></span>
-                    <span>{{ d.district }}</span>
+                  <!-- Top: Indicator Dot & Name -->
+                  <div class="flex items-center gap-1.5 min-w-0">
+                    <span class="w-2 h-2 rounded-full shrink-0 shadow-sm" :style="{ backgroundColor: cat.color }"></span>
+                    <span class="text-[11px] 2xl:text-xs font-semibold text-[#DCF2FF] truncate font-spec-cn">{{ cat.shortName }}</span>
+                  </div>
+                  <!-- Mid: Total & Rate -->
+                  <div class="flex items-baseline justify-between mt-1">
+                    <div class="flex items-baseline gap-0.5 font-spec-num">
+                      <span class="text-sm 2xl:text-base font-bold text-white">{{ cat.total }}</span>
+                      <span class="text-[9px] text-[#8FB6D4]">处</span>
+                    </div>
+                    <span class="text-[10.5px] 2xl:text-[11px] font-bold font-spec-num" :style="{ color: cat.color }">{{ cat.rate }}%</span>
+                  </div>
+                  <!-- Bottom: Normal vs Status -->
+                  <div class="flex items-center justify-between text-[9px] text-[#8FB6D4] mt-0.5 pt-0.5 border-t border-[rgba(70,180,235,0.12)] font-spec-cn">
+                    <span>正常 {{ cat.normal }}</span>
+                    <span :class="cat.fault > 0 ? 'text-[#FF6B7A]' : 'text-[#3DDC97]'">{{ cat.fault > 0 ? '异常' + cat.fault : '运行良好' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 统计图展示容器 (填补原留白，增强高度协调感) -->
+              <div class="flex-1 min-h-[175px] 2xl:min-h-[195px] flex flex-col justify-between">
+                <!-- 统计图模式 1: 分类对比柱状图 (站点总数 vs 正常站点 + 正常率连线) -->
+                <div v-if="facilityChartMode === 'bar'" class="w-full flex-1 relative flex flex-col justify-between">
+                  <!-- Chart Legend & Subtitle -->
+                  <div class="flex items-center justify-between text-[10px] mb-1 shrink-0 font-spec-cn pt-0.5">
+                    <span class="text-[#8FB6D4]">各类设施总数与正常运行对比</span>
+                    <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2 rounded-xs bg-[#1E7BE8]"></span>
+                        <span class="text-[#8FB6D4]">站点总数</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2 rounded-xs bg-[#3FD0FF] shadow-[0_0_4px_#3FD0FF]"></span>
+                        <span class="text-[#3FD0FF]">正常站点</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-0.5 bg-[#FFC65C]"></span>
+                        <span class="text-[#FFC65C]">正常率(%)</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <!-- 进度条与数量 -->
-                  <div class="flex-1 mx-3">
-                    <div class="flex justify-between text-[10px] text-slate-400 mb-0.5">
-                      <span>总 {{ d.total }} 台 · 在线 {{ d.online }}</span>
-                      <span :class="d.fault > 0 ? 'text-rose-400' : 'text-slate-400'">
-                        {{ d.fault > 0 ? `故障 ${d.fault}台` : '无故障' }}
-                        {{ d.pending > 0 ? `· 待检 ${d.pending}` : '' }}
-                      </span>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-700/60 rounded-full overflow-hidden flex">
-                      <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-300" :style="{ width: `${d.rate}%` }"></div>
+                  <!-- SVG Grouped Bar Chart (高挑饱满，比例协调) -->
+                  <div class="w-full flex-1 min-h-[155px] relative">
+                    <svg viewBox="0 0 380 165" class="w-full h-full overflow-visible">
+                      <defs>
+                        <linearGradient id="facilityTotalGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="#1E7BE8" stop-opacity="0.95" />
+                          <stop offset="100%" stop-color="#0b2c52" stop-opacity="0.4" />
+                        </linearGradient>
+                        <linearGradient id="facilityNormalGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="#3FD0FF" stop-opacity="1" />
+                          <stop offset="100%" stop-color="#0f6496" stop-opacity="0.45" />
+                        </linearGradient>
+                      </defs>
+
+                      <!-- Grid Lines -->
+                      <g stroke="rgba(70,180,235,0.12)" stroke-width="0.8">
+                        <line x1="30" y1="18" x2="372" y2="18" />
+                        <line x1="30" y1="47" x2="372" y2="47" />
+                        <line x1="30" y1="76" x2="372" y2="76" />
+                        <line x1="30" y1="105" x2="372" y2="105" />
+                        <line x1="30" y1="125" x2="372" y2="125" stroke="rgba(70,180,235,0.24)" />
+                      </g>
+
+                      <!-- Y-Axis labels -->
+                      <g fill="#5D8AAA" font-size="8.5" font-family="var(--spec-num)" text-anchor="end">
+                        <text x="26" y="21">140</text>
+                        <text x="26" y="50">100</text>
+                        <text x="26" y="79">60</text>
+                        <text x="26" y="108">20</text>
+                        <text x="26" y="128">0</text>
+                      </g>
+
+                      <!-- 1. 国控监控 - Center x=76 -->
+                      <g class="cursor-pointer group" @mouseenter="hoveredFacilityCategory = 'national'" @mouseleave="hoveredFacilityCategory = null">
+                        <!-- Total Bar (126) -->
+                        <rect x="62.5" y="28.7" width="12" height="96.3" fill="url(#facilityTotalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'national' ? '#1E7BE8' : 'none'" stroke-width="1" />
+                        <text x="68.5" y="24" fill="#8FB6D4" font-size="8.5" font-family="var(--spec-num)" text-anchor="middle">126</text>
+                        <!-- Normal Bar (116) -->
+                        <rect x="77.5" y="36.3" width="12" height="88.7" fill="url(#facilityNormalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'national' ? '#3FD0FF' : 'none'" stroke-width="1" />
+                        <text x="83.5" y="32" fill="#3FD0FF" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">116</text>
+                        <!-- Labels -->
+                        <text x="76" y="142" :fill="hoveredFacilityCategory === 'national' ? '#3FD0FF' : '#DCF2FF'" font-size="9" text-anchor="middle" font-family="var(--spec-cn)" font-weight="500">国控监控</text>
+                        <text x="76" y="156" fill="#FFC65C" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">92.1%</text>
+                      </g>
+
+                      <!-- 2. 自建/自计量 - Center x=161 -->
+                      <g class="cursor-pointer group" @mouseenter="hoveredFacilityCategory = 'self'" @mouseleave="hoveredFacilityCategory = null">
+                        <!-- Total Bar (98) -->
+                        <rect x="147.5" y="50.1" width="12" height="74.9" fill="url(#facilityTotalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'self' ? '#1E7BE8' : 'none'" stroke-width="1" />
+                        <text x="153.5" y="45" fill="#8FB6D4" font-size="8.5" font-family="var(--spec-num)" text-anchor="middle">98</text>
+                        <!-- Normal Bar (86) -->
+                        <rect x="162.5" y="59.3" width="12" height="65.7" fill="url(#facilityNormalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'self' ? '#3FD0FF' : 'none'" stroke-width="1" />
+                        <text x="168.5" y="55" fill="#3FD0FF" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">86</text>
+                        <!-- Labels -->
+                        <text x="161" y="142" :fill="hoveredFacilityCategory === 'self' ? '#3FD0FF' : '#DCF2FF'" font-size="9" text-anchor="middle" font-family="var(--spec-cn)" font-weight="500">自建/自计量</text>
+                        <text x="161" y="156" fill="#FFC65C" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">87.8%</text>
+                      </g>
+
+                      <!-- 3. 中央资金 - Center x=246 -->
+                      <g class="cursor-pointer group" @mouseenter="hoveredFacilityCategory = 'central_fund'" @mouseleave="hoveredFacilityCategory = null">
+                        <!-- Total Bar (54) -->
+                        <rect x="232.5" y="83.7" width="12" height="41.3" fill="url(#facilityTotalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'central_fund' ? '#FFC65C' : 'none'" stroke-width="1" />
+                        <text x="238.5" y="79" fill="#8FB6D4" font-size="8.5" font-family="var(--spec-num)" text-anchor="middle">54</text>
+                        <!-- Normal Bar (48) -->
+                        <rect x="247.5" y="88.3" width="12" height="36.7" fill="url(#facilityNormalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'central_fund' ? '#3FD0FF' : 'none'" stroke-width="1" />
+                        <text x="253.5" y="84" fill="#3FD0FF" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">48</text>
+                        <!-- Labels -->
+                        <text x="246" y="142" :fill="hoveredFacilityCategory === 'central_fund' ? '#FFC65C' : '#DCF2FF'" font-size="9" text-anchor="middle" font-family="var(--spec-cn)" font-weight="500">中央资金</text>
+                        <text x="246" y="156" fill="#FFC65C" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">88.9%</text>
+                      </g>
+
+                      <!-- 4. 省级资金 - Center x=331 -->
+                      <g class="cursor-pointer group" @mouseenter="hoveredFacilityCategory = 'provincial_fund'" @mouseleave="hoveredFacilityCategory = null">
+                        <!-- Total Bar (40) -->
+                        <rect x="317.5" y="94.4" width="12" height="30.6" fill="url(#facilityTotalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'provincial_fund' ? '#3DDC97' : 'none'" stroke-width="1" />
+                        <text x="323.5" y="90" fill="#8FB6D4" font-size="8.5" font-family="var(--spec-num)" text-anchor="middle">40</text>
+                        <!-- Normal Bar (34) -->
+                        <rect x="332.5" y="99.0" width="12" height="26.0" fill="url(#facilityNormalGrad)" rx="2" :stroke="hoveredFacilityCategory === 'provincial_fund' ? '#3FD0FF' : 'none'" stroke-width="1" />
+                        <text x="338.5" y="95" fill="#3FD0FF" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">34</text>
+                        <!-- Labels -->
+                        <text x="331" y="142" :fill="hoveredFacilityCategory === 'provincial_fund' ? '#3DDC97' : '#DCF2FF'" font-size="9" text-anchor="middle" font-family="var(--spec-cn)" font-weight="500">省级资金</text>
+                        <text x="331" y="156" fill="#FFC65C" font-size="8.5" font-weight="bold" font-family="var(--spec-num)" text-anchor="middle">85.0%</text>
+                      </g>
+
+                      <!-- Normal Rate Connecting Polyline -->
+                      <polyline
+                        points="76,24 161,46 246,75 331,88"
+                        fill="none"
+                        stroke="#FFC65C"
+                        stroke-width="1.8"
+                        stroke-dasharray="3 2"
+                        opacity="0.9"
+                      />
+                      <circle cx="76" cy="24" r="3" fill="#FFC65C" stroke="#061423" stroke-width="1" />
+                      <circle cx="161" cy="46" r="3" fill="#FFC65C" stroke="#061423" stroke-width="1" />
+                      <circle cx="246" cy="75" r="3" fill="#FFC65C" stroke="#061423" stroke-width="1" />
+                      <circle cx="331" cy="88" r="3" fill="#FFC65C" stroke="#061423" stroke-width="1" />
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- 统计图模式 2: 分类占比环形统计图 (Donut Ring Chart + Metrics) -->
+                <div v-else class="w-full flex-1 min-h-[175px] flex items-center justify-between gap-4 py-2 px-1">
+                  <!-- Left: SVG Donut Chart -->
+                  <div class="w-28 h-28 2xl:w-32 2xl:h-32 relative shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+                      <circle
+                        v-for="cat in facilitySourceStats"
+                        :key="cat.id"
+                        cx="50"
+                        cy="50"
+                        r="36"
+                        fill="transparent"
+                        :stroke="cat.color"
+                        stroke-width="14"
+                        :stroke-dasharray="`${cat.dashLength} 226.2`"
+                        :stroke-dashoffset="cat.dashOffset"
+                        class="transition-all duration-300 cursor-pointer"
+                        :opacity="hoveredFacilityCategory && hoveredFacilityCategory !== cat.id ? 0.35 : 1"
+                        @mouseenter="hoveredFacilityCategory = cat.id"
+                        @mouseleave="hoveredFacilityCategory = null"
+                      />
+                    </svg>
+                    <!-- Center Metric Text -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                      <span class="text-lg 2xl:text-xl font-bold font-spec-num text-white leading-none">318</span>
+                      <span class="text-[9.5px] text-[#8FB6D4] font-spec-cn mt-0.5">全域站点</span>
                     </div>
                   </div>
 
-                  <!-- 在线率 -->
-                  <div class="w-12 text-right font-mono font-bold text-xs shrink-0" :class="d.rate >= 90 ? 'text-cyan-300' : 'text-amber-300'">
-                    {{ d.rate }}%
+                  <!-- Right: 4 Category Metrics List with Mini Progress Bars -->
+                  <div class="flex-1 space-y-1.5 text-xs min-w-0 font-spec-cn">
+                    <div
+                      v-for="cat in facilitySourceStats"
+                      :key="cat.id"
+                      class="p-1.5 rounded transition bg-[rgba(10,36,58,0.55)] border flex flex-col gap-1 cursor-pointer"
+                      :class="hoveredFacilityCategory === cat.id ? 'border-[#3FD0FF] bg-[rgba(14,46,78,0.9)] shadow-sm' : 'border-[rgba(70,180,235,0.15)]'"
+                      @mouseenter="hoveredFacilityCategory = cat.id"
+                      @mouseleave="hoveredFacilityCategory = null"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                          <span class="w-2 h-2 rounded-xs shrink-0" :style="{ backgroundColor: cat.color }"></span>
+                          <span class="text-[11px] text-[#DCF2FF] truncate font-medium">{{ cat.shortName }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 font-spec-num shrink-0 text-[10.5px]">
+                          <span class="text-[#8FB6D4]">正常 {{ cat.normal }}/{{ cat.total }}</span>
+                          <span class="font-bold text-[#9BEAFF]">{{ cat.percentage }}%</span>
+                        </div>
+                      </div>
+                      <!-- Category Progress Track -->
+                      <div class="w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                        <div
+                          class="h-full rounded-full transition-all duration-300"
+                          :style="{ width: `${cat.percentage}%`, backgroundColor: cat.color }"
+                        ></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- 设施运行与在线度简报底栏 -->
-              <div class="pt-1.5 border-t border-[#143b6b]/60 flex items-center justify-between text-[10px] text-slate-400 shrink-0">
-                <span>设施健康度评定：<span class="text-cyan-300 font-bold">优良 (98.2分)</span></span>
-                <span>巡检消缺：<span class="text-slate-200">月度全域覆盖</span></span>
+              <div class="pt-1.5 border-t border-[rgba(70,180,235,0.16)] flex items-center justify-between text-[10.5px] text-[#8FB6D4] shrink-0 font-spec-cn">
+                <span>设施健康度评定：<span class="text-[#3DDC97] font-bold font-spec-num">优良 (98.2分)</span></span>
+                <span>巡检消缺：<span class="text-[#DCF2FF]">月度全域覆盖</span></span>
               </div>
             </div>
           </div>
 
           <!-- ================= 专项 Card 2: 重点取水户概况 ================= -->
-          <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 flex flex-col gap-2">
+          <div class="spec-card rounded-lg p-3 flex-1 min-h-0 flex flex-col gap-2 overflow-hidden">
             <!-- Card Header -->
-            <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80 shrink-0">
+            <div class="flex items-center justify-between pb-1.5 shrink-0">
               <div class="flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-                <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">重点取水户概况</h2>
+                <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2" stroke-width="1.8" />
+                  <polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5 12 6" stroke-width="1.2" stroke-opacity="0.6" />
+                </svg>
+                <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">重点取水户概况</h2>
               </div>
-              <div class="text-xs text-cyan-300 font-mono">
-                纳管率: <span class="font-bold text-cyan-300">100%</span>
-                <span class="text-slate-400 ml-1 font-sans">重点监控 58 家</span>
+              <div class="text-xs text-[#3FD0FF] font-spec-num">
+                纳管率: <span class="font-bold text-[#3FD0FF]">100%</span>
+                <span class="text-[#8FB6D4] ml-1 font-spec-cn">重点监控 58 家</span>
               </div>
             </div>
+            <div class="spec-header-divider mb-1"></div>
 
             <!-- 4大核心统计参数: 重点取水户数量、年许可水量总量、今日累计取水量、今日告警次数 -->
             <div class="grid grid-cols-4 gap-2 shrink-0">
               <!-- 1. 重点取水户数量 -->
-              <div class="bg-[#0b2447] border border-[#1b4372] rounded-lg p-2 text-center">
-                <span class="text-[10px] text-slate-300 block font-medium">重点取水户</span>
+              <div class="bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.16)] rounded p-2 text-center">
+                <span class="text-[10px] text-[#8FB6D4] block font-medium">重点取水户</span>
                 <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
-                  <span class="text-xl font-bold font-mono text-cyan-300">{{ majorUserStats.totalCount }}</span>
-                  <span class="text-[10px] text-slate-400 font-sans">家</span>
+                  <span class="text-xl font-bold font-spec-num text-[#3FD0FF]">{{ majorUserStats.totalCount }}</span>
+                  <span class="text-[10px] text-[#8FB6D4] font-spec-cn">家</span>
                 </div>
-                <span class="text-[9px] text-slate-400 block mt-0.5">规上重点监造</span>
+                <span class="text-[9px] text-[#5D8AAA] block mt-0.5">规上重点监造</span>
               </div>
 
               <!-- 2. 年许可水量总量 -->
-              <div class="bg-[#0b2447] border border-[#1b4372] rounded-lg p-2 text-center">
-                <span class="text-[10px] text-slate-300 block font-medium">年许可总量</span>
+              <div class="bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.16)] rounded p-2 text-center">
+                <span class="text-[10px] text-[#8FB6D4] block font-medium">年许可总量</span>
                 <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
-                  <span class="text-xl font-bold font-mono text-blue-300">{{ (majorUserStats.annualLicensedQuota / 10000).toFixed(2) }}</span>
-                  <span class="text-[10px] text-slate-400 font-sans">亿m³</span>
+                  <span class="text-xl font-bold font-spec-num text-[#9BEAFF]">{{ (majorUserStats.annualLicensedQuota / 10000).toFixed(2) }}</span>
+                  <span class="text-[10px] text-[#8FB6D4] font-spec-cn">亿m³</span>
                 </div>
-                <span class="text-[9px] text-slate-400 block mt-0.5">占全域 71.8%</span>
+                <span class="text-[9px] text-[#5D8AAA] block mt-0.5">占全域 71.8%</span>
               </div>
 
               <!-- 3. 今日累计取水量 -->
-              <div class="bg-[#0b2447] border border-[#1b4372] rounded-lg p-2 text-center">
-                <span class="text-[10px] text-slate-300 block font-medium">今日累计取水</span>
+              <div class="bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.16)] rounded p-2 text-center">
+                <span class="text-[10px] text-[#8FB6D4] block font-medium">今日累计取水</span>
                 <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
-                  <span class="text-xl font-bold font-mono text-cyan-300">{{ majorUserStats.todayAccumulatedWater }}</span>
-                  <span class="text-[10px] text-slate-400 font-sans">万m³</span>
+                  <span class="text-xl font-bold font-spec-num text-[#3FD0FF]">{{ majorUserStats.todayAccumulatedWater }}</span>
+                  <span class="text-[10px] text-[#8FB6D4] font-spec-cn">万m³</span>
                 </div>
-                <span class="text-[9px] text-slate-400 block mt-0.5">较昨日 -1.2%</span>
+                <span class="text-[9px] text-[#5D8AAA] block mt-0.5">较昨日 -1.2%</span>
               </div>
 
               <!-- 4. 今日告警次数 -->
-              <div class="bg-rose-950/20 border border-rose-500/30 rounded-lg p-2 text-center">
-                <span class="text-[10px] text-rose-300 block font-medium">今日告警次数</span>
+              <div class="bg-rose-950/20 border border-[#FF6B7A]/40 rounded p-2 text-center">
+                <span class="text-[10px] text-[#FF6B7A] block font-medium">今日告警次数</span>
                 <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
-                  <span class="text-xl font-bold font-mono text-rose-400">{{ majorUserStats.todayAlertCount }}</span>
-                  <span class="text-[10px] text-slate-400 font-sans">次</span>
+                  <span class="text-xl font-bold font-spec-num text-[#FF6B7A]">{{ majorUserStats.todayAlertCount }}</span>
+                  <span class="text-[10px] text-[#FF6B7A] font-spec-cn">次</span>
                 </div>
-                <span class="text-[9px] text-rose-300/80 block mt-0.5">高危预警 2次</span>
+                <span class="text-[9px] text-[#FF6B7A]/80 block mt-0.5">高危预警 2次</span>
               </div>
             </div>
 
-            <!-- 取水量排名列表 (合理布局，去除中间空白与产品类型标签) -->
+            <!-- 取水量排名列表 (框内独立平滑滚动展示，避免溢出卡片) -->
             <div class="flex-1 flex flex-col gap-1.5 min-h-0">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 shrink-0">
+              <div class="flex items-center justify-between text-xs font-semibold text-[#DCF2FF] shrink-0">
                 <span class="flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
+                  <span class="text-[#3FD0FF] font-bold">|</span>
                   <span>重点取水户取水量排名 (Top 5)</span>
                 </span>
-                <span class="text-[10px] text-slate-400 font-normal">年许可执行进度比</span>
+                <span class="text-[10px] text-[#8FB6D4] font-normal">框内滚动</span>
               </div>
 
-              <div class="space-y-1.5 text-xs flex-1 overflow-y-auto custom-dark-scrollbar pr-0.5">
+              <!-- 框内平滑滚动列表容器 -->
+              <div class="space-y-1.5 text-xs flex-1 min-h-0 max-h-[160px] 2xl:max-h-[210px] overflow-y-auto custom-dark-scrollbar pr-1">
                 <div
                   v-for="(user, idx) in majorUserRankings"
                   :key="user.id"
-                  class="p-2 rounded-lg bg-[#091f3d]/60 border border-[#163b66]/60 hover:bg-[#0d2a52] transition flex flex-col gap-1.5 cursor-pointer"
+                  class="p-2 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.16)] hover:bg-[#0d2a52] transition flex flex-col gap-1.5 cursor-pointer"
                   @click="navigate('enterprise_dossier')"
                 >
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 min-w-0">
                       <span
-                        class="w-4 h-4 rounded-full flex items-center justify-center font-mono font-bold text-[10px] shrink-0"
-                        :class="idx === 0 ? 'bg-amber-400 text-amber-950' : idx === 1 ? 'bg-slate-300 text-slate-900' : idx === 2 ? 'bg-amber-700 text-white' : 'bg-slate-700 text-slate-300'"
+                        class="w-4 h-4 rounded-full flex items-center justify-center font-spec-num font-bold text-[10px] shrink-0"
+                        :class="idx === 0 ? 'bg-[#FFC65C] text-amber-950' : idx === 1 ? 'bg-slate-300 text-slate-900' : idx === 2 ? 'bg-[#1E7BE8] text-white' : 'bg-slate-700 text-slate-300'"
                       >
                         {{ idx + 1 }}
                       </span>
-                      <span class="font-medium text-white truncate max-w-[210px] 2xl:max-w-[250px]" :title="user.name">{{ user.name }}</span>
+                      <span class="font-medium text-[#DCF2FF] truncate max-w-[210px] 2xl:max-w-[250px]" :title="user.name">{{ user.name }}</span>
                     </div>
 
-                    <div class="flex items-center gap-2.5 font-mono shrink-0">
-                      <span class="text-slate-300 text-[11px]">今日 {{ user.todayWater }}m³</span>
+                    <div class="flex items-center gap-2.5 font-spec-num shrink-0">
+                      <span class="text-[#8FB6D4] text-[11px]">今日 {{ user.todayWater }}m³</span>
                       <span
                         class="text-xs font-bold"
-                        :class="user.progressRate >= 90 ? 'text-rose-400' : user.progressRate >= 80 ? 'text-amber-400' : 'text-cyan-300'"
+                        :class="user.progressRate >= 90 ? 'text-[#FF6B7A]' : user.progressRate >= 80 ? 'text-[#FFC65C]' : 'text-[#3FD0FF]'"
                       >
                         {{ user.progressRate }}%
                       </span>
@@ -1474,23 +1931,23 @@
                   </div>
 
                   <!-- 年度取水进度条与配额使用情况 -->
-                  <div class="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                  <div class="flex items-center gap-2 text-[10px] text-[#8FB6D4] font-spec-num">
                     <div class="flex-1 h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
                       <div
                         class="h-full rounded-full transition-all duration-300"
-                        :class="user.progressRate >= 90 ? 'bg-gradient-to-r from-amber-500 to-rose-500' : user.progressRate >= 80 ? 'bg-gradient-to-r from-cyan-500 to-amber-400' : 'bg-gradient-to-r from-cyan-500 to-blue-500'"
+                        :class="user.progressRate >= 90 ? 'bg-gradient-to-r from-amber-500 to-[#FF6B7A]' : user.progressRate >= 80 ? 'bg-gradient-to-r from-[#3FD0FF] to-[#FFC65C]' : 'bg-gradient-to-r from-[#3FD0FF] to-[#1E7BE8]'"
                         :style="{ width: `${user.progressRate}%` }"
                       ></div>
                     </div>
-                    <span class="shrink-0 text-[10px] text-slate-400">已累取 {{ user.annualAccumulated }} / 许可 {{ user.annualLicensed }}万m³</span>
+                    <span class="shrink-0 text-[10px] text-[#8FB6D4]">已累取 {{ user.annualAccumulated }} / 许可 {{ user.annualLicensed }}万m³</span>
                   </div>
                 </div>
               </div>
 
               <!-- 重点户监管底栏 -->
-              <div class="pt-1.5 border-t border-[#143b6b]/60 flex items-center justify-between text-[10px] text-slate-400 shrink-0">
-                <span>重点户纳管覆盖：<span class="text-cyan-300 font-bold">100% 实时遥测</span></span>
-                <span>超许可预警：<span class="text-slate-200">进度达 80% 触发预警</span></span>
+              <div class="pt-1.5 border-t border-[rgba(70,180,235,0.16)] flex items-center justify-between text-[10.5px] text-[#8FB6D4] shrink-0">
+                <span>重点户纳管覆盖：<span class="text-[#3FD0FF] font-bold">100% 实时遥测</span></span>
+                <span>异常工单：<span class="text-[#FFC65C] font-bold">0 未派</span></span>
               </div>
             </div>
           </div>
@@ -1499,15 +1956,28 @@
       </aside>
 
       <!-- ================= Central Column: Top 6-Metrics KPI Banner & Unblocked Map Overlay ================= -->
-      <div class="flex-1 min-w-0 pointer-events-none relative flex flex-col justify-between items-center pt-2.5 pb-3 z-30 h-full">
-        <!-- 6 Metrics Banner (Above Map) with clear larger readable fonts -->
+      <div class="flex-1 min-w-0 pointer-events-none relative flex flex-col justify-between items-center pt-2 pb-3 z-30 h-full">
+        <!-- 6 Metrics Banner (Above Map) with design spec styling -->
         <div class="w-full max-w-5xl px-3 pointer-events-auto">
-          <div class="relative bg-[#091b36]/92 backdrop-blur-md rounded-xl border border-[#1b4372] shadow-[0_4px_25px_rgba(0,0,0,0.5)] overflow-hidden">
-            <!-- Top cyan decorative glow line -->
-            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent"></div>
-            
+          <div
+            id="dev-anno-6"
+            class="spec-card rounded-lg shadow-[0_8px_30px_rgba(0,10,20,0.7)] overflow-hidden relative transition-all duration-300"
+            :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 6 }"
+          >
+            <!-- Numbered Point 6 Badge (核心指标与直报看板 - 地图上方) -->
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+              class="absolute -top-1.5 -left-1.5 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 6 }"
+              @mouseenter="activeAnnotationId = 6"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(6)"
+              title="开发标注 #6: 核心指标与直报看板 (地图上方)"
+            >
+              6
+            </div>
             <!-- 6 Columns Grid with Dividers -->
-            <div class="grid grid-cols-6 divide-x divide-[#163866]/80 py-3 px-1">
+            <div class="grid grid-cols-6 divide-x divide-[rgba(70,180,235,0.18)] py-2.5 px-1 bg-[rgba(6,22,40,0.35)]">
               <div
                 v-for="item in topMapMetrics"
                 :key="item.title"
@@ -1515,23 +1985,23 @@
                 @click="item.action()"
               >
                 <!-- Title -->
-                <span class="text-xs 2xl:text-sm font-semibold text-slate-200 tracking-wide group-hover:text-cyan-300 transition-colors">
+                <span class="text-xs 2xl:text-[13px] font-semibold text-[#8FB6D4] tracking-wide group-hover:text-[#9BEAFF] transition-colors">
                   {{ item.title }}
                 </span>
                 
-                <!-- Main Value -->
-                <div class="my-1 flex items-baseline justify-center gap-1 font-mono">
-                  <span class="text-2xl lg:text-3xl font-bold text-white tracking-tight drop-shadow-sm group-hover:text-cyan-400 transition-colors">
+                <!-- Main Value (Spec KPI Gradient) -->
+                <div class="my-1 flex items-baseline justify-center gap-1">
+                  <span class="text-2xl lg:text-[27px] font-bold tracking-tight spec-kpi-val group-hover:scale-105 transition-transform duration-150 inline-block font-spec-num">
                     {{ item.value }}
                   </span>
-                  <span class="text-xs text-slate-300 font-sans font-medium">
+                  <span class="text-xs text-[#8FB6D4] font-spec-cn font-medium">
                     {{ item.unit }}
                   </span>
                 </div>
 
                 <!-- Subtitle / Status badge -->
-                <div class="text-xs font-medium flex items-center justify-center gap-1.5 mt-0.5" :class="item.subClass">
-                  <span v-if="item.iconType === 'warning'" class="inline-flex items-center text-amber-400">
+                <div class="text-[11px] font-medium flex items-center justify-center gap-1.5 mt-0.5" :class="item.subClass">
+                  <span v-if="item.iconType === 'warning'" class="inline-flex items-center text-[#FFC65C]">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                       <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -1539,39 +2009,52 @@
                     </svg>
                   </span>
                   <span v-else-if="item.iconType === 'red-dot'" class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF6B7A] opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-[#FF6B7A]"></span>
                   </span>
-                  <span>{{ item.subText }}</span>
+                  <span class="font-spec-num">{{ item.subText }}</span>
                 </div>
               </div>
             </div>
-
-            <!-- Bottom subtle border line -->
-            <div class="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
           </div>
         </div>
 
         <!-- ================= 行政区划全局统一搜索 (地图左上角，顶部对齐地图图层，整体下移至 top-28，支持收起/展开) ================= -->
-        <div class="absolute top-28 left-4 pointer-events-auto z-30 transition-all duration-300">
+        <div
+          id="dev-anno-5"
+          class="absolute top-28 left-6 pointer-events-auto z-30 transition-all duration-300"
+          :class="{ 'ring-2 ring-[#FFB800] rounded-xl shadow-[0_0_28px_rgba(255,184,0,0.7)]': activeAnnotationId === 5 }"
+        >
+          <!-- Numbered Point 5 Badge (西宁全域 GIS 数字孪生底图 - 核心) -->
+          <div
+            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+            class="absolute -top-3 -left-2.5 z-50 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125 pointer-events-auto"
+            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 5 }"
+            @mouseenter="activeAnnotationId = 5"
+            @mouseleave="activeAnnotationId = null"
+            @click="scrollToAnnotation(5)"
+            title="开发标注 #5: 西宁全域 GIS 数字孪生底图 (核心)"
+          >
+            5
+          </div>
           <!-- 1. 收起状态：紧凑胶囊入口 -->
           <div
             v-if="isDistrictPanelCollapsed"
-            class="bg-[#091b36]/95 backdrop-blur-md rounded-xl border border-[#1b4372] px-3 py-2 shadow-2xl flex items-center gap-2 cursor-pointer hover:border-cyan-400/80 hover:bg-[#0c2447] transition group"
+            class="spec-card rounded px-3 py-1.5 shadow-2xl flex items-center gap-2 cursor-pointer hover:border-[#3FD0FF] transition group"
             @click="isDistrictPanelCollapsed = false"
             title="点击展开行政区划与全局搜索"
           >
-            <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#00e5ff]"></span>
-            <span class="text-xs font-bold text-white tracking-wide">行政区划</span>
+            <span class="w-2 h-2 rounded-full bg-[#3FD0FF] shadow-[0_0_6px_#3FD0FF]"></span>
+            <span class="text-xs font-semibold text-[#DCF2FF] tracking-wide">行政区划</span>
             <span
-              class="text-[10px] px-1.5 py-0.5 rounded-full border font-mono font-medium"
+              class="text-[10px] px-1.5 py-0.5 rounded font-spec-num font-medium border"
               :class="filterParams.district === '西宁市'
-                ? 'bg-cyan-500/20 text-cyan-200 border-cyan-400/40'
-                : 'bg-blue-500/25 text-blue-200 border-blue-400/50 font-bold'"
+                ? 'bg-[#3FD0FF]/15 text-[#9BEAFF] border-[#3FD0FF]/40'
+                : 'bg-[#1E7BE8]/25 text-[#DCF2FF] border-[#3FD0FF]/50 font-bold'"
             >
               {{ filterParams.district === '西宁市' ? '全市视角' : filterParams.district }}
             </span>
-            <span class="text-[11px] text-cyan-400 group-hover:text-cyan-200 transition ml-0.5 flex items-center gap-0.5 font-medium">
+            <span class="text-[11px] text-[#3FD0FF] group-hover:text-[#9BEAFF] transition ml-0.5 flex items-center gap-0.5 font-medium">
               <span>展开</span>
               <svg class="w-3.5 h-3.5 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 18l6-6-6-6"></path>
@@ -1582,20 +2065,20 @@
           <!-- 2. 展开状态：完整行政区划与全局搜索卡片 -->
           <div
             v-else
-            class="w-72 2xl:w-80 bg-[#091b36]/95 backdrop-blur-md rounded-xl border border-[#1b4372] p-2.5 shadow-2xl transition-all"
+            class="w-72 2xl:w-80 spec-card rounded-lg p-2.5 shadow-2xl transition-all"
           >
             <!-- Header: Title, Selected District Badge & 收起/重置操作 -->
-            <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1b4372]/80">
+            <div class="flex items-center justify-between pb-1.5 mb-1.5">
               <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00e5ff]"></span>
-                <span class="text-xs font-bold text-white tracking-wide">行政区划 · 全局搜索</span>
+                <span class="w-2 h-2 rounded-full bg-[#3FD0FF] shadow-[0_0_6px_#3FD0FF]"></span>
+                <span class="text-xs font-semibold text-[#E4F6FF] tracking-wide">行政区划 · 全局搜索</span>
               </div>
               <div class="flex items-center gap-1.5">
                 <span
-                  class="text-[10px] font-medium px-1.5 py-0.5 rounded-full border transition"
+                  class="text-[10px] font-medium px-1.5 py-0.5 rounded border transition font-spec-num"
                   :class="filterParams.district === '西宁市'
-                    ? 'bg-cyan-500/20 text-cyan-200 border-cyan-400/40'
-                    : 'bg-blue-500/25 text-blue-200 border-blue-400/50 font-bold'"
+                    ? 'bg-[#3FD0FF]/15 text-[#9BEAFF] border-[#3FD0FF]/40'
+                    : 'bg-[#1E7BE8]/25 text-[#DCF2FF] border-[#3FD0FF]/50 font-bold'"
                 >
                   {{ filterParams.district === '西宁市' ? '全市视角' : filterParams.district }}
                 </span>
@@ -1603,7 +2086,7 @@
                   v-if="filterParams.district !== '西宁市'"
                   type="button"
                   @click="resetMapView"
-                  class="text-[10px] text-cyan-400 hover:text-cyan-200 transition cursor-pointer p-0.5"
+                  class="text-[10px] text-[#3FD0FF] hover:text-[#9BEAFF] transition cursor-pointer p-0.5"
                   title="重置为全域西宁"
                 >
                   重置
@@ -1611,7 +2094,7 @@
                 <button
                   type="button"
                   @click="isDistrictPanelCollapsed = true"
-                  class="flex items-center gap-0.5 text-[10px] text-slate-400 hover:text-cyan-300 transition cursor-pointer px-1 py-0.5 rounded hover:bg-white/10 ml-0.5"
+                  class="flex items-center gap-0.5 text-[10px] text-[#8FB6D4] hover:text-[#3FD0FF] transition cursor-pointer px-1 py-0.5 rounded hover:bg-white/10 ml-0.5"
                   title="收起行政区划"
                 >
                   <span>收起</span>
@@ -1621,6 +2104,7 @@
                 </button>
               </div>
             </div>
+            <div class="spec-header-divider mb-2"></div>
 
             <!-- Global Unified Search Input -->
             <div class="relative">
@@ -1795,26 +2279,29 @@
         <!-- ================= Floating Map Controls (Top Right of Center Area - 顶部对齐行政区划，统一 top-28) ================= -->
         <div class="absolute top-28 right-4 pointer-events-auto z-30 flex flex-col items-end gap-2">
           <!-- Layer Toolbox (3核心图层: 计量点 / 用水户 / 预警事件) -->
-          <div class="flex flex-col bg-[#091b36]/95 backdrop-blur-md border border-[#1b4372] rounded-xl p-2 shadow-2xl text-xs w-[132px] 2xl:w-[142px]">
+          <div class="spec-card flex flex-col rounded-xl p-2.5 shadow-2xl text-xs w-[136px] 2xl:w-[146px]">
             <!-- Header with Compass & reset button -->
-            <div class="px-1 py-0.5 flex items-center justify-between border-b border-[#1b4372]/70 mb-1.5">
+            <div class="px-1 py-0.5 flex items-center justify-between border-b border-[rgba(70,180,235,0.2)] mb-1.5">
               <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#00e5ff]"></span>
-                <span class="text-[11px] font-bold text-slate-200 tracking-wide">地图图层</span>
+                <svg class="w-3.5 h-3.5 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
+                  <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
+                  <circle cx="8" cy="8" r="2" fill="#00E5FF" />
+                </svg>
+                <span class="text-[11px] font-bold text-white tracking-wide font-spec-cn">地图图层</span>
               </div>
               <div class="flex items-center gap-1">
                 <!-- Compass (指北针徽标) -->
                 <button
                   type="button"
-                  class="w-5 h-5 rounded-full border border-cyan-400/50 bg-[#071932] flex items-center justify-center cursor-pointer hover:border-cyan-300 hover:bg-cyan-500/20 transition shadow-sm"
+                  class="w-5 h-5 rounded-full border border-[rgba(70,180,235,0.4)] bg-[#071932] flex items-center justify-center cursor-pointer hover:border-[#00E5FF] hover:bg-[#00E5FF]/20 transition shadow-sm"
                   title="正北方向·点击重置全域视角"
                   @click="resetMapView"
                 >
-                  <span class="text-[9px] font-bold text-cyan-400 font-mono leading-none">N</span>
+                  <span class="text-[9px] font-bold text-[#00E5FF] font-spec-num leading-none">N</span>
                 </button>
                 <button
                   type="button"
-                  class="text-slate-400 hover:text-cyan-300 transition cursor-pointer p-0.5 rounded hover:bg-white/5"
+                  class="text-[#5D8AAA] hover:text-[#00E5FF] transition cursor-pointer p-0.5 rounded hover:bg-white/5"
                   title="重置全域视角"
                   @click="resetMapView"
                 >
@@ -1989,26 +2476,31 @@
         </div>
 
         <!-- ================= Fully Visible Map Legend (Bottom-Left of Center Area) ================= -->
-        <div class="absolute bottom-14 left-4 pointer-events-auto z-30">
-          <div class="bg-[#091b36]/95 backdrop-blur-md rounded-xl border border-[#1b4372] p-3 shadow-2xl transition-all duration-200 min-w-[310px] max-w-[360px]">
+        <div class="absolute bottom-16 left-6 pointer-events-auto z-30">
+          <div class="spec-card rounded-xl p-2.5 shadow-2xl transition-all duration-200 min-w-[260px] max-w-[290px]">
             <!-- Legend Header -->
-            <div class="flex items-center justify-between gap-3 pb-1.5 border-b border-[#1b4372]/80">
+            <div class="flex items-center justify-between gap-3 pb-1.5 border-b border-[rgba(70,180,235,0.2)]">
               <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00e5ff]"></span>
-                <span class="text-xs font-bold text-white tracking-wide">
-                  {{ scenarioMode === 'comprehensive' ? '水量使用情况图例' : '西宁全域监控图例' }}
+                <svg class="w-3.5 h-3.5 text-[#3FD0FF] shrink-0" viewBox="0 0 16 16" fill="none">
+                  <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#3FD0FF" stroke-width="1.2" fill="none" />
+                  <circle cx="8" cy="8" r="2" fill="#3FD0FF" />
+                </svg>
+                <span class="text-xs font-bold text-white tracking-wide font-spec-cn">
+                  {{ scenarioMode === 'comprehensive' ? '水量使用情况' : '西宁全域监控图例' }}
                 </span>
               </div>
               <div class="flex items-center gap-2">
-                <span v-if="scenarioMode === 'comprehensive'" class="text-[10px] text-cyan-300 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/30">
-                  4个等级划分
-                </span>
-                <span v-else-if="activeLayers.meters" class="text-[10px] text-cyan-300 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/30">
-                  计量点模式
-                </span>
+                <button
+                  v-if="selectedUsageTierFilter"
+                  type="button"
+                  class="text-[10.5px] text-[#3FD0FF] hover:underline cursor-pointer"
+                  @click.stop="selectedUsageTierFilter = null"
+                >
+                  重置
+                </button>
                 <button
                   type="button"
-                  class="text-[11px] text-cyan-400 hover:text-cyan-300 transition cursor-pointer"
+                  class="text-[11px] text-[#5D8AAA] hover:text-[#3FD0FF] transition cursor-pointer font-spec-cn"
                   @click="showMapLegend = !showMapLegend"
                 >
                   {{ showMapLegend ? '收起' : '展开' }}
@@ -2017,257 +2509,165 @@
             </div>
 
             <!-- Legend Body (Unblocked and clean) -->
-            <div v-if="showMapLegend" class="mt-2 space-y-2 text-xs">
+            <div v-if="showMapLegend" class="mt-2 space-y-1.5 text-xs">
               
-              <!-- A. 综合应用场景图例：水量使用情况 4个等级图例 (大于100万方、大于70万方、大于50万方、小于50万方) -->
+              <!-- A. 综合应用场景图例：水量使用情况 4个等级图例 (极简紧凑 2x2 网格) -->
               <template v-if="scenarioMode === 'comprehensive'">
-                <div class="space-y-1.5">
+                <div class="grid grid-cols-2 gap-1.5">
                   <div
                     v-for="tier in waterUsageTiers"
                     :key="tier.id"
-                    class="p-2 rounded-lg border transition-all cursor-pointer flex items-center justify-between"
+                    class="p-1.5 rounded transition-all cursor-pointer border flex items-center justify-between"
                     :class="selectedUsageTierFilter === tier.id
-                      ? 'bg-cyan-500/20 border-cyan-400/80 shadow-[0_0_8px_rgba(6,182,212,0.3)]'
-                      : 'bg-[#07172f]/80 border-[#143b6b]/70 hover:bg-[#0c2447] hover:border-cyan-500/40'"
+                      ? 'bg-[rgba(63,208,255,0.2)] border-[#3FD0FF] shadow-[0_0_8px_rgba(63,208,255,0.3)]'
+                      : 'bg-[rgba(10,36,58,0.5)] border-[rgba(70,180,235,0.18)] hover:bg-[rgba(18,52,86,0.6)] hover:border-[#3FD0FF]/40'"
                     @click="selectedUsageTierFilter = selectedUsageTierFilter === tier.id ? null : tier.id"
+                    :title="`${tier.label}: ${tier.districts.join('、')}`"
                   >
-                    <div class="flex items-center gap-2.5">
-                      <!-- 颜色标识块 -->
+                    <div class="flex items-center gap-1.5 min-w-0">
                       <span
-                        class="w-4 h-4 rounded-sm flex items-center justify-center border shadow-xs shrink-0"
-                        :style="{ backgroundColor: tier.color, borderColor: tier.strokeColor }"
-                      >
-                        <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                      </span>
-
-                      <div>
-                        <div class="flex items-center gap-1.5">
-                          <span class="text-xs font-bold text-white">{{ tier.label }}</span>
-                          <span class="text-[10px] font-mono text-cyan-300/80">({{ tier.range }})</span>
-                        </div>
-                        <div class="text-[10px] text-slate-300 mt-0.5">
-                          {{ tier.districts.map(d => `${d} ${getDistrictUsage(d)}万m³`).join('、') }}
-                        </div>
-                      </div>
+                        class="w-2.5 h-2.5 rounded-xs shrink-0 shadow-xs"
+                        :style="{ backgroundColor: tier.color, border: '1px solid ' + tier.strokeColor }"
+                      ></span>
+                      <span class="text-[11px] font-bold font-spec-num text-[#E4F6FF] truncate">{{ tier.range }}</span>
                     </div>
-
-                    <div class="text-right shrink-0 ml-2">
-                      <span
-                        class="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold"
-                        :style="{
-                          backgroundColor: tier.color + '33',
-                          color: tier.strokeColor,
-                          border: '1px solid ' + tier.strokeColor + '66'
-                        }"
-                      >
-                        {{ tier.districts.length }}个区县
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- 5. 直报水量超计划红色边缘标记图例项 -->
-                  <div
-                    class="p-2 rounded-lg border transition-all cursor-pointer flex items-center justify-between"
-                    :class="selectedUsageTierFilter === 'exceeded'
-                      ? 'bg-rose-500/25 border-rose-400 shadow-[0_0_10px_rgba(239,68,68,0.4)]'
-                      : 'bg-[#07172f]/80 border-rose-500/40 hover:bg-[#1f1022] hover:border-rose-400/80'"
-                    @click="selectedUsageTierFilter = selectedUsageTierFilter === 'exceeded' ? null : 'exceeded'"
-                    title="点击高亮所有直报水量大于计划水量的区县"
-                  >
-                    <div class="flex items-center gap-2.5">
-                      <!-- 红色低饱和警示线方块 -->
-                      <span class="w-4 h-4 rounded-sm flex items-center justify-center border-2 border-rose-400/80 bg-rose-950/60 shadow-[0_0_6px_rgba(248,113,113,0.5)] shrink-0">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-300"></span>
-                      </span>
-
-                      <div>
-                        <div class="flex items-center gap-1.5">
-                          <span class="text-xs font-bold text-rose-200">直报超计划 (低饱和红边)</span>
-                          <span class="text-[10px] font-mono text-rose-300/90 font-medium">直报 > 计划</span>
-                        </div>
-                        <div class="text-[10px] text-slate-300 mt-0.5">
-                          {{ exceededDistrictsList.map(d => `${d.name}超${(d.reported - d.planned).toFixed(1)}万m³`).join('、') }}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="text-right shrink-0 ml-2">
-                      <span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50">
-                        {{ exceededDistrictsList.length }}个超额区县
-                      </span>
-                    </div>
+                    <span class="text-[10px] text-[#5D8AAA] shrink-0 font-spec-num ml-1">{{ tier.districts.length }}区</span>
                   </div>
                 </div>
 
-                <!-- 综合底栏说明与微调测试入口 -->
-                <div class="pt-2 border-t border-[#1b4372]/50 flex items-center justify-between text-slate-300 text-[10px]">
-                  <div class="flex items-center gap-2">
-                    <span class="text-slate-400">点击等级项可高亮区县</span>
-                    <button
-                      v-if="selectedUsageTierFilter"
-                      type="button"
-                      class="text-cyan-400 hover:underline cursor-pointer"
-                      @click.stop="selectedUsageTierFilter = null"
-                    >
-                      重置筛选
-                    </button>
+                <!-- 直报超计划红边提示 (紧凑单行) -->
+                <div
+                  class="p-1.5 rounded transition-all cursor-pointer border flex items-center justify-between"
+                  :class="selectedUsageTierFilter === 'exceeded'
+                    ? 'bg-rose-500/20 border-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.3)]'
+                    : 'bg-[rgba(10,36,58,0.5)] border-rose-500/30 hover:border-rose-400/60'"
+                  @click="selectedUsageTierFilter = selectedUsageTierFilter === 'exceeded' ? null : 'exceeded'"
+                  title="点击高亮直报水量超计划的区县"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-xs border-2 border-rose-400 bg-rose-500/40 shrink-0"></span>
+                    <span class="text-[11px] font-medium text-rose-200">直报超计划</span>
+                    <span class="text-[10px] text-rose-300 font-spec-num font-normal">(直报 > 计划)</span>
                   </div>
+                  <span class="text-[10px] px-1 py-0.2 rounded font-bold font-spec-num text-rose-300 bg-rose-500/20 border border-rose-500/40">
+                    {{ exceededDistrictsList.length }} 区县
+                  </span>
+                </div>
+
+                <!-- 底部快捷比对管控 -->
+                <div class="pt-1.5 border-t border-[rgba(70,180,235,0.18)] flex items-center justify-between text-[10px] text-[#5D8AAA]">
+                  <span>点击等级联动高亮地图</span>
                   <button
                     type="button"
-                    class="px-2 py-0.5 rounded bg-cyan-950/70 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-500/40 cursor-pointer font-medium transition flex items-center gap-1"
+                    class="px-2 py-0.5 rounded bg-[rgba(10,36,58,0.8)] hover:bg-[#1E7BE8]/30 text-[#9BEAFF] border border-[rgba(70,180,235,0.3)] cursor-pointer font-medium transition flex items-center gap-1"
                     @click.stop="showWaterQuotaModal = true"
                   >
-                    <span>水量比对管控</span>
+                    <span>比对管控</span>
                     <span class="w-1.5 h-1.5 rounded-full bg-rose-400" v-if="exceededDistrictsList.length"></span>
                   </button>
                 </div>
               </template>
 
-              <!-- B. 专项业务应用场景图例：计量点 / 用水户 / 预警事件 -->
+              <!-- B. 专项业务应用场景图例：极简风格 (计量点3色状态、用水户纵向展示、预警事件保留) -->
               <template v-else>
-                <!-- 核心图例模块 1: 点击计量点图层时，展示图例颜色区分状态 (正常/故障/待检定) -->
-                <div v-if="activeLayers.meters" class="bg-[#07172f]/80 p-2.5 rounded-lg border border-cyan-500/30">
-                  <div class="flex items-center justify-between text-[11px] font-bold text-white mb-2">
+                <!-- 1. 计量点运行状态 (仅展示正常、故障、待检定三个颜色) -->
+                <div>
+                  <div class="text-[11px] font-semibold text-slate-300 mb-1.5 font-spec-cn flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                      <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                      <span>计量点运行状态 (共 {{ meterStats.total }} 处)</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#00E5FF]"></span>
+                      <span>计量点运行状态</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-normal">点击快速筛选</span>
+                    <span class="text-[10px] text-[#5D8AAA] font-spec-num">{{ meterStats.total }}处</span>
                   </div>
-
-                  <!-- 快速筛选状态按钮组 -->
-                  <div class="grid grid-cols-4 gap-1 mb-2 text-[10px]">
-                    <button
-                      type="button"
-                      class="py-1 rounded text-center transition cursor-pointer border"
-                      :class="meterStatusFilter === 'all'
-                        ? 'bg-cyan-500/25 text-cyan-200 border-cyan-400/60 font-bold'
-                        : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'"
-                      @click="meterStatusFilter = 'all'"
-                    >
-                      全部 {{ meterStats.total }}
-                    </button>
-                    <button
-                      type="button"
-                      class="py-1 rounded text-center transition cursor-pointer border"
-                      :class="meterStatusFilter === 'normal'
-                        ? 'bg-emerald-500/25 text-emerald-200 border-emerald-400/60 font-bold'
-                        : 'bg-white/5 text-emerald-300/80 border-white/10 hover:bg-white/10'"
-                      @click="meterStatusFilter = meterStatusFilter === 'normal' ? 'all' : 'normal'"
-                    >
-                      正常 {{ meterStats.normal }}
-                    </button>
-                    <button
-                      type="button"
-                      class="py-1 rounded text-center transition cursor-pointer border"
-                      :class="meterStatusFilter === 'fault'
-                        ? 'bg-rose-500/25 text-rose-200 border-rose-400/60 font-bold'
-                        : 'bg-white/5 text-rose-300/80 border-white/10 hover:bg-white/10'"
-                      @click="meterStatusFilter = meterStatusFilter === 'fault' ? 'all' : 'fault'"
-                    >
-                      故障 {{ meterStats.fault }}
-                    </button>
-                    <button
-                      type="button"
-                      class="py-1 rounded text-center transition cursor-pointer border"
-                      :class="meterStatusFilter === 'pending'
-                        ? 'bg-amber-500/25 text-amber-200 border-amber-400/60 font-bold'
-                        : 'bg-white/5 text-amber-300/80 border-white/10 hover:bg-white/10'"
-                      @click="meterStatusFilter = meterStatusFilter === 'pending' ? 'all' : 'pending'"
-                    >
-                      待检 {{ meterStats.pending }}
-                    </button>
-                  </div>
-
-                  <!-- 颜色图例清单 (区分正常、故障、待检定) -->
-                  <div class="space-y-1.5 text-[11px]">
-                    <!-- 正常 (Normal - 绿色) -->
+                  <div class="flex items-center justify-between px-2 py-1.5 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.18)] text-[11px] font-spec-cn">
+                    <!-- 正常 (绿色) -->
                     <div
-                      class="flex items-center justify-between p-1 rounded transition cursor-pointer hover:bg-white/5"
+                      class="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition"
+                      :class="meterStatusFilter === 'normal' ? 'text-emerald-300 font-bold' : 'text-slate-200'"
                       @click="meterStatusFilter = meterStatusFilter === 'normal' ? 'all' : 'normal'"
+                      title="点击筛选正常站点"
                     >
-                      <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-[#10b981] border border-white shadow-[0_0_6px_#10b981] flex items-center justify-center">
-                          <span class="w-1 h-1 rounded-full bg-white"></span>
-                        </span>
-                        <span class="text-emerald-300 font-semibold">正常状态</span>
-                      </div>
-                      <span class="text-slate-300 text-[10px]">实时在线·数据平稳 ({{ meterStats.normal }}个)</span>
+                      <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] shadow-[0_0_6px_#10b981] border border-white/60"></span>
+                      <span>正常</span>
                     </div>
 
-                    <!-- 故障 (Fault - 红色) -->
+                    <!-- 故障 (红色) -->
                     <div
-                      class="flex items-center justify-between p-1 rounded transition cursor-pointer hover:bg-white/5"
+                      class="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition"
+                      :class="meterStatusFilter === 'fault' ? 'text-rose-300 font-bold' : 'text-slate-200'"
                       @click="meterStatusFilter = meterStatusFilter === 'fault' ? 'all' : 'fault'"
+                      title="点击筛选故障站点"
                     >
-                      <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-[#ef4444] border border-white shadow-[0_0_6px_#ef4444] animate-pulse flex items-center justify-center">
-                          <span class="text-[8px] text-white font-black leading-none">!</span>
-                        </span>
-                        <span class="text-rose-300 font-semibold">故障状态</span>
-                      </div>
-                      <span class="text-slate-300 text-[10px]">设备离线·通信异常 ({{ meterStats.fault }}个)</span>
+                      <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444] shadow-[0_0_6px_#ef4444] border border-white/60"></span>
+                      <span>故障</span>
                     </div>
 
-                    <!-- 待检定 (Pending - 橙黄色) -->
+                    <!-- 待检定 (橙黄色) -->
                     <div
-                      class="flex items-center justify-between p-1 rounded transition cursor-pointer hover:bg-white/5"
+                      class="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition"
+                      :class="meterStatusFilter === 'pending' ? 'text-amber-300 font-bold' : 'text-slate-200'"
                       @click="meterStatusFilter = meterStatusFilter === 'pending' ? 'all' : 'pending'"
+                      title="点击筛选待检定站点"
                     >
-                      <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-[#f59e0b] border border-dashed border-white shadow-[0_0_6px_#f59e0b] flex items-center justify-center">
-                          <span class="w-1 h-1 rounded-full bg-amber-900"></span>
-                        </span>
-                        <span class="text-amber-300 font-semibold">待检定状态</span>
-                      </div>
-                      <span class="text-slate-300 text-[10px]">周期届满·待现场定检 ({{ meterStats.pending }}个)</span>
+                      <span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_6px_#f59e0b] border border-white/60"></span>
+                      <span>待检定</span>
                     </div>
                   </div>
                 </div>
 
-                <!-- 模块 2: 用水户图例 (当用水户图层开启时) -->
-                <div v-if="activeLayers.users" class="pt-1.5 border-t border-[#1b4372]/60">
-                  <div class="text-[11px] font-semibold text-slate-300 mb-1">用水户类别 (共 {{ waterUsersList.length }} 户):</div>
-                  <div class="grid grid-cols-3 gap-1.5 text-slate-200 text-[11px] font-medium">
+                <!-- 2. 用水户类型 (保留纵向展示) -->
+                <div class="pt-1.5 border-t border-[rgba(70,180,235,0.18)]">
+                  <div class="text-[11px] font-semibold text-slate-300 mb-1.5 font-spec-cn flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                      <span class="w-2.5 h-2.5 bg-[#38bdf8] rotate-45 border border-white"></span>
-                      <span>规上工业</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#38BDF8]"></span>
+                      <span>用水户类型</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                      <span class="w-2.5 h-2.5 rounded-xs bg-[#00e5ff] border border-white"></span>
-                      <span>现代化灌区</span>
+                    <span class="text-[10px] text-[#5D8AAA] font-spec-num">{{ waterUsersList.length }}户</span>
+                  </div>
+                  <!-- 纵向展示 -->
+                  <div class="space-y-1.5 px-2 py-1.5 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.18)] text-[11px] font-spec-cn text-slate-200">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 bg-[#38bdf8] rotate-45 border border-white/80 shrink-0"></span>
+                        <span class="text-[#DCF2FF]">规上工业</span>
+                      </div>
+                      <span class="text-[10px] text-[#5D8AAA] font-spec-num">5户</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                      <span class="w-2.5 h-2.5 rounded-full bg-[#818cf8] border border-white"></span>
-                      <span>自来水厂</span>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-xs bg-[#00e5ff] border border-white/80 shrink-0"></span>
+                        <span class="text-[#DCF2FF]">现代化灌区</span>
+                      </div>
+                      <span class="text-[10px] text-[#5D8AAA] font-spec-num">3处</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#818cf8] border border-white/80 shrink-0"></span>
+                        <span class="text-[#DCF2FF]">自来水厂</span>
+                      </div>
+                      <span class="text-[10px] text-[#5D8AAA] font-spec-num">2座</span>
                     </div>
                   </div>
                 </div>
 
-                <!-- 模块 3: 预警事件图例 (当预警图层开启时) -->
-                <div v-if="activeLayers.warnings" class="pt-1.5 border-t border-[#1b4372]/60">
-                  <div class="text-[11px] font-semibold text-slate-300 mb-1">预警事件等级:</div>
-                  <div class="flex items-center gap-3 text-slate-200 text-[11px] font-medium">
+                <!-- 3. 预警事件展示保留 -->
+                <div class="pt-1.5 border-t border-[rgba(70,180,235,0.18)]">
+                  <div class="text-[11px] font-semibold text-slate-300 mb-1.5 font-spec-cn flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                      <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
-                      <span>高风险 (超许可/断线)</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#ef4444]"></span>
+                      <span>预警事件展示</span>
+                    </div>
+                    <span class="text-[10px] text-[#5D8AAA] font-spec-num">{{ warningEventsList.length }}起</span>
+                  </div>
+                  <div class="flex items-center justify-between px-2 py-1.5 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.18)] text-[11px] font-spec-cn text-slate-200">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shrink-0"></span>
+                      <span>高风险预警</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                      <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                      <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
                       <span>中/低风险预警</span>
                     </div>
-                  </div>
-                </div>
-
-                <!-- 模块 4: 地图底图水系 -->
-                <div class="pt-1.5 border-t border-[#1b4372]/50 flex items-center justify-between text-slate-300 text-[10px]">
-                  <div class="flex items-center gap-1.5">
-                    <span class="w-4 h-1 rounded-full bg-gradient-to-r from-[#0284c7] to-[#38bdf8]"></span>
-                    <span>湟水河干流水系</span>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <span class="w-3 h-2 border border-[#00e5ff] rounded-xs bg-[#00b4d8]/20"></span>
-                    <span>西宁4区3县区划</span>
                   </div>
                 </div>
               </template>
@@ -2276,24 +2676,39 @@
         </div>
 
         <!-- ================= Bottom Center: Scenario Switcher Tabs (两个切换: 综合应用场景 / 专项业务应用场景) ================= -->
-        <div class="absolute bottom-3 inset-x-0 mx-auto w-fit pointer-events-auto z-30">
-          <div class="flex items-center bg-[#091b36]/95 backdrop-blur-md border border-[#1b4372] rounded-full p-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.6)] text-xs gap-1.5">
+        <div class="absolute bottom-5 xl:bottom-6 inset-x-0 mx-auto w-fit pointer-events-auto z-30" id="dev-anno-7">
+          <div
+            class="spec-card flex items-center rounded-full p-1 shadow-[0_4px_28px_rgba(0,10,25,0.8)] text-xs gap-1.5 border border-[rgba(70,180,235,0.35)] relative transition-all duration-300"
+            :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 7 }"
+          >
+            <!-- Numbered Point 7 Badge (综合管控场景切换与图例联动 - 中下) -->
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+              class="absolute -top-2.5 -left-2.5 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 7 }"
+              @mouseenter="activeAnnotationId = 7"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(7)"
+              title="开发标注 #7: 综合管控场景切换与图例联动 (中下)"
+            >
+              7
+            </div>
             <!-- 1. 综合应用场景 -->
             <button
               type="button"
               class="px-5 py-2 rounded-full font-bold transition-all duration-200 cursor-pointer flex items-center gap-2"
               :class="scenarioMode === 'comprehensive'
-                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-[0_0_14px_rgba(6,182,212,0.45)] border border-cyan-400/40'
-                : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'"
+                ? 'bg-gradient-to-r from-[#00E5FF]/25 to-[#38BDF8]/15 text-white shadow-[0_0_16px_rgba(0,229,255,0.35)] border border-[#00E5FF]'
+                : 'text-[#8AAEC8] hover:text-white hover:bg-white/5 border border-transparent'"
               @click="switchScenarioMode('comprehensive')"
             >
-              <svg class="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg class="w-4 h-4 text-[#00E5FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="7" height="7"></rect>
                 <rect x="14" y="3" width="7" height="7"></rect>
                 <rect x="14" y="14" width="7" height="7"></rect>
                 <rect x="3" y="14" width="7" height="7"></rect>
               </svg>
-              <span class="tracking-wide text-xs 2xl:text-sm">综合应用场景</span>
+              <span class="tracking-wide text-xs 2xl:text-sm font-spec-cn">综合应用场景</span>
             </button>
 
             <!-- 2. 专项业务应用场景 -->
@@ -2301,14 +2716,14 @@
               type="button"
               class="px-5 py-2 rounded-full font-bold transition-all duration-200 cursor-pointer flex items-center gap-2"
               :class="scenarioMode === 'special'
-                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-[0_0_14px_rgba(6,182,212,0.45)] border border-cyan-400/40'
-                : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'"
+                ? 'bg-gradient-to-r from-[#00E5FF]/25 to-[#38BDF8]/15 text-white shadow-[0_0_16px_rgba(0,229,255,0.35)] border border-[#00E5FF]'
+                : 'text-[#8AAEC8] hover:text-white hover:bg-white/5 border border-transparent'"
               @click="switchScenarioMode('special')"
             >
-              <svg class="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg class="w-4 h-4 text-[#00E5FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
               </svg>
-              <span class="tracking-wide text-xs 2xl:text-sm">专项业务应用场景</span>
+              <span class="tracking-wide text-xs 2xl:text-sm font-spec-cn">专项业务应用场景</span>
             </button>
           </div>
         </div>
@@ -2316,32 +2731,54 @@
       </div>
 
       <!-- ================= 4. RIGHT COLUMN (综合应用场景 预警研判 vs 专项业务应用场景 异常处置与对比分析引擎) ================= -->
-      <aside class="relative z-10 w-[420px] 2xl:w-[460px] h-full p-2.5 flex flex-col gap-2.5 pointer-events-auto shrink-0 overflow-y-auto custom-dark-scrollbar">
+      <aside class="relative z-10 w-[395px] xl:w-[415px] 2xl:w-[440px] h-full p-1 xl:p-1.5 flex flex-col gap-2.5 pointer-events-auto shrink-0 overflow-y-auto custom-dark-scrollbar">
         
         <!-- A. 综合应用场景 (常态化预警监测 & 业务关联研判 & 计量点接入与到报率监控) -->
         <template v-if="scenarioMode === 'comprehensive'">
         <!-- ================= Right Box 1: 常态化预警监测 ================= -->
-        <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[200px] flex flex-col justify-between">
-          <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
-            <div class="flex items-center gap-2">
-              <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">常态化预警监测</h2>
+        <div
+          id="dev-anno-8"
+          class="spec-card p-3.5 flex-1 min-h-[200px] flex flex-col justify-between relative transition-all duration-300"
+          :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 8 }"
+        >
+          <!-- Numbered Point 8 Badge (常态化预警监测 - 右1) -->
+          <div
+            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+            class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 8 }"
+            @mouseenter="activeAnnotationId = 8"
+            @mouseleave="activeAnnotationId = null"
+            @click="scrollToAnnotation(8)"
+            title="开发标注 #8: 常态化预警监测 (右1)"
+          >
+            8
+          </div>
+          <div>
+            <div class="flex items-center justify-between pb-2">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
+                  <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
+                  <polygon points="8,4 12,6 12,10 8,12 4,10 4,6" fill="rgba(0,229,255,0.3)" />
+                </svg>
+                <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide font-spec-cn">常态化预警监测</h2>
+              </div>
+              <button
+                type="button"
+                class="text-xs text-[#00E5FF] hover:text-[#79D8FF] transition cursor-pointer flex items-center gap-0.5 font-spec-cn"
+                @click="navigate('violation_national')"
+              >
+                <span>更多</span>
+                <span>&gt;</span>
+              </button>
             </div>
-            <button
-              type="button"
-              class="text-xs text-cyan-400 hover:text-cyan-300 transition cursor-pointer flex items-center gap-0.5"
-              @click="navigate('violation_national')"
-            >
-              <span>更多</span>
-              <span>&gt;</span>
-            </button>
+            <div class="spec-header-divider mb-2"></div>
           </div>
 
           <!-- 3 Warning Status Badges (Enlarged) -->
           <div class="grid grid-cols-3 gap-2 my-1.5">
             <!-- 1. 接近计划值 (12) -->
-            <div class="bg-[#0c264c]/70 border border-[#1e4976] rounded-lg p-2.5 flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(255,198,92,0.3)] rounded-lg p-2.5 flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#FFC65C]/20 text-[#FFC65C] flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                   <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -2349,15 +2786,15 @@
                 </svg>
               </div>
               <div class="min-w-0">
-                <div class="text-xs text-slate-200 font-medium truncate">接近计划值</div>
-                <div class="text-xl font-bold font-mono text-amber-400 leading-tight">12</div>
-                <div class="text-[11px] text-slate-400 font-mono">80%≤占&lt;100%</div>
+                <div class="text-xs text-slate-200 font-medium truncate font-spec-cn">接近计划值</div>
+                <div class="text-xl font-bold font-spec-num text-[#FFC65C] leading-tight">12</div>
+                <div class="text-[10px] text-[#5D8AAA] font-spec-num">80%≤占&lt;100%</div>
               </div>
             </div>
 
             <!-- 2. 超计划预警 (7) -->
-            <div class="bg-[#0c264c]/70 border border-[#1e4976] rounded-lg p-2.5 flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(255,159,67,0.35)] rounded-lg p-2.5 flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#FF9F43]/20 text-[#FF9F43] flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 2l10 18H2L12 2z"></path>
                   <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -2365,15 +2802,15 @@
                 </svg>
               </div>
               <div class="min-w-0">
-                <div class="text-xs text-slate-200 font-medium truncate">超计划预警</div>
-                <div class="text-xl font-bold font-mono text-orange-400 leading-tight">7</div>
-                <div class="text-[11px] text-slate-400 font-mono">占比≥100%</div>
+                <div class="text-xs text-slate-200 font-medium truncate font-spec-cn">超计划预警</div>
+                <div class="text-xl font-bold font-spec-num text-[#FF9F43] leading-tight">7</div>
+                <div class="text-[10px] text-[#5D8AAA] font-spec-num">占比≥100%</div>
               </div>
             </div>
 
             <!-- 3. 超许可预警 (3) -->
-            <div class="bg-[#0c264c]/70 border border-[#1e4976] rounded-lg p-2.5 flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(255,107,122,0.35)] rounded-lg p-2.5 flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#FF6B7A]/20 text-[#FF6B7A] flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                   <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -2381,57 +2818,57 @@
                 </svg>
               </div>
               <div class="min-w-0">
-                <div class="text-xs text-slate-200 font-medium truncate">超许可预警</div>
-                <div class="text-xl font-bold font-mono text-red-400 leading-tight">3</div>
-                <div class="text-[11px] text-slate-400 font-mono">超许可红线</div>
+                <div class="text-xs text-slate-200 font-medium truncate font-spec-cn">超许可预警</div>
+                <div class="text-xl font-bold font-spec-num text-[#FF6B7A] leading-tight">3</div>
+                <div class="text-[10px] text-[#5D8AAA] font-spec-num">超许可红线</div>
               </div>
             </div>
           </div>
 
           <!-- Table: 预警事项列表 (Improved readability) -->
-          <div class="flex-1 min-h-[95px]">
-            <div class="text-xs font-bold text-white mb-1.5 flex items-center gap-1.5">
-              <span class="text-cyan-400 font-bold">|</span>
+          <div class="flex-1 min-h-[95px] mt-1 overflow-x-auto custom-dark-scrollbar">
+            <div class="text-xs font-bold text-white mb-1.5 flex items-center gap-1.5 font-spec-cn">
+              <span class="text-[#00E5FF] font-bold">|</span>
               <span>实时预警事项列表</span>
             </div>
             <table class="w-full text-xs text-left">
               <thead>
-                <tr class="text-slate-400 border-b border-[#143b6b]">
-                  <th class="py-1 font-medium">预警类型</th>
-                  <th class="py-1 font-medium">行政区</th>
-                  <th class="py-1 text-right font-medium">当前用水(万m³)</th>
-                  <th class="py-1 text-right font-medium">占指标比</th>
-                  <th class="py-1 text-right font-medium">预警时间</th>
+                <tr class="text-[#5D8AAA] border-b border-[rgba(70,180,235,0.2)] bg-[rgba(10,36,58,0.4)]">
+                  <th class="py-1 px-1 font-medium font-spec-cn">预警类型</th>
+                  <th class="py-1 px-1 font-medium font-spec-cn">行政区</th>
+                  <th class="py-1 px-1 text-right font-medium font-spec-cn">当前用水(万m³)</th>
+                  <th class="py-1 px-1 text-right font-medium font-spec-cn">占指标比</th>
+                  <th class="py-1 px-1 text-right font-medium font-spec-cn">预警时间</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[#143b6b]/40 font-mono text-slate-300">
+              <tbody class="divide-y divide-[rgba(70,180,235,0.12)] divide-dashed font-spec-num text-slate-300">
                 <tr class="hover:bg-white/5 transition cursor-pointer" @click="handleEventClick('城东区接近计划值')">
-                  <td class="py-1 text-amber-400 font-sans font-medium">接近计划值</td>
-                  <td class="py-1 font-sans">城东区</td>
-                  <td class="py-1 text-right">8,432.21</td>
-                  <td class="py-1 text-right text-amber-400">82.6%</td>
-                  <td class="py-1 text-right text-slate-400 font-sans">05-20 08:30</td>
+                  <td class="py-1 px-1 text-[#FFC65C] font-spec-cn font-medium">接近计划值</td>
+                  <td class="py-1 px-1 font-spec-cn">城东区</td>
+                  <td class="py-1 px-1 text-right">8,432.21</td>
+                  <td class="py-1 px-1 text-right text-[#FFC65C]">82.6%</td>
+                  <td class="py-1 px-1 text-right text-[#5D8AAA] font-spec-cn">05-20 08:30</td>
                 </tr>
                 <tr class="hover:bg-white/5 transition cursor-pointer" @click="handleEventClick('城中区超计划预警')">
-                  <td class="py-1 text-orange-400 font-sans font-medium">超计划预警</td>
-                  <td class="py-1 font-sans">城中区</td>
-                  <td class="py-1 text-right">6,512.44</td>
-                  <td class="py-1 text-right text-orange-400 font-bold">105.3%</td>
-                  <td class="py-1 text-right text-slate-400 font-sans">05-20 08:10</td>
+                  <td class="py-1 px-1 text-[#FF9F43] font-spec-cn font-medium">超计划预警</td>
+                  <td class="py-1 px-1 font-spec-cn">城中区</td>
+                  <td class="py-1 px-1 text-right">6,512.44</td>
+                  <td class="py-1 px-1 text-right text-[#FF9F43] font-bold">105.3%</td>
+                  <td class="py-1 px-1 text-right text-[#5D8AAA] font-spec-cn">05-20 08:10</td>
                 </tr>
                 <tr class="hover:bg-white/5 transition cursor-pointer" @click="handleEventClick('湟源县超许可预警')">
-                  <td class="py-1 text-red-400 font-sans font-medium">超许可预警</td>
-                  <td class="py-1 font-sans">湟源县</td>
-                  <td class="py-1 text-right">2,153.75</td>
-                  <td class="py-1 text-right text-red-400 font-bold">112.7%</td>
-                  <td class="py-1 text-right text-slate-400 font-sans">05-20 07:45</td>
+                  <td class="py-1 px-1 text-[#FF6B7A] font-spec-cn font-medium">超许可预警</td>
+                  <td class="py-1 px-1 font-spec-cn">湟源县</td>
+                  <td class="py-1 px-1 text-right">2,153.75</td>
+                  <td class="py-1 px-1 text-right text-[#FF6B7A] font-bold">112.7%</td>
+                  <td class="py-1 px-1 text-right text-[#5D8AAA] font-spec-cn">05-20 07:45</td>
                 </tr>
                 <tr class="hover:bg-white/5 transition cursor-pointer" @click="handleEventClick('湟中区接近计划值')">
-                  <td class="py-1 text-amber-400 font-sans font-medium">接近计划值</td>
-                  <td class="py-1 font-sans">湟中区</td>
-                  <td class="py-1 text-right">5,326.18</td>
-                  <td class="py-1 text-right text-amber-400">78.4%</td>
-                  <td class="py-1 text-right text-slate-400 font-sans">05-20 07:30</td>
+                  <td class="py-1 px-1 text-[#FFC65C] font-spec-cn font-medium">接近计划值</td>
+                  <td class="py-1 px-1 font-spec-cn">湟中区</td>
+                  <td class="py-1 px-1 text-right">5,326.18</td>
+                  <td class="py-1 px-1 text-right text-[#FFC65C]">78.4%</td>
+                  <td class="py-1 px-1 text-right text-[#5D8AAA] font-spec-cn">05-20 07:30</td>
                 </tr>
               </tbody>
             </table>
@@ -2439,85 +2876,107 @@
         </div>
 
         <!-- ================= Right Box 2: 业务关联研判 ================= -->
-        <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[200px] flex flex-col justify-between">
-          <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
-            <div class="flex items-center gap-2">
-              <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">业务关联研判</h2>
+        <div
+          id="dev-anno-9"
+          class="spec-card p-3.5 flex-1 min-h-[200px] flex flex-col justify-between relative transition-all duration-300"
+          :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 9 }"
+        >
+          <!-- Numbered Point 9 Badge (业务关联研判 - 右2) -->
+          <div
+            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+            class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 9 }"
+            @mouseenter="activeAnnotationId = 9"
+            @mouseleave="activeAnnotationId = null"
+            @click="scrollToAnnotation(9)"
+            title="开发标注 #9: 业务关联研判 (右2)"
+          >
+            9
+          </div>
+          <div>
+            <div class="flex items-center justify-between pb-2">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
+                  <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
+                  <polygon points="8,4 12,6 12,10 8,12 4,10 4,6" fill="rgba(0,229,255,0.3)" />
+                </svg>
+                <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide font-spec-cn">业务关联研判</h2>
+              </div>
+              <button
+                type="button"
+                class="text-xs text-[#00E5FF] hover:text-[#79D8FF] transition cursor-pointer flex items-center gap-0.5 font-spec-cn"
+                @click="navigate('enterprise_dossier')"
+              >
+                <span>更多</span>
+                <span>&gt;</span>
+              </button>
             </div>
-            <button
-              type="button"
-              class="text-xs text-cyan-400 hover:text-cyan-300 transition cursor-pointer flex items-center gap-0.5"
-              @click="navigate('enterprise_dossier')"
-            >
-              <span>更多</span>
-              <span>&gt;</span>
-            </button>
+            <div class="spec-header-divider mb-2"></div>
           </div>
 
           <!-- 4 Key Metric Cards (Enlarged) -->
           <div class="grid grid-cols-4 gap-2 text-center my-1.5">
-            <div class="bg-[#0c264c]/70 border border-[#163e70] rounded-lg p-1.5">
-              <div class="text-xs text-slate-300 font-medium">许可误差率</div>
-              <div class="text-sm lg:text-base font-bold font-mono text-cyan-300 mt-0.5">2.35%</div>
-              <div class="text-[11px] text-emerald-400 font-mono mt-0.5">-0.45%</div>
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-1.5">
+              <div class="text-xs text-slate-300 font-medium font-spec-cn">许可误差率</div>
+              <div class="text-sm lg:text-base font-bold font-spec-num text-[#00E5FF] mt-0.5">2.35%</div>
+              <div class="text-[10px] text-[#3DDC97] font-spec-num mt-0.5">-0.45%</div>
             </div>
 
-            <div class="bg-[#0c264c]/70 border border-[#163e70] rounded-lg p-1.5">
-              <div class="text-xs text-slate-300 font-medium">证照问题数</div>
-              <div class="text-sm lg:text-base font-bold font-mono text-amber-400 mt-0.5">56 个</div>
-              <div class="text-[11px] text-emerald-400 font-mono mt-0.5">-12 个</div>
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-1.5">
+              <div class="text-xs text-slate-300 font-medium font-spec-cn">证照问题数</div>
+              <div class="text-sm lg:text-base font-bold font-spec-num text-[#FFC65C] mt-0.5">56 个</div>
+              <div class="text-[10px] text-[#3DDC97] font-spec-num mt-0.5">-12 个</div>
             </div>
 
-            <div class="bg-[#0c264c]/70 border border-[#163e70] rounded-lg p-1.5">
-              <div class="text-xs text-slate-300 font-medium">治理完成率</div>
-              <div class="text-sm lg:text-base font-bold font-mono text-emerald-400 mt-0.5">92.35%</div>
-              <div class="text-[11px] text-emerald-400 font-mono mt-0.5">+2.35%</div>
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-1.5">
+              <div class="text-xs text-slate-300 font-medium font-spec-cn">治理完成率</div>
+              <div class="text-sm lg:text-base font-bold font-spec-num text-[#3DDC97] mt-0.5">92.35%</div>
+              <div class="text-[10px] text-[#3DDC97] font-spec-num mt-0.5">+2.35%</div>
             </div>
 
-            <div class="bg-[#0c264c]/70 border border-[#163e70] rounded-lg p-1.5">
-              <div class="text-xs text-slate-300 font-medium">未治理占比</div>
-              <div class="text-sm lg:text-base font-bold font-mono text-rose-400 mt-0.5">7.65%</div>
-              <div class="text-[11px] text-emerald-400 font-mono mt-0.5">-2.35%</div>
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-1.5">
+              <div class="text-xs text-slate-300 font-medium font-spec-cn">未治理占比</div>
+              <div class="text-sm lg:text-base font-bold font-spec-num text-[#FF6B7A] mt-0.5">7.65%</div>
+              <div class="text-[10px] text-[#3DDC97] font-spec-num mt-0.5">-2.35%</div>
             </div>
           </div>
 
           <!-- Sub-Row: TOP5 Error Rates & License Issue Types -->
-          <div class="grid grid-cols-2 gap-3 pt-1.5 border-t border-[#143b6b]/60 flex-1">
+          <div class="grid grid-cols-2 gap-3 pt-1.5 border-t border-[rgba(70,180,235,0.2)] flex-1">
             <!-- Left: 许可水量误差率TOP -->
             <div>
-              <div class="text-xs font-bold text-white mb-1.5 flex items-center gap-1.5">
-                <span class="text-cyan-400 font-bold">|</span>
+              <div class="text-xs font-bold text-white mb-1.5 flex items-center gap-1.5 font-spec-cn">
+                <span class="text-[#00E5FF] font-bold">|</span>
                 <span>许可水量误差TOP</span>
               </div>
               <table class="w-full text-xs text-left">
                 <thead>
-                  <tr class="text-slate-400 border-b border-[#143b6b]/60">
-                    <th class="py-1 font-medium w-4">#</th>
-                    <th class="py-1 font-medium">单位名称</th>
-                    <th class="py-1 text-right font-medium">误差率</th>
+                  <tr class="text-[#5D8AAA] border-b border-[rgba(70,180,235,0.2)] bg-[rgba(10,36,58,0.4)]">
+                    <th class="py-1 px-1 font-medium w-4 font-spec-cn">#</th>
+                    <th class="py-1 px-1 font-medium font-spec-cn">单位名称</th>
+                    <th class="py-1 px-1 text-right font-medium font-spec-cn">误差率</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-[#143b6b]/40 font-mono text-slate-300">
+                <tbody class="divide-y divide-[rgba(70,180,235,0.12)] divide-dashed font-spec-num text-slate-300">
                   <tr>
-                    <td class="py-1 text-center text-amber-400 font-bold">1</td>
-                    <td class="py-1 font-sans truncate max-w-[85px]">湟源县某农水户</td>
-                    <td class="py-1 text-right text-rose-400 font-bold">8.72%</td>
+                    <td class="py-1 px-1 text-center text-[#FFC65C] font-bold">1</td>
+                    <td class="py-1 px-1 font-spec-cn truncate max-w-[85px]">湟源县某农水户</td>
+                    <td class="py-1 px-1 text-right text-[#FF6B7A] font-bold">8.72%</td>
                   </tr>
                   <tr>
-                    <td class="py-1 text-center text-amber-400 font-bold">2</td>
-                    <td class="py-1 font-sans truncate max-w-[85px]">大通县某工业户</td>
-                    <td class="py-1 text-right text-rose-400">6.35%</td>
+                    <td class="py-1 px-1 text-center text-[#FFC65C] font-bold">2</td>
+                    <td class="py-1 px-1 font-spec-cn truncate max-w-[85px]">大通县某工业户</td>
+                    <td class="py-1 px-1 text-right text-[#FF6B7A]">6.35%</td>
                   </tr>
                   <tr>
-                    <td class="py-1 text-center text-slate-400">3</td>
-                    <td class="py-1 font-sans truncate max-w-[85px]">城北区某企业</td>
-                    <td class="py-1 text-right text-amber-400">4.28%</td>
+                    <td class="py-1 px-1 text-center text-[#5D8AAA]">3</td>
+                    <td class="py-1 px-1 font-spec-cn truncate max-w-[85px]">城北区某企业</td>
+                    <td class="py-1 px-1 text-right text-[#FFC65C]">4.28%</td>
                   </tr>
                   <tr>
-                    <td class="py-1 text-center text-slate-400">4</td>
-                    <td class="py-1 font-sans truncate max-w-[85px]">湟中区某灌区</td>
-                    <td class="py-1 text-right text-slate-300">3.21%</td>
+                    <td class="py-1 px-1 text-center text-[#5D8AAA]">4</td>
+                    <td class="py-1 px-1 font-spec-cn truncate max-w-[85px]">湟中区某灌区</td>
+                    <td class="py-1 px-1 text-right text-slate-300">3.21%</td>
                   </tr>
                 </tbody>
               </table>
@@ -2525,51 +2984,51 @@
 
             <!-- Right: 证照问题类型分布 (Donut chart & stats) -->
             <div class="flex flex-col justify-between">
-              <div class="text-xs font-bold text-white mb-1.5 flex items-center justify-between">
+              <div class="text-xs font-bold text-white mb-1.5 flex items-center justify-between font-spec-cn">
                 <div class="flex items-center gap-1.5">
-                  <span class="text-cyan-400 font-bold">|</span>
+                  <span class="text-[#00E5FF] font-bold">|</span>
                   <span>证照问题分布</span>
                 </div>
-                <span class="text-[10px] text-slate-400 font-mono font-normal">共 56 个</span>
+                <span class="text-[10px] text-[#5D8AAA] font-spec-num font-normal">共 56 个</span>
               </div>
               <div class="flex items-center gap-2 mt-0.5">
                 <!-- Mini Donut -->
                 <div class="w-14 h-14 relative shrink-0">
                   <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
-                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#0284c7" stroke-width="15" stroke-dasharray="72.4 153.8" stroke-dashoffset="0">
+                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#00E5FF" stroke-width="15" stroke-dasharray="72.4 153.8" stroke-dashoffset="0">
                       <title>计量水量超许可: 18个 (32%)</title>
                     </circle>
-                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#06b6d4" stroke-width="15" stroke-dasharray="56.5 169.7" stroke-dashoffset="-72.4">
+                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#38BDF8" stroke-width="15" stroke-dasharray="56.5 169.7" stroke-dashoffset="-72.4">
                       <title>直报水量超许可: 14个 (25%)</title>
                     </circle>
-                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#f59e0b" stroke-width="15" stroke-dasharray="40.7 185.5" stroke-dashoffset="-128.9">
+                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#FFC65C" stroke-width="15" stroke-dasharray="40.7 185.5" stroke-dashoffset="-128.9">
                       <title>违规新增取水许可: 10个 (18%)</title>
                     </circle>
-                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#ef4444" stroke-width="15" stroke-dasharray="31.7 194.5" stroke-dashoffset="-169.6">
+                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#FF6B7A" stroke-width="15" stroke-dasharray="31.7 194.5" stroke-dashoffset="-169.6">
                       <title>证照失效仍取水: 8个 (14%)</title>
                     </circle>
-                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#8b5cf6" stroke-width="15" stroke-dasharray="24.9 201.3" stroke-dashoffset="-201.3">
+                    <circle cx="50" cy="50" r="36" fill="transparent" stroke="#A78BFA" stroke-width="15" stroke-dasharray="24.9 201.3" stroke-dashoffset="-201.3">
                       <title>取水计量数据异常: 6个 (11%)</title>
                     </circle>
                   </svg>
                   <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span class="text-[11px] font-bold font-mono text-cyan-300 leading-none">56</span>
-                    <span class="text-[8px] text-slate-400 scale-90 leading-none mt-0.5">个</span>
+                    <span class="text-[11px] font-bold font-spec-num text-[#00E5FF] leading-none">56</span>
+                    <span class="text-[8px] text-[#5D8AAA] scale-90 leading-none mt-0.5 font-spec-cn">个</span>
                   </div>
                 </div>
 
                 <!-- Labels -->
-                <div class="space-y-0.5 text-[11px] text-slate-300 leading-tight flex-1 min-w-0">
+                <div class="space-y-0.5 text-[11px] text-slate-300 leading-tight flex-1 min-w-0 font-spec-cn">
                   <div
                     class="flex items-center justify-between gap-1 hover:text-white transition-colors cursor-pointer group"
                     title="计量水量超许可: 18个 (32%)"
                     @click="handleEventClick('计量水量超许可研判')"
                   >
                     <div class="flex items-center gap-1.5 min-w-0">
-                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#0284c7]"></span>
-                      <span class="truncate group-hover:text-cyan-300 transition-colors">计量水量超许可</span>
+                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#00E5FF]"></span>
+                      <span class="truncate group-hover:text-[#00E5FF] transition-colors">计量水量超许可</span>
                     </div>
-                    <span class="font-mono text-cyan-400 text-[10px] shrink-0">32%</span>
+                    <span class="font-spec-num text-[#00E5FF] text-[10px] shrink-0">32%</span>
                   </div>
 
                   <div
@@ -2578,10 +3037,10 @@
                     @click="handleEventClick('直报水量超许可研判')"
                   >
                     <div class="flex items-center gap-1.5 min-w-0">
-                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#06b6d4]"></span>
-                      <span class="truncate group-hover:text-cyan-300 transition-colors">直报水量超许可</span>
+                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#38BDF8]"></span>
+                      <span class="truncate group-hover:text-[#38BDF8] transition-colors">直报水量超许可</span>
                     </div>
-                    <span class="font-mono text-cyan-400 text-[10px] shrink-0">25%</span>
+                    <span class="font-spec-num text-[#38BDF8] text-[10px] shrink-0">25%</span>
                   </div>
 
                   <div
@@ -2590,10 +3049,10 @@
                     @click="handleEventClick('违规新增取水许可研判')"
                   >
                     <div class="flex items-center gap-1.5 min-w-0">
-                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#f59e0b]"></span>
-                      <span class="truncate group-hover:text-amber-300 transition-colors">违规新增取水许可</span>
+                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#FFC65C]"></span>
+                      <span class="truncate group-hover:text-[#FFC65C] transition-colors">违规新增取水许可</span>
                     </div>
-                    <span class="font-mono text-amber-400 text-[10px] shrink-0">18%</span>
+                    <span class="font-spec-num text-[#FFC65C] text-[10px] shrink-0">18%</span>
                   </div>
 
                   <div
@@ -2602,10 +3061,10 @@
                     @click="handleEventClick('证照失效仍取水研判')"
                   >
                     <div class="flex items-center gap-1.5 min-w-0">
-                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#ef4444]"></span>
-                      <span class="truncate group-hover:text-rose-300 transition-colors">证照失效仍取水</span>
+                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#FF6B7A]"></span>
+                      <span class="truncate group-hover:text-[#FF6B7A] transition-colors">证照失效仍取水</span>
                     </div>
-                    <span class="font-mono text-rose-400 text-[10px] shrink-0">14%</span>
+                    <span class="font-spec-num text-[#FF6B7A] text-[10px] shrink-0">14%</span>
                   </div>
 
                   <div
@@ -2614,10 +3073,10 @@
                     @click="handleEventClick('取水计量数据异常研判')"
                   >
                     <div class="flex items-center gap-1.5 min-w-0">
-                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#8b5cf6]"></span>
-                      <span class="truncate group-hover:text-purple-300 transition-colors">取水计量数据异常</span>
+                      <span class="w-1.5 h-1.5 rounded-xs shrink-0 bg-[#A78BFA]"></span>
+                      <span class="truncate group-hover:text-[#A78BFA] transition-colors">取水计量数据异常</span>
                     </div>
-                    <span class="font-mono text-purple-400 text-[10px] shrink-0">11%</span>
+                    <span class="font-spec-num text-[#A78BFA] text-[10px] shrink-0">11%</span>
                   </div>
                 </div>
               </div>
@@ -2626,139 +3085,191 @@
         </div>
 
         <!-- ================= Right Box 3: 计量点接入与到报率监控 ================= -->
-        <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[200px] flex flex-col justify-between">
-          <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
-            <div class="flex items-center gap-2">
-              <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">计量点接入与到报率监控</h2>
+        <div
+          id="dev-anno-10"
+          class="spec-card p-3.5 flex-1 min-h-[200px] flex flex-col justify-between relative transition-all duration-300"
+          :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 10 }"
+        >
+          <!-- Numbered Point 10 Badge (计量点接入与到报率监控 - 右3) -->
+          <div
+            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+            class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 10 }"
+            @mouseenter="activeAnnotationId = 10"
+            @mouseleave="activeAnnotationId = null"
+            @click="scrollToAnnotation(10)"
+            title="开发标注 #10: 计量点接入与到报率监控 (右3)"
+          >
+            10
+          </div>
+          <div>
+            <div class="flex items-center justify-between pb-2">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
+                  <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
+                  <polygon points="8,4 12,6 12,10 8,12 4,10 4,6" fill="rgba(0,229,255,0.3)" />
+                </svg>
+                <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide font-spec-cn">计量点接入与到报率监控</h2>
+              </div>
+              <button
+                type="button"
+                class="text-xs text-[#00E5FF] hover:text-[#79D8FF] transition cursor-pointer flex items-center gap-0.5 font-spec-cn"
+                @click="navigate('facility_management')"
+              >
+                <span>更多</span>
+                <span>&gt;</span>
+              </button>
             </div>
-            <button
-              type="button"
-              class="text-xs text-cyan-400 hover:text-cyan-300 transition cursor-pointer flex items-center gap-0.5"
-              @click="navigate('facility_management')"
-            >
-              <span>更多</span>
-              <span>&gt;</span>
-            </button>
+            <div class="spec-header-divider mb-2"></div>
           </div>
 
           <!-- 2 Meter Category Stats -->
           <div class="grid grid-cols-2 gap-2 text-center text-xs my-1.5">
-            <div class="bg-[#0c264c]/70 border border-[#163e70] rounded-lg p-2">
-              <div class="text-xs text-slate-300 font-medium mb-1">规模以上农业计量点</div>
-              <div class="flex justify-around items-center font-mono">
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-2">
+              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">规模以上农业计量点</div>
+              <div class="flex justify-around items-center font-spec-num">
                 <div>
-                  <span class="text-[11px] text-slate-400 block font-sans">接入率</span>
-                  <span class="font-bold text-cyan-400 text-sm">92.36%</span>
+                  <span class="text-[10px] text-[#5D8AAA] block font-spec-cn">接入率</span>
+                  <span class="font-bold text-[#00E5FF] text-sm">92.36%</span>
                 </div>
-                <div class="w-px h-6 bg-[#163e70]"></div>
+                <div class="w-px h-6 bg-[rgba(70,180,235,0.2)]"></div>
                 <div>
-                  <span class="text-[11px] text-slate-400 block font-sans">到报率</span>
-                  <span class="font-bold text-emerald-400 text-sm">88.45%</span>
+                  <span class="text-[10px] text-[#5D8AAA] block font-spec-cn">到报率</span>
+                  <span class="font-bold text-[#3DDC97] text-sm">88.45%</span>
                 </div>
               </div>
             </div>
 
-            <div class="bg-[#0c264c]/70 border border-[#163e70] rounded-lg p-2">
-              <div class="text-xs text-slate-300 font-medium mb-1">规模以上非农计量点</div>
-              <div class="flex justify-around items-center font-mono">
+            <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-2">
+              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">规模以上非农计量点</div>
+              <div class="flex justify-around items-center font-spec-num">
                 <div>
-                  <span class="text-[11px] text-slate-400 block font-sans">接入率</span>
-                  <span class="font-bold text-cyan-400 text-sm">95.12%</span>
+                  <span class="text-[10px] text-[#5D8AAA] block font-spec-cn">接入率</span>
+                  <span class="font-bold text-[#00E5FF] text-sm">95.12%</span>
                 </div>
-                <div class="w-px h-6 bg-[#163e70]"></div>
+                <div class="w-px h-6 bg-[rgba(70,180,235,0.2)]"></div>
                 <div>
-                  <span class="text-[11px] text-slate-400 block font-sans">到报率</span>
-                  <span class="font-bold text-emerald-400 text-sm">91.27%</span>
+                  <span class="text-[10px] text-[#5D8AAA] block font-spec-cn">到报率</span>
+                  <span class="font-bold text-[#3DDC97] text-sm">91.27%</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Sub-Row: 接入率月度趋势对比 & 到报率滞后点位TOP -->
-          <div class="grid grid-cols-2 gap-3 pt-1.5 border-t border-[#143b6b]/60 flex-1">
-            <!-- Left: 接入率月度趋势对比 -->
-            <div>
-              <div class="text-xs font-bold text-white mb-1 flex items-center justify-between">
-                <span class="text-cyan-400">| 接入率趋势对比</span>
-                <div class="flex items-center gap-2 text-xs text-slate-300">
-                  <span class="text-blue-400 font-medium">● 农业</span>
-                  <span class="text-cyan-400 font-medium">● 非农</span>
-                </div>
+          <!-- Sub-Row: 仅展示接入率趋势对比 (全宽展示，已去掉到报率滞后TOP) -->
+          <div class="pt-2 border-t border-[rgba(70,180,235,0.2)] flex-1 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs font-bold text-white mb-1.5 font-spec-cn">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[#00E5FF] font-bold">|</span>
+                <span>计量点接入率月度趋势对比</span>
               </div>
-              <!-- Mini SVG line chart -->
-              <div class="w-full h-20">
-                <svg viewBox="0 0 160 70" class="w-full h-full overflow-visible">
-                  <line x1="22" y1="10" x2="155" y2="10" stroke="#163866" stroke-width="0.8" />
-                  <line x1="22" y1="30" x2="155" y2="30" stroke="#163866" stroke-width="0.8" />
-                  <line x1="22" y1="50" x2="155" y2="50" stroke="#163866" stroke-width="0.8" />
-
-                  <g fill="#94a3b8" font-size="8" font-family="monospace">
-                    <text x="18" y="13" text-anchor="end">100</text>
-                    <text x="18" y="33" text-anchor="end">50</text>
-                    <text x="18" y="53" text-anchor="end">0</text>
-                  </g>
-
-                  <!-- 农业 Line -->
-                  <path d="M 28,20 L 52,18 L 76,17 L 100,16 L 124,15 L 148,14" fill="none" stroke="#2563eb" stroke-width="1.8" />
-                  <!-- 非农 Line -->
-                  <path d="M 28,15 L 52,14 L 76,13 L 100,12 L 124,11 L 148,10" fill="none" stroke="#00e5ff" stroke-width="1.8" />
-
-                  <!-- Month Labels -->
-                  <g fill="#cbd5e1" font-size="8" text-anchor="middle">
-                    <text x="28" y="63">1月</text>
-                    <text x="52" y="63">2月</text>
-                    <text x="76" y="63">3月</text>
-                    <text x="100" y="63">4月</text>
-                    <text x="124" y="63">5月</text>
-                    <text x="148" y="63">6月</text>
-                  </g>
-                </svg>
+              <div class="flex items-center gap-3 text-xs text-slate-300">
+                <span class="flex items-center gap-1 text-[#38BDF8]">
+                  <span class="w-2.5 h-0.5 bg-[#38BDF8] rounded-xs"></span>
+                  <span class="font-medium text-[11px]">农业计量点</span>
+                </span>
+                <span class="flex items-center gap-1 text-[#00E5FF]">
+                  <span class="w-2.5 h-0.5 bg-[#00E5FF] rounded-xs shadow-[0_0_4px_#00E5FF]"></span>
+                  <span class="font-medium text-[11px]">非农计量点</span>
+                </span>
               </div>
             </div>
 
-            <!-- Right: 到报率滞后点位TOP -->
-            <div>
-              <div class="text-xs font-bold text-white mb-1 flex items-center gap-1.5">
-                <span class="text-cyan-400 font-bold">|</span>
-                <span>到报率滞后TOP</span>
-              </div>
-              <table class="w-full text-xs text-left">
-                <thead>
-                  <tr class="text-slate-400 border-b border-[#143b6b]/60">
-                    <th class="py-0.5 font-medium w-4">#</th>
-                    <th class="py-0.5 font-medium">点位名称</th>
-                    <th class="py-0.5 text-right font-medium">到报率</th>
-                    <th class="py-0.5 text-right font-medium">滞后</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-[#143b6b]/40 font-mono text-slate-300">
-                  <tr>
-                    <td class="py-0.5 text-center text-amber-400 font-bold">1</td>
-                    <td class="py-0.5 font-sans truncate max-w-[75px]">城东区某取水口</td>
-                    <td class="py-0.5 text-right text-rose-400">76.2%</td>
-                    <td class="py-0.5 text-right text-rose-400 font-bold">3天</td>
-                  </tr>
-                  <tr>
-                    <td class="py-0.5 text-center text-amber-400 font-bold">2</td>
-                    <td class="py-0.5 font-sans truncate max-w-[75px]">湟源县某灌区</td>
-                    <td class="py-0.5 text-right text-rose-400">78.5%</td>
-                    <td class="py-0.5 text-right text-rose-400">2天</td>
-                  </tr>
-                  <tr>
-                    <td class="py-0.5 text-center text-slate-400">3</td>
-                    <td class="py-0.5 font-sans truncate max-w-[75px]">城北区某企业</td>
-                    <td class="py-0.5 text-right text-amber-400">80.1%</td>
-                    <td class="py-0.5 text-right text-amber-400">2天</td>
-                  </tr>
-                  <tr>
-                    <td class="py-0.5 text-center text-slate-400">4</td>
-                    <td class="py-0.5 font-sans truncate max-w-[75px]">大通县某水厂</td>
-                    <td class="py-0.5 text-right text-slate-300">81.1%</td>
-                    <td class="py-0.5 text-right text-slate-300">1天</td>
-                  </tr>
-                </tbody>
-              </table>
+            <!-- Full-width SVG Trend Chart -->
+            <div class="w-full h-28 relative">
+              <svg viewBox="0 0 380 95" class="w-full h-full overflow-visible">
+                <defs>
+                  <linearGradient id="accessAgriArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.25" />
+                    <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.0" />
+                  </linearGradient>
+                  <linearGradient id="accessNonAgriArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.3" />
+                    <stop offset="100%" stop-color="#00E5FF" stop-opacity="0.0" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Horizontal Grid Lines (100%, 90%, 80%, 70%) -->
+                <g stroke="rgba(70,180,235,0.12)" stroke-width="0.8">
+                  <line x1="30" y1="12" x2="368" y2="12" />
+                  <line x1="30" y1="34" x2="368" y2="34" />
+                  <line x1="30" y1="56" x2="368" y2="56" />
+                  <line x1="30" y1="78" x2="368" y2="78" stroke="rgba(70,180,235,0.22)" />
+                </g>
+
+                <!-- Y-Axis Labels -->
+                <g fill="#5D8AAA" font-size="8.5" font-family="var(--spec-num)" text-anchor="end">
+                  <text x="26" y="15">100%</text>
+                  <text x="26" y="37">90%</text>
+                  <text x="26" y="59">80%</text>
+                  <text x="26" y="81">70%</text>
+                </g>
+
+                <!-- 1. 农业 Area & Smooth Line (88.5% -> 92.4%) -->
+                <path
+                  d="M 55,37.3 Q 85,36.5 115,35.8 T 175,33.1 T 235,31.6 T 295,30.0 T 355,28.7 L 355,78 L 55,78 Z"
+                  fill="url(#accessAgriArea)"
+                />
+                <path
+                  d="M 55,37.3 Q 85,36.5 115,35.8 T 175,33.1 T 235,31.6 T 295,30.0 T 355,28.7"
+                  fill="none"
+                  stroke="#38BDF8"
+                  stroke-width="2"
+                />
+
+                <!-- 2. 非农 Area & Smooth Line (91.0% -> 95.1%) -->
+                <path
+                  d="M 55,31.8 Q 85,30.1 115,28.5 T 175,26.5 T 235,24.8 T 295,23.4 T 355,22.8 L 355,78 L 55,78 Z"
+                  fill="url(#accessNonAgriArea)"
+                />
+                <path
+                  d="M 55,31.8 Q 85,30.1 115,28.5 T 175,26.5 T 235,24.8 T 295,23.4 T 355,22.8"
+                  fill="none"
+                  stroke="#00E5FF"
+                  stroke-width="2.2"
+                />
+
+                <!-- Data Points & Labels -->
+                <g>
+                  <circle cx="55" cy="37.3" r="2.5" fill="#38BDF8" stroke="#07172f" stroke-width="1.2" />
+                  <circle cx="55" cy="31.8" r="2.5" fill="#00E5FF" stroke="#07172f" stroke-width="1.2" />
+                  <text x="55" y="90" text-anchor="middle" font-size="8.5" fill="#8AAEC8" font-family="var(--spec-num)">1月</text>
+                </g>
+                <g>
+                  <circle cx="115" cy="35.8" r="2.5" fill="#38BDF8" stroke="#07172f" stroke-width="1.2" />
+                  <circle cx="115" cy="28.5" r="2.5" fill="#00E5FF" stroke="#07172f" stroke-width="1.2" />
+                  <text x="115" y="90" text-anchor="middle" font-size="8.5" fill="#8AAEC8" font-family="var(--spec-num)">2月</text>
+                </g>
+                <g>
+                  <circle cx="175" cy="33.1" r="2.5" fill="#38BDF8" stroke="#07172f" stroke-width="1.2" />
+                  <circle cx="175" cy="26.5" r="2.5" fill="#00E5FF" stroke="#07172f" stroke-width="1.2" />
+                  <text x="175" y="90" text-anchor="middle" font-size="8.5" fill="#8AAEC8" font-family="var(--spec-num)">3月</text>
+                </g>
+                <g>
+                  <circle cx="235" cy="31.6" r="2.5" fill="#38BDF8" stroke="#07172f" stroke-width="1.2" />
+                  <circle cx="235" cy="24.8" r="2.5" fill="#00E5FF" stroke="#07172f" stroke-width="1.2" />
+                  <text x="235" y="90" text-anchor="middle" font-size="8.5" fill="#8AAEC8" font-family="var(--spec-num)">4月</text>
+                </g>
+                <g>
+                  <circle cx="295" cy="30.0" r="2.5" fill="#38BDF8" stroke="#07172f" stroke-width="1.2" />
+                  <circle cx="295" cy="23.4" r="2.5" fill="#00E5FF" stroke="#07172f" stroke-width="1.2" />
+                  <text x="295" y="90" text-anchor="middle" font-size="8.5" fill="#8AAEC8" font-family="var(--spec-num)">5月</text>
+                </g>
+                <!-- 6月 (当前高亮点) -->
+                <g>
+                  <circle cx="355" cy="28.7" r="3.5" fill="#ffffff" stroke="#38BDF8" stroke-width="2" />
+                  <text x="355" y="19" text-anchor="middle" font-size="8.5" fill="#38BDF8" font-weight="bold" font-family="var(--spec-num)">92.4%</text>
+                  <circle cx="355" cy="22.8" r="3.5" fill="#ffffff" stroke="#00E5FF" stroke-width="2" />
+                  <text x="355" y="10" text-anchor="middle" font-size="8.5" fill="#00E5FF" font-weight="bold" font-family="var(--spec-num)">95.1%</text>
+                  <text x="355" y="90" text-anchor="middle" font-size="8.5" fill="#00E5FF" font-weight="bold" font-family="var(--spec-num)">6月</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Footer summary strip -->
+            <div class="mt-1 pt-1.5 border-t border-[rgba(70,180,235,0.15)] flex items-center justify-between text-[10px] text-[#8FB6D4]">
+              <span>接入趋势研判：<span class="text-[#3DDC97] font-bold font-spec-cn">平稳上扬 (较年初 +3.8%)</span></span>
+              <span>通信质量：<span class="text-[#DCF2FF] font-spec-cn">99.1% 优良传输</span></span>
             </div>
           </div>
         </div>
@@ -2767,167 +3278,243 @@
         <!-- B. 专项业务应用场景 (右侧模块 3: 异常情况处置 & 模块 4: 取水数据对比分析与复核跟踪 - 精炼色彩) -->
         <template v-else>
           <!-- ================= 专项 Card 3: 异常情况处置与运维能效评估 ================= -->
-          <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[300px] flex flex-col justify-between">
+          <div class="spec-card p-3 flex-1 min-h-0 flex flex-col justify-between overflow-hidden relative">
             <!-- Card Header -->
-            <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-                <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">异常情况处置与能效评估</h2>
+            <div>
+              <div class="flex items-center justify-between pb-1.5">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
+                    <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
+                    <polygon points="8,4 12,6 12,10 8,12 4,10 4,6" fill="rgba(0,229,255,0.3)" />
+                  </svg>
+                  <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide font-spec-cn">异常情况处置与能效评估</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 text-xs text-[#00E5FF] font-spec-num">
+                    <span class="text-[#5D8AAA] font-spec-cn">闭环率:</span>
+                    <span class="font-bold text-[#00E5FF]">{{ operationEfficiencyMetrics.closedLoopRate }}%</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="text-xs text-[#00E5FF] hover:text-[#79D8FF] transition cursor-pointer flex items-center gap-0.5 font-spec-cn ml-1"
+                    @click="navigate('alarm_work_order')"
+                    title="跳转至告警工单处置台账"
+                  >
+                    <span>工单台账</span>
+                    <span>&gt;</span>
+                  </button>
+                </div>
               </div>
-              <div class="flex items-center gap-1.5 text-xs text-cyan-300 font-mono">
-                <span class="text-slate-400 font-sans">闭环率:</span>
-                <span class="font-bold text-cyan-300">{{ operationEfficiencyMetrics.closedLoopRate }}%</span>
+              <div class="spec-header-divider mb-1.5"></div>
+            </div>
+
+            <!-- 1. 异常工单处置统计 (调整后标题，去掉青海/西宁按钮，与地图区县联动) -->
+            <div class="p-2 bg-[rgba(6,26,46,0.65)] rounded-lg border border-[rgba(70,180,235,0.22)]">
+              <!-- Header with Title and Map District Linkage Badge -->
+              <div class="flex items-center justify-between pb-1 mb-1.5 border-b border-[rgba(70,180,235,0.18)]">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[#00E5FF] font-bold">|</span>
+                  <span class="text-xs font-semibold text-white tracking-wide font-spec-cn">异常工单处置统计</span>
+                </div>
+
+                <!-- 地图区县联动指示与切换 -->
+                <div class="flex items-center gap-1.5 text-[10px]">
+                  <span class="text-[#8AAEC8] font-spec-cn">地图联动:</span>
+                  <button
+                    type="button"
+                    class="px-2 py-0.5 rounded cursor-pointer transition font-spec-cn flex items-center gap-1"
+                    :class="filterParams.district !== '西宁市'
+                      ? 'bg-[#00E5FF]/25 text-[#9BEAFF] font-bold border border-[#00E5FF]/60 shadow-[0_0_8px_rgba(0,229,255,0.3)]'
+                      : 'bg-[#071932] text-[#8AAEC8] border border-[rgba(70,180,235,0.25)] hover:text-white'"
+                    @click="filterParams.district = '西宁市'"
+                    :title="filterParams.district !== '西宁市' ? '点击重置为全域' : '当前展示西宁全域'"
+                  >
+                    <span>{{ filterParams.district === '西宁市' ? '西宁全域 (7区县)' : filterParams.district }}</span>
+                    <span v-if="filterParams.district !== '西宁市'" class="text-[#00E5FF] hover:text-white ml-0.5">✕</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 4-Metric Aggregated Summary Strip for Active Linked District -->
+              <div class="grid grid-cols-4 gap-1.5 mb-1.5 text-center text-xs">
+                <!-- 待处置 -->
+                <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(255,198,92,0.3)] rounded p-1">
+                  <span class="text-[9.5px] text-[#FFC65C] font-spec-cn block">待处置</span>
+                  <div class="text-sm font-bold font-spec-num text-[#FFC65C] mt-0.5">
+                    {{ currentWorkOrderTotals.pending }} <span class="text-[9px] font-normal text-[#FFC65C]/80">起</span>
+                  </div>
+                </div>
+                <!-- 处置中 -->
+                <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(0,229,255,0.3)] rounded p-1">
+                  <span class="text-[9.5px] text-[#00E5FF] font-spec-cn block">处置中</span>
+                  <div class="text-sm font-bold font-spec-num text-[#00E5FF] mt-0.5">
+                    {{ currentWorkOrderTotals.processing }} <span class="text-[9px] font-normal text-[#00E5FF]/80">起</span>
+                  </div>
+                </div>
+                <!-- 待水量修订 -->
+                <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(56,189,248,0.3)] rounded p-1">
+                  <span class="text-[9.5px] text-[#38BDF8] font-spec-cn block">待水量修订</span>
+                  <div class="text-sm font-bold font-spec-num text-[#38BDF8] mt-0.5">
+                    {{ currentWorkOrderTotals.revisionNeeded }} <span class="text-[9px] font-normal text-[#38BDF8]/80">起</span>
+                  </div>
+                </div>
+                <!-- 已完成修订 -->
+                <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(61,220,151,0.3)] rounded p-1">
+                  <span class="text-[9.5px] text-[#3DDC97] font-spec-cn block">已完成修订</span>
+                  <div class="text-sm font-bold font-spec-num text-[#3DDC97] mt-0.5">
+                    {{ currentWorkOrderTotals.completed }} <span class="text-[9px] font-normal text-[#3DDC97]/80">起</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Data Table: 行政区划、待处置、处置中、待水量修订、已完成修订、合计 (与地图区县点击联动) -->
+              <div class="overflow-x-auto max-h-[135px] custom-dark-scrollbar">
+                <table class="w-full text-xs text-left">
+                  <thead class="sticky top-0 z-10">
+                    <tr class="text-[#8FB6D4] border-b border-[rgba(70,180,235,0.2)] bg-[rgba(10,36,58,0.95)] backdrop-blur-xs text-[10.5px]">
+                      <th class="py-1 px-1.5 font-medium font-spec-cn text-left">行政区划</th>
+                      <th class="py-1 px-1 font-medium font-spec-cn text-right text-[#FFC65C]">待处置</th>
+                      <th class="py-1 px-1 font-medium font-spec-cn text-right text-[#00E5FF]">处置中</th>
+                      <th class="py-1 px-1 font-medium font-spec-cn text-right text-[#38BDF8]">待修订</th>
+                      <th class="py-1 px-1 font-medium font-spec-cn text-right text-[#3DDC97]">已完成</th>
+                      <th class="py-1 px-1.5 font-medium font-spec-cn text-right text-[#E4F6FF]">合计</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[rgba(70,180,235,0.12)] font-spec-num text-slate-300">
+                    <tr
+                      v-for="item in currentWorkOrderStats"
+                      :key="item.district"
+                      class="transition cursor-pointer group"
+                      :class="filterParams.district === item.district
+                        ? 'bg-[rgba(0,229,255,0.18)] font-semibold'
+                        : 'hover:bg-white/5'"
+                      @click="filterParams.district = filterParams.district === item.district ? '西宁市' : item.district"
+                      :title="`点击联动地图定位 ${item.district}`"
+                    >
+                      <td class="py-1 px-1.5 font-spec-cn font-medium flex items-center gap-1.5"
+                          :class="filterParams.district === item.district ? 'text-[#00E5FF]' : 'text-[#DCF2FF] group-hover:text-[#00E5FF]'">
+                        <span
+                          class="w-1.5 h-1.5 rounded-full transition-all"
+                          :class="filterParams.district === item.district ? 'bg-[#00E5FF] shadow-[0_0_6px_#00E5FF]' : 'bg-[#00E5FF]/60'"
+                        ></span>
+                        <span class="truncate">{{ item.district }}</span>
+                        <span v-if="filterParams.district === item.district" class="text-[9px] px-1 py-0 rounded bg-[#00E5FF]/30 text-[#00E5FF] font-normal font-spec-cn">选中</span>
+                      </td>
+                      <td class="py-1 px-1 text-right text-[#FFC65C] font-semibold">
+                        {{ item.pending }}
+                      </td>
+                      <td class="py-1 px-1 text-right text-[#00E5FF]">
+                        {{ item.processing }}
+                      </td>
+                      <td class="py-1 px-1 text-right text-[#38BDF8]">
+                        {{ item.revisionNeeded }}
+                      </td>
+                      <td class="py-1 px-1 text-right text-[#3DDC97]">
+                        {{ item.completed }}
+                      </td>
+                      <td class="py-1 px-1.5 text-right font-bold text-[#E4F6FF]">
+                        {{ item.total }}
+                      </td>
+                    </tr>
+                    <!-- Total Row -->
+                    <tr
+                      class="bg-[rgba(10,36,58,0.9)] font-bold border-t border-[rgba(70,180,235,0.3)] sticky bottom-0 cursor-pointer hover:bg-[rgba(10,36,58,1)] transition"
+                      @click="filterParams.district = '西宁市'"
+                      title="点击切换为全域总览"
+                    >
+                      <td class="py-1.5 px-1.5 font-spec-cn text-[#9BEAFF] flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#9BEAFF]"></span>
+                        <span>全域汇总</span>
+                      </td>
+                      <td class="py-1.5 px-1 text-right text-[#FFC65C]">{{ currentWorkOrderTotals.pending }}</td>
+                      <td class="py-1.5 px-1 text-right text-[#00E5FF]">{{ currentWorkOrderTotals.processing }}</td>
+                      <td class="py-1.5 px-1 text-right text-[#38BDF8]">{{ currentWorkOrderTotals.revisionNeeded }}</td>
+                      <td class="py-1.5 px-1 text-right text-[#3DDC97]">{{ currentWorkOrderTotals.completed }}</td>
+                      <td class="py-1.5 px-1.5 text-right text-[#00E5FF] font-bold">{{ currentWorkOrderTotals.total }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <!-- 1. 异常类型统计 (负值、超阈值、奇异值、通信掉线) -->
-            <div class="my-2">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5">
-                <span class="flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
-                  <span>异常类型多维分布统计</span>
-                </span>
-                <span class="text-[10px] text-slate-400">本月累计 {{ anomalyWorkOrderStatus.total }} 起</span>
-              </div>
-
-              <!-- 4 Types Grid -->
-              <div class="grid grid-cols-4 gap-1.5 text-center">
-                <div
-                  v-for="anom in anomalyTypeStats"
-                  :key="anom.type"
-                  class="bg-[#0b2447] border border-[#183f6d] rounded-lg p-1.5 relative overflow-hidden group hover:border-cyan-400/50 transition cursor-pointer"
-                  :title="anom.desc"
-                >
-                  <div class="text-[10px] text-slate-300 truncate font-medium">{{ anom.type }}</div>
-                  <div class="text-base 2xl:text-lg font-bold font-mono my-0.5" :style="{ color: anom.color }">
-                    {{ anom.count }}
-                    <span class="text-[10px] text-slate-400 font-normal">次</span>
-                  </div>
-                  <div class="text-[10px] text-slate-400 font-mono">{{ anom.percentage }}%</div>
-                  <div class="h-1 w-full bg-slate-700/50 rounded-full mt-1 overflow-hidden">
-                    <div class="h-full rounded-full" :style="{ width: `${anom.percentage}%`, backgroundColor: anom.color }"></div>
-                  </div>
+            <!-- 2. 运维单位能效排名 (支持区域内滚动展示，绝不溢出容器) -->
+            <div class="mt-1.5 pt-1.5 border-t border-[rgba(70,180,235,0.22)]">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5 font-spec-cn">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[#00E5FF] font-bold">|</span>
+                  <span class="text-white">运维单位能效排名</span>
+                  <span class="text-[9.5px] text-[#5D8AAA] font-normal font-spec-cn">区域滚动展示</span>
+                </div>
+                <div class="text-[10px] text-[#5D8AAA] font-spec-num">
+                  平均响应: <span class="text-[#00E5FF] font-bold">{{ operationEfficiencyMetrics.avgResolutionTime }}h</span>
+                  <span class="mx-1 text-slate-600">|</span>
+                  成功率: <span class="text-[#3DDC97] font-bold">{{ operationEfficiencyMetrics.successRate }}%</span>
                 </div>
               </div>
-            </div>
 
-            <!-- 2. 异常工单处置流程 (待处置 ➔ 处置中 ➔ 待水量修订 ➔ 已完成 - 统一蓝系底色) -->
-            <div class="my-1.5 p-2 bg-[#06182e]/80 rounded-lg border border-[#13355e]">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5">
-                <span class="flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
-                  <span>异常工单处置全流程流转</span>
-                </span>
-                <span class="text-[10px] text-cyan-300">智能工单引擎</span>
-              </div>
-
-              <!-- 4-step Pipeline with Flow Connectors -->
-              <div class="grid grid-cols-4 gap-1 text-center relative items-center">
-                <!-- 1. 待处置 (告警橙) -->
-                <div class="bg-[#0b2447] border border-amber-500/40 rounded-lg p-1.5 transition hover:bg-amber-950/20">
-                  <div class="text-[10px] text-amber-300 font-medium">1. 待处置</div>
-                  <div class="text-base font-bold font-mono text-amber-400 mt-0.5">{{ anomalyWorkOrderStatus.pending }}</div>
-                  <div class="text-[9px] text-amber-300/70">工单派发中</div>
-                </div>
-
-                <!-- 2. 处置中 (科技蓝) -->
-                <div class="bg-[#0b2447] border border-cyan-500/40 rounded-lg p-1.5 transition hover:bg-cyan-950/20">
-                  <div class="text-[10px] text-cyan-300 font-medium">2. 处置中</div>
-                  <div class="text-base font-bold font-mono text-cyan-400 mt-0.5">{{ anomalyWorkOrderStatus.processing }}</div>
-                  <div class="text-[9px] text-cyan-300/70">现场排查消缺</div>
-                </div>
-
-                <!-- 3. 待水量修订 (柔和天蓝) -->
-                <div class="bg-[#0b2447] border border-blue-500/40 rounded-lg p-1.5 transition hover:bg-blue-950/20">
-                  <div class="text-[10px] text-blue-300 font-medium">3. 待水量修订</div>
-                  <div class="text-base font-bold font-mono text-blue-400 mt-0.5">{{ anomalyWorkOrderStatus.revisionNeeded }}</div>
-                  <div class="text-[9px] text-blue-300/70">算法补算校验</div>
-                </div>
-
-                <!-- 4. 已完成 (中性灰闭环) -->
-                <div class="bg-[#0b2447] border border-slate-600/40 rounded-lg p-1.5 transition hover:bg-slate-800/20">
-                  <div class="text-[10px] text-slate-300 font-medium">4. 已完成</div>
-                  <div class="text-base font-bold font-mono text-slate-200 mt-0.5">{{ anomalyWorkOrderStatus.completed }}</div>
-                  <div class="text-[9px] text-slate-400">归档销号闭环</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 3. 处置能效评估 (4项核心指标) -->
-            <div class="my-1.5">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1">
-                <span class="flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
-                  <span>处置能效综合评估</span>
-                </span>
-                <span class="text-[10px] text-cyan-300 font-mono">达成率 A+</span>
-              </div>
-
-              <div class="grid grid-cols-4 gap-1.5 text-center">
-                <div class="bg-[#0b2447] border border-[#163c6a] rounded-lg p-1.5">
-                  <span class="text-[10px] text-slate-300 block">平均处置时长</span>
-                  <div class="text-sm 2xl:text-base font-bold font-mono text-cyan-300 mt-0.5">
-                    {{ operationEfficiencyMetrics.avgResolutionTime }}<span class="text-[10px] font-normal text-slate-400">h</span>
-                  </div>
-                  <span class="text-[9px] text-slate-400 block mt-0.5">环比 -0.4h ↓</span>
-                </div>
-
-                <div class="bg-[#0b2447] border border-[#163c6a] rounded-lg p-1.5">
-                  <span class="text-[10px] text-slate-300 block">处置成功率</span>
-                  <div class="text-sm 2xl:text-base font-bold font-mono text-cyan-300 mt-0.5">
-                    {{ operationEfficiencyMetrics.successRate }}<span class="text-[10px] font-normal text-slate-400">%</span>
-                  </div>
-                  <span class="text-[9px] text-slate-400 block mt-0.5">首派高准度</span>
-                </div>
-
-                <div class="bg-[#0b2447] border border-[#163c6a] rounded-lg p-1.5">
-                  <span class="text-[10px] text-slate-300 block">重复异常率</span>
-                  <div class="text-sm 2xl:text-base font-bold font-mono text-blue-300 mt-0.5">
-                    {{ operationEfficiencyMetrics.repeatAnomalyRate }}<span class="text-[10px] font-normal text-slate-400">%</span>
-                  </div>
-                  <span class="text-[9px] text-slate-400 block mt-0.5">同比 -1.5% ↓</span>
-                </div>
-
-                <div class="bg-[#0b2447] border border-[#163c6a] rounded-lg p-1.5">
-                  <span class="text-[10px] text-slate-300 block">闭环率</span>
-                  <div class="text-sm 2xl:text-base font-bold font-mono text-cyan-300 mt-0.5">
-                    {{ operationEfficiencyMetrics.closedLoopRate }}<span class="text-[10px] font-normal text-slate-400">%</span>
-                  </div>
-                  <span class="text-[9px] text-slate-400 block mt-0.5">全域销号</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 4. 运维单位能效排名 -->
-            <div class="mt-1 pt-1.5 border-t border-[#143b6b]/60">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5">
-                <span class="flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
-                  <span>运维单位能效排名榜</span>
-                </span>
-                <span class="text-[10px] text-slate-400">综合消缺实效</span>
-              </div>
-
-              <div class="space-y-1 text-xs">
+              <!-- 运维单位排名列表卡片 (在区域内纵向自适应滚动展示) -->
+              <div class="space-y-1.5 max-h-[135px] 2xl:max-h-[160px] overflow-y-auto custom-dark-scrollbar pr-1">
                 <div
                   v-for="team in maintenanceTeamRanks"
                   :key="team.rank"
-                  class="flex items-center justify-between p-1.5 rounded-lg bg-[#091f3d]/60 border border-[#163b66]/60 hover:bg-[#0d2a52] transition text-[11px]"
+                  class="p-2 rounded-lg bg-[rgba(10,36,58,0.6)] border border-[rgba(70,180,235,0.2)] hover:border-[#00E5FF]/60 hover:bg-[rgba(10,42,70,0.75)] transition cursor-pointer"
+                  :title="`${team.name} - 综合得分: ${team.score}分, 平均消缺历时: ${team.avgHours}小时`"
                 >
-                  <div class="flex items-center gap-2 min-w-0">
-                    <span
-                      class="w-4 h-4 rounded-full flex items-center justify-center font-mono font-bold text-[10px] shrink-0"
-                      :class="team.rank === 1 ? 'bg-amber-400 text-amber-950' : team.rank === 2 ? 'bg-slate-300 text-slate-900' : team.rank === 3 ? 'bg-amber-700 text-white' : 'bg-slate-700 text-slate-300'"
-                    >
-                      {{ team.rank }}
-                    </span>
-                    <span class="font-medium text-slate-200 truncate max-w-[140px] 2xl:max-w-[160px]">{{ team.name }}</span>
+                  <div class="flex items-center justify-between gap-2">
+                    <!-- 左侧: 排名与单位名称 -->
+                    <div class="flex items-center gap-2 min-w-0">
+                      <!-- 排名徽章 -->
+                      <span
+                        class="w-5 h-5 rounded flex items-center justify-center font-spec-num font-bold text-[11px] shrink-0 shadow-xs"
+                        :class="team.rank === 1
+                          ? 'bg-gradient-to-br from-[#FFE279] to-[#F59E0B] text-slate-950 ring-1 ring-[#FFE279]/60'
+                          : team.rank === 2
+                          ? 'bg-gradient-to-br from-[#F1F5F9] to-[#94A3B8] text-slate-950 ring-1 ring-white/50'
+                          : team.rank === 3
+                          ? 'bg-gradient-to-br from-[#FDBA74] to-[#C2410C] text-white ring-1 ring-[#FDBA74]/50'
+                          : 'bg-[#122b49] text-[#8AAEC8] border border-[rgba(70,180,235,0.25)]'"
+                      >
+                        {{ team.rank }}
+                      </span>
+                      <span class="font-medium text-[#DCF2FF] truncate text-xs font-spec-cn" :title="team.name">
+                        {{ team.name }}
+                      </span>
+                    </div>
+
+                    <!-- 右侧: 工单处置数、响应耗时与评分 -->
+                    <div class="flex items-center gap-3 shrink-0 font-spec-num text-xs">
+                      <!-- 办结工单数 -->
+                      <div class="text-[11px] text-[#8AAEC8] font-spec-cn flex items-center gap-1">
+                        <span>办结</span>
+                        <span class="text-white font-spec-num font-semibold">{{ team.resolvedOrders }}</span>
+                        <span class="text-slate-500">/</span>
+                        <span class="font-spec-num">{{ team.totalOrders }}</span>
+                      </div>
+
+                      <!-- 平均时效 -->
+                      <div class="text-[11px] px-1.5 py-0.2 rounded bg-[#071d37] border border-[rgba(70,180,235,0.2)] text-[#00E5FF]">
+                        {{ team.avgHours }}h
+                      </div>
+
+                      <!-- 能效得分 -->
+                      <div class="flex items-center gap-1 min-w-[58px] justify-end">
+                        <span class="font-bold text-sm" :class="team.rank <= 2 ? 'text-[#00E5FF]' : team.rank === 3 ? 'text-[#FFC65C]' : 'text-[#38BDF8]'">
+                          {{ team.score }}
+                        </span>
+                        <span class="text-[10px] text-[#5D8AAA] font-spec-cn">分</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div class="flex items-center gap-3 font-mono text-slate-300">
-                    <span class="text-[10px] text-slate-400 font-sans">工单 {{ team.resolvedOrders }}/{{ team.totalOrders }}</span>
-                    <span class="text-cyan-300 text-[11px]">{{ team.avgHours }}h</span>
-                    <span class="font-bold text-cyan-300 text-xs">{{ team.score }}分</span>
+                  <!-- 评分直观微型能效进度条 -->
+                  <div class="mt-1.5 h-1 w-full bg-[#071932] rounded-full overflow-hidden flex items-center">
+                    <div
+                      class="h-full rounded-full transition-all duration-500"
+                      :style="{
+                        width: `${Math.min(100, Math.max(0, team.score))}%`,
+                        backgroundColor: team.rank === 1 ? '#00E5FF' : team.rank === 2 ? '#38BDF8' : team.rank === 3 ? '#FFC65C' : '#3DDC97'
+                      }"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -2935,82 +3522,88 @@
           </div>
 
           <!-- ================= 专项 Card 4: 取水数据对比分析与复核跟踪 ================= -->
-          <div class="bg-[#081b36]/90 backdrop-blur-md rounded-xl border border-[#143b6b] p-3.5 shadow-xl flex-1 min-h-[340px] flex flex-col justify-between">
+          <div class="spec-card p-3 2xl:p-3.5 flex-1 min-h-0 flex flex-col justify-between overflow-hidden relative">
             <!-- Card Header with Engine Controls -->
-            <div class="flex items-center justify-between pb-2 border-b border-[#143b6b]/80">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-                <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide">取水数据对比分析</h2>
-              </div>
+            <div>
+              <div class="flex items-center justify-between pb-2">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
+                    <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
+                    <polygon points="8,4 12,6 12,10 8,12 4,10 4,6" fill="rgba(0,229,255,0.3)" />
+                  </svg>
+                  <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide font-spec-cn">取水数据对比分析</h2>
+                </div>
 
-              <!-- Actions: Time Window & Review Tracking Button -->
-              <div class="flex items-center gap-1.5">
-                <!-- Time Window Select (自动重算对比数据) -->
-                <select
-                  v-model="compareTimeWindow"
-                  @change="triggerCompareAnalysis"
-                  class="bg-[#0b2447] border border-[#1b4372] rounded-md px-2 py-1 text-slate-100 text-[11px] focus:outline-none focus:border-cyan-400 cursor-pointer"
-                  title="切换对比时间窗口"
-                >
-                  <option value="month">当月计划期</option>
-                  <option value="30d">近30天累计</option>
-                  <option value="quarter">二季度(4-6月)</option>
-                  <option value="year">2025年度累计</option>
-                </select>
+                <!-- Actions: Time Window & Review Tracking Button -->
+                <div class="flex items-center gap-1.5 font-spec-cn">
+                  <!-- Time Window Select (自动重算对比数据) -->
+                  <select
+                    v-model="compareTimeWindow"
+                    @change="triggerCompareAnalysis"
+                    class="bg-[rgba(10,36,58,0.8)] border border-[rgba(70,180,235,0.3)] rounded-md px-2 py-1 text-slate-100 text-[11px] focus:outline-none focus:border-[#00E5FF] cursor-pointer"
+                    title="切换对比时间窗口"
+                  >
+                    <option value="month">当月计划期</option>
+                    <option value="30d">近30天累计</option>
+                    <option value="quarter">二季度(4-6月)</option>
+                    <option value="year">2025年度累计</option>
+                  </select>
 
-                <!-- 复核任务跟踪中心按钮 -->
-                <button
-                  type="button"
-                  @click="showReviewTaskModal = true"
-                  class="px-2 py-1 rounded-md bg-white/10 hover:bg-white/15 text-cyan-300 text-[11px] border border-cyan-500/30 flex items-center gap-1 cursor-pointer transition"
-                  title="查看复核任务流转与跟踪中心"
-                >
-                  <span>复核跟踪</span>
-                  <span class="w-4 h-4 rounded-full bg-cyan-500/30 text-cyan-300 border border-cyan-400/40 text-[10px] font-mono font-bold flex items-center justify-center">
-                    {{ reviewTaskList.filter(t => t.status !== 'closed').length }}
-                  </span>
-                </button>
+                  <!-- 复核任务跟踪中心按钮 -->
+                  <button
+                    type="button"
+                    @click="showReviewTaskModal = true"
+                    class="px-2 py-1 rounded-md bg-[#00E5FF]/10 hover:bg-[#00E5FF]/20 text-[#00E5FF] text-[11px] border border-[#00E5FF]/40 flex items-center gap-1 cursor-pointer transition"
+                    title="查看复核任务流转与跟踪中心"
+                  >
+                    <span>复核跟踪</span>
+                    <span class="w-4 h-4 rounded-full bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/50 text-[10px] font-spec-num font-bold flex items-center justify-center">
+                      {{ reviewTaskList.filter(t => t.status !== 'closed').length }}
+                    </span>
+                  </button>
+                </div>
               </div>
+              <div class="spec-header-divider mb-2"></div>
             </div>
 
             <!-- 柱状图直观呈现比对结果 (4 Bars: 水蓝系+计划金+剩余银灰) -->
             <div class="my-1.5">
               <div class="flex items-center justify-between text-xs mb-1">
-                <span class="font-semibold text-slate-300 flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
-                  <span>重点对象多维水量比对柱状图 (万m³)</span>
+                <span class="font-semibold text-slate-300 flex items-center gap-1 font-spec-cn">
+                  <span class="text-[#00E5FF] font-bold">|</span>
+                  <span>重点对象多维水量比对 (万m³)</span>
                 </span>
 
                 <!-- 4 Legends -->
-                <div class="flex items-center gap-2 text-[10px]">
+                <div class="flex items-center gap-2 text-[10px] font-spec-cn">
                   <div class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-xs bg-[#00e5ff]"></span>
+                    <span class="w-2 h-2 rounded-xs bg-[#00E5FF]"></span>
                     <span class="text-slate-300">当前取水</span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-xs bg-[#38bdf8]"></span>
+                    <span class="w-2 h-2 rounded-xs bg-[#38BDF8]"></span>
                     <span class="text-slate-300">3年均值</span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-xs bg-[#f59e0b]"></span>
+                    <span class="w-2 h-2 rounded-xs bg-[#FFC65C]"></span>
                     <span class="text-slate-300">当月计划</span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-xs bg-[#94a3b8]"></span>
+                    <span class="w-2 h-2 rounded-xs bg-[#8AAEC8]"></span>
                     <span class="text-slate-300">许可剩余</span>
                   </div>
                 </div>
               </div>
 
               <!-- SVG Grouped 4-Bar Chart -->
-              <div class="w-full h-24 relative bg-[#06182e]/60 rounded-lg p-1 border border-[#13355e]">
+              <div class="w-full h-24 relative bg-[rgba(6,26,46,0.6)] rounded-lg p-1 border border-[rgba(70,180,235,0.2)]">
                 <svg viewBox="0 0 380 90" class="w-full h-full overflow-visible">
                   <!-- Horizontal grid lines -->
-                  <line x1="25" y1="15" x2="375" y2="15" stroke="#163866" stroke-width="0.7" stroke-dasharray="2,2" />
-                  <line x1="25" y1="40" x2="375" y2="40" stroke="#163866" stroke-width="0.7" stroke-dasharray="2,2" />
-                  <line x1="25" y1="65" x2="375" y2="65" stroke="#1f4b82" stroke-width="1" />
+                  <line x1="25" y1="15" x2="375" y2="15" stroke="rgba(70,180,235,0.15)" stroke-width="0.7" stroke-dasharray="2,2" />
+                  <line x1="25" y1="40" x2="375" y2="40" stroke="rgba(70,180,235,0.15)" stroke-width="0.7" stroke-dasharray="2,2" />
+                  <line x1="25" y1="65" x2="375" y2="65" stroke="rgba(70,180,235,0.3)" stroke-width="1" />
 
-                  <g fill="#94a3b8" font-size="8" font-family="monospace" text-anchor="end">
+                  <g fill="#5D8AAA" font-size="8" font-family="Bahnschrift, monospace" text-anchor="end">
                     <text x="22" y="18">3500</text>
                     <text x="22" y="43">1800</text>
                     <text x="22" y="68">0</text>
@@ -3024,7 +3617,7 @@
                       :y="65 - Math.max(4, (item.currentWater / 3500) * 50)"
                       width="5"
                       :height="Math.max(4, (item.currentWater / 3500) * 50)"
-                      fill="#00e5ff"
+                      fill="#00E5FF"
                       rx="1"
                     >
                       <title>{{ item.name }} 当前取水: {{ item.currentWater }} 万m³</title>
@@ -3036,7 +3629,7 @@
                       :y="65 - Math.max(4, (item.threeYearAvg / 3500) * 50)"
                       width="5"
                       :height="Math.max(4, (item.threeYearAvg / 3500) * 50)"
-                      fill="#38bdf8"
+                      fill="#38BDF8"
                       rx="1"
                     >
                       <title>{{ item.name }} 近3年同期均值: {{ item.threeYearAvg }} 万m³</title>
@@ -3048,7 +3641,7 @@
                       :y="65 - Math.max(4, (item.monthlyPlan / 3500) * 50)"
                       width="5"
                       :height="Math.max(4, (item.monthlyPlan / 3500) * 50)"
-                      fill="#f59e0b"
+                      fill="#FFC65C"
                       rx="1"
                     >
                       <title>{{ item.name }} 当月计划: {{ item.monthlyPlan }} 万m³</title>
@@ -3073,7 +3666,7 @@
                       text-anchor="middle"
                       font-size="9"
                       fill="#cbd5e1"
-                      class="font-medium"
+                      class="font-medium font-spec-cn"
                     >
                       {{ item.name.slice(0, 4) }}
                     </text>
@@ -3082,84 +3675,84 @@
               </div>
             </div>
 
-            <!-- 差值表直观呈现比对结果与复核任务下发 -->
-            <div class="mt-1">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1">
+            <!-- 差值表直观呈现比对结果与复核任务下发 (框内独立平滑滚动展示，避免溢出卡片) -->
+            <div class="mt-1 flex-1 min-h-0 flex flex-col">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1 font-spec-cn shrink-0">
                 <span class="flex items-center gap-1">
-                  <span class="text-cyan-400 font-bold">|</span>
+                  <span class="text-[#00E5FF] font-bold">|</span>
                   <span>取水数据差值比对与复核下发</span>
                 </span>
-                <span class="text-[10px] text-slate-400">支持下发复核指令</span>
+                <span class="text-[10px] text-[#5D8AAA]">框内滚动 / 支持下发指令</span>
               </div>
 
-              <!-- Difference Table -->
-              <div class="overflow-x-auto">
+              <!-- Difference Table (Scrollable within container) -->
+              <div class="max-h-[140px] 2xl:max-h-[185px] overflow-y-auto overflow-x-auto custom-dark-scrollbar rounded bg-[rgba(6,26,46,0.6)] border border-[rgba(70,180,235,0.2)]">
                 <table class="w-full text-xs text-left">
-                  <thead>
-                    <tr class="text-slate-400 border-b border-[#143b6b] text-[10px]">
-                      <th class="py-1 font-medium">分析对象</th>
-                      <th class="py-1 text-right font-medium">当前(万m³)</th>
-                      <th class="py-1 text-right font-medium">同期均值/偏差</th>
-                      <th class="py-1 text-right font-medium">当月计划</th>
-                      <th class="py-1 text-right font-medium">许可剩余</th>
-                      <th class="py-1 text-center font-medium">复核操作</th>
+                  <thead class="sticky top-0 z-10 bg-[#071F38] shadow-xs">
+                    <tr class="text-[#5D8AAA] border-b border-[rgba(70,180,235,0.25)] text-[10px]">
+                      <th class="py-1 px-1.5 font-medium font-spec-cn bg-[#071F38]">分析对象</th>
+                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">当前(万m³)</th>
+                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">同期均值/偏差</th>
+                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">当月计划</th>
+                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">许可剩余</th>
+                      <th class="py-1 px-1.5 text-center font-medium font-spec-cn bg-[#071F38]">复核操作</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-[#143b6b]/40 text-slate-300 text-[11px] font-mono">
+                  <tbody class="divide-y divide-[rgba(70,180,235,0.12)] divide-dashed text-slate-300 text-[11px] font-spec-num">
                     <tr
                       v-for="item in standardCompareList"
                       :key="item.id"
                       class="hover:bg-white/5 transition"
                     >
                       <!-- Name -->
-                      <td class="py-1.5 font-sans">
+                      <td class="py-1.5 px-1.5 font-spec-cn">
                         <div class="font-medium text-white truncate max-w-[90px] 2xl:max-w-[105px]" :title="item.name">
                           {{ item.name }}
                         </div>
-                        <span class="text-[9px] text-slate-400">{{ item.category }}</span>
+                        <span class="text-[9px] text-[#5D8AAA]">{{ item.category }}</span>
                       </td>
 
                       <!-- Current Water -->
-                      <td class="py-1.5 text-right font-bold text-cyan-300">
+                      <td class="py-1.5 px-1 text-right font-bold text-[#00E5FF]">
                         {{ item.currentWater }}
                       </td>
 
                       <!-- Three Year Avg & Deviation -->
-                      <td class="py-1.5 text-right">
+                      <td class="py-1.5 px-1 text-right">
                         <div>{{ item.threeYearAvg }}</div>
                         <span
                           class="text-[10px] font-bold block"
-                          :class="item.isAbnormal ? (item.avgDeviation > 0 ? 'text-cyan-300' : 'text-blue-300') : 'text-slate-400'"
+                          :class="item.isAbnormal ? (item.avgDeviation > 0 ? 'text-[#00E5FF]' : 'text-[#38BDF8]') : 'text-[#5D8AAA]'"
                         >
                           {{ item.avgDeviation > 0 ? '+' : '' }}{{ item.avgDeviation }}%
                         </span>
                       </td>
 
                       <!-- Monthly Plan & Deviation -->
-                      <td class="py-1.5 text-right text-slate-300">
+                      <td class="py-1.5 px-1 text-right text-slate-300">
                         <div>{{ item.monthlyPlan }}</div>
-                        <span class="text-[9px] text-slate-400 block font-sans">
+                        <span class="text-[9px] text-[#5D8AAA] block font-spec-cn">
                           {{ item.planDeviation > 0 ? '+' : '' }}{{ item.planDeviation }}%
                         </span>
                       </td>
 
                       <!-- Licensed Remaining -->
-                      <td class="py-1.5 text-right text-slate-200 font-bold">
+                      <td class="py-1.5 px-1 text-right text-slate-200 font-bold">
                         {{ item.licensedRemaining }}
                       </td>
 
                       <!-- Action: Dispatch Review Task Button -->
-                      <td class="py-1.5 text-center font-sans">
+                      <td class="py-1.5 px-1.5 text-center font-spec-cn">
                         <button
                           v-if="item.isAbnormal"
                           type="button"
                           @click="dispatchReviewTask(item)"
-                          class="px-2 py-0.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] shadow-sm shadow-blue-900/40 cursor-pointer transition active:scale-95 whitespace-nowrap"
+                          class="px-2 py-0.5 rounded bg-[#00E5FF]/20 hover:bg-[#00E5FF]/30 text-[#00E5FF] border border-[#00E5FF]/50 font-bold text-[10px] shadow-sm cursor-pointer transition active:scale-95 whitespace-nowrap"
                           title="下发复核指令"
                         >
                           下发复核
                         </button>
-                        <span v-else class="text-[10px] text-cyan-300 bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-500/20">
+                        <span v-else class="text-[10px] text-[#3DDC97] bg-[#3DDC97]/10 px-1.5 py-0.5 rounded border border-[#3DDC97]/30">
                           正常受控
                         </span>
                       </td>
@@ -3170,17 +3763,17 @@
             </div>
 
             <!-- 复核任务实时流转跟踪状态简报条 -->
-            <div class="mt-2 pt-1.5 border-t border-[#143b6b]/60 flex items-center justify-between text-xs">
+            <div class="mt-2 pt-1.5 border-t border-[rgba(70,180,235,0.2)] flex items-center justify-between text-xs">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                <span class="text-slate-300 text-[11px]">
-                  复核任务流转跟踪：<span class="text-white font-bold font-mono">{{ reviewTaskList.length }}</span> 件在线
+                <span class="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse"></span>
+                <span class="text-slate-300 text-[11px] font-spec-cn">
+                  复核任务流转跟踪：<span class="text-white font-bold font-spec-num">{{ reviewTaskList.length }}</span> 件在线
                 </span>
               </div>
               <button
                 type="button"
                 @click="showReviewTaskModal = true"
-                class="text-[11px] text-cyan-400 hover:text-cyan-300 transition flex items-center gap-0.5 cursor-pointer font-medium"
+                class="text-[11px] text-[#00E5FF] hover:text-[#79D8FF] transition flex items-center gap-0.5 cursor-pointer font-medium font-spec-cn"
               >
                 <span>任务看板与反馈跟踪</span>
                 <span>&gt;</span>
@@ -3194,13 +3787,13 @@
     </main>
 
     <!-- ================= 5. BOTTOM STATUS BAR ================= -->
-    <footer class="h-8 bg-[#061429] border-t border-[#143b6b]/60 flex items-center justify-between px-5 text-[11px] text-slate-400 font-sans z-40 shrink-0">
+    <footer class="h-8 bg-[#072444]/90 backdrop-blur-md border-t border-[rgba(70,180,235,0.3)] flex items-center justify-between px-5 text-[11px] text-[#8FB6D4] font-spec-cn z-40 shrink-0">
       <div class="flex items-center gap-2">
-        <span>数据更新时间: 2025-05-20 10:25:00</span>
+        <span>数据更新时间: <span class="font-spec-num text-slate-300">2025-05-20 10:25:00</span></span>
         <button
           type="button"
           @click="refreshData"
-          class="text-cyan-400 hover:text-cyan-300 transition cursor-pointer"
+          class="text-[#00E5FF] hover:text-white transition cursor-pointer"
           title="刷新数据"
         >
           <svg class="w-3.5 h-3.5" :class="{ 'animate-spin': isRefreshing }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3211,7 +3804,7 @@
         </button>
       </div>
 
-      <div class="flex items-center gap-4 text-slate-400">
+      <div class="flex items-center gap-4 text-[#5D8AAA]">
         <span>数据来源: 西宁市水务局</span>
       </div>
     </footer>
@@ -3219,19 +3812,19 @@
     <!-- ================= 6. MODAL: 预警事件处置中心 ================= -->
     <div
       v-if="showWarningModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 font-spec-cn"
     >
-      <div class="bg-[#0a2244] border border-cyan-500/50 rounded-xl shadow-2xl w-full max-w-xl overflow-hidden text-white animate-scale-in">
-        <div class="px-5 py-3.5 bg-gradient-to-r from-blue-700 to-cyan-700 flex items-center justify-between">
+      <div class="spec-card rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden text-white animate-scale-in border border-[rgba(70,180,235,0.4)]">
+        <div class="px-5 py-3.5 bg-gradient-to-r from-[#071F38] to-[#0A2E50] border-b border-[rgba(70,180,235,0.3)] flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="w-5 h-5 text-[#FFC65C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
             </svg>
-            <span class="font-bold text-sm tracking-wide">常态化预警与工单调度中心</span>
+            <span class="font-bold text-sm tracking-wide font-spec-cn">常态化预警与工单调度中心</span>
           </div>
           <button
             type="button"
-            class="text-white/80 hover:text-white cursor-pointer"
+            class="text-[#5D8AAA] hover:text-white cursor-pointer"
             @click="showWarningModal = false"
           >
             ✕
@@ -3239,36 +3832,36 @@
         </div>
 
         <div class="p-5 space-y-4 text-xs">
-          <div class="p-3 bg-[#08182f] rounded-lg border border-[#1b4372]">
-            <div class="font-bold text-cyan-300 mb-1">当前处置预警事件: {{ selectedEvent || '西宁全域水资源风控事件' }}</div>
+          <div class="p-3 bg-[rgba(6,26,46,0.8)] rounded-lg border border-[rgba(70,180,235,0.25)]">
+            <div class="font-bold text-[#00E5FF] mb-1">当前处置预警事件: {{ selectedEvent || '西宁全域水资源风控事件' }}</div>
             <div class="text-slate-300 leading-relaxed text-[11px]">
               监测到湟源县某工业取水户累计已超许可 12.7%，系统已自动锁定相关取水闸门遥控频次，触发二级水政督办流程。
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3 text-slate-300">
-            <div class="p-2.5 rounded bg-white/5 border border-white/10">
-              <div class="text-slate-400 text-[10px]">事件等级</div>
-              <div class="font-bold text-red-400 mt-0.5">高风险 (超许可预警)</div>
+            <div class="p-2.5 rounded bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)]">
+              <div class="text-[#5D8AAA] text-[10px]">事件等级</div>
+              <div class="font-bold text-[#FF6B7A] mt-0.5">高风险 (超许可预警)</div>
             </div>
-            <div class="p-2.5 rounded bg-white/5 border border-white/10">
-              <div class="text-slate-400 text-[10px]">响应时限</div>
-              <div class="font-bold text-amber-400 mt-0.5">剩余 2 小时 45 分</div>
+            <div class="p-2.5 rounded bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)]">
+              <div class="text-[#5D8AAA] text-[10px]">响应时限</div>
+              <div class="font-bold text-[#FFC65C] mt-0.5">剩余 2 小时 45 分</div>
             </div>
           </div>
         </div>
 
-        <div class="px-5 py-3 bg-[#06152b] border-t border-[#1b4372] flex justify-end gap-2 text-xs">
+        <div class="px-5 py-3 bg-[rgba(4,14,26,0.9)] border-t border-[rgba(70,180,235,0.2)] flex justify-end gap-2 text-xs">
           <button
             type="button"
-            class="px-4 py-1.5 rounded border border-slate-600 text-slate-300 hover:bg-white/10 cursor-pointer"
+            class="px-4 py-1.5 rounded border border-[rgba(70,180,235,0.3)] text-slate-300 hover:bg-white/10 cursor-pointer"
             @click="showWarningModal = false"
           >
             关闭
           </button>
           <button
             type="button"
-            class="px-4 py-1.5 rounded bg-cyan-600 text-white font-bold hover:bg-cyan-500 cursor-pointer"
+            class="px-4 py-1.5 rounded bg-[#00E5FF]/20 border border-[#00E5FF]/60 text-[#00E5FF] font-bold hover:bg-[#00E5FF]/30 cursor-pointer shadow-[0_0_12px_rgba(0,229,255,0.3)]"
             @click="dispatchWarningWorkOrder"
           >
             下发督办工单
@@ -3280,31 +3873,31 @@
     <!-- ================= 2. 计量点详情简洁小弹窗 (点击地图计量点触发) ================= -->
     <div
       v-if="showMeterDetailModal && selectedMeterPoint"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 font-spec-cn"
       @click.self="showMeterDetailModal = false"
     >
-      <div class="bg-[#091f3d] border border-cyan-500/60 rounded-xl shadow-2xl w-full max-w-md overflow-hidden text-white transition-all transform animate-fade-in">
+      <div class="spec-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden text-white transition-all transform animate-fade-in border border-[rgba(70,180,235,0.4)]">
         <!-- 弹窗顶栏 (简洁紧凑) -->
-        <div class="px-4 py-3 bg-gradient-to-r from-[#0c2b55] to-[#081d3a] border-b border-[#1b4372] flex items-center justify-between">
+        <div class="px-4 py-3 bg-gradient-to-r from-[#071F38] to-[#0A2E50] border-b border-[rgba(70,180,235,0.3)] flex items-center justify-between">
           <div class="flex items-center gap-2 min-w-0">
             <span
               class="w-2.5 h-2.5 rounded-full shrink-0"
               :class="selectedMeterPoint.meterStatus === 'normal'
-                ? 'bg-emerald-400 shadow-[0_0_6px_#10b981]'
+                ? 'bg-[#3DDC97] shadow-[0_0_6px_#3DDC97]'
                 : selectedMeterPoint.meterStatus === 'fault'
-                  ? 'bg-rose-500 shadow-[0_0_6px_#ef4444]'
-                  : 'bg-amber-400 shadow-[0_0_6px_#f59e0b]'"
+                  ? 'bg-[#FF6B7A] shadow-[0_0_6px_#FF6B7A]'
+                  : 'bg-[#FFC65C] shadow-[0_0_6px_#FFC65C]'"
             ></span>
-            <h3 class="text-sm font-bold text-white truncate tracking-wide">
+            <h3 class="text-sm font-bold text-white truncate tracking-wide font-spec-cn">
               {{ selectedMeterPoint.name }}
             </h3>
             <span
-              class="px-1.5 py-0.2 rounded text-[10px] font-bold border shrink-0"
+              class="px-1.5 py-0.2 rounded text-[10px] font-bold border shrink-0 font-spec-cn"
               :class="selectedMeterPoint.meterStatus === 'normal'
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                ? 'bg-[#3DDC97]/20 text-[#3DDC97] border-[#3DDC97]/40'
                 : selectedMeterPoint.meterStatus === 'fault'
-                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                  : 'bg-amber-500/20 text-amber-300 border-amber-500/40'"
+                  ? 'bg-[#FF6B7A]/20 text-[#FF6B7A] border-[#FF6B7A]/40'
+                  : 'bg-[#FFC65C]/20 text-[#FFC65C] border-[#FFC65C]/40'"
             >
               {{ selectedMeterPoint.meterStatus === 'normal' ? '正常' : selectedMeterPoint.meterStatus === 'fault' ? '故障' : '待检定' }}
             </span>
@@ -3312,7 +3905,7 @@
 
           <button
             type="button"
-            class="text-slate-400 hover:text-white p-1 rounded hover:bg-white/10 transition cursor-pointer text-xs"
+            class="text-[#5D8AAA] hover:text-white p-1 rounded hover:bg-white/10 transition cursor-pointer text-xs"
             @click="showMeterDetailModal = false"
           >
             ✕
@@ -3323,41 +3916,41 @@
         <div class="p-4 space-y-3 text-xs">
           <!-- 实时数据双指标卡片 -->
           <div class="grid grid-cols-2 gap-2 text-center">
-            <div class="p-2.5 rounded-lg bg-[#07172f] border border-cyan-500/30">
-              <span class="text-slate-400 text-[10px] block">瞬时流速 / 流量</span>
-              <div class="text-lg font-bold font-mono text-cyan-300 mt-0.5">
-                {{ selectedMeterPoint.instantFlow }} <span class="text-[10px] font-normal text-slate-400">m³/h</span>
+            <div class="p-2.5 rounded-lg bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.25)]">
+              <span class="text-[#5D8AAA] text-[10px] block font-spec-cn">瞬时流速 / 流量</span>
+              <div class="text-lg font-bold font-spec-num text-[#00E5FF] mt-0.5">
+                {{ selectedMeterPoint.instantFlow }} <span class="text-[10px] font-normal text-[#5D8AAA]">m³/h</span>
               </div>
             </div>
-            <div class="p-2.5 rounded-lg bg-[#07172f] border border-blue-500/30">
-              <span class="text-slate-400 text-[10px] block">今日累计取水</span>
-              <div class="text-lg font-bold font-mono text-blue-300 mt-0.5">
-                {{ selectedMeterPoint.dailyAccumulated }} <span class="text-[10px] font-normal text-slate-400">m³</span>
+            <div class="p-2.5 rounded-lg bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.25)]">
+              <span class="text-[#5D8AAA] text-[10px] block font-spec-cn">今日累计取水</span>
+              <div class="text-lg font-bold font-spec-num text-[#38BDF8] mt-0.5">
+                {{ selectedMeterPoint.dailyAccumulated }} <span class="text-[10px] font-normal text-[#5D8AAA]">m³</span>
               </div>
             </div>
           </div>
 
           <!-- 核心属性精简列表 -->
-          <div class="p-3 rounded-lg bg-[#06162d]/80 border border-[#1b4372]/60 space-y-1.5 text-[11px]">
+          <div class="p-3 rounded-lg bg-[rgba(6,26,46,0.8)] border border-[rgba(70,180,235,0.2)] space-y-1.5 text-[11px] font-spec-cn">
             <div class="flex items-center justify-between">
-              <span class="text-slate-400">计量编码</span>
-              <span class="font-mono text-cyan-300 font-semibold select-all">{{ selectedMeterPoint.meterCode }}</span>
+              <span class="text-[#5D8AAA]">计量编码</span>
+              <span class="font-spec-num text-[#00E5FF] font-semibold select-all">{{ selectedMeterPoint.meterCode }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-slate-400">器具类型</span>
+              <span class="text-[#5D8AAA]">器具类型</span>
               <span class="text-slate-200 font-medium">{{ selectedMeterPoint.deviceType }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-slate-400">所属用水户</span>
+              <span class="text-[#5D8AAA]">所属用水户</span>
               <span class="text-slate-200 truncate max-w-[210px] text-right">{{ selectedMeterPoint.userEnterprise }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-slate-400">安装位置</span>
+              <span class="text-[#5D8AAA]">安装位置</span>
               <span class="text-slate-200 truncate max-w-[210px] text-right" :title="selectedMeterPoint.installLocation">{{ selectedMeterPoint.installLocation }}</span>
             </div>
-            <div class="flex items-center justify-between pt-1 border-t border-[#1b4372]/40">
-              <span class="text-slate-400">检定有效期</span>
-              <span class="font-mono" :class="selectedMeterPoint.meterStatus === 'pending' ? 'text-amber-400 font-bold' : 'text-slate-200'">
+            <div class="flex items-center justify-between pt-1 border-t border-[rgba(70,180,235,0.2)]">
+              <span class="text-[#5D8AAA]">检定有效期</span>
+              <span class="font-spec-num" :class="selectedMeterPoint.meterStatus === 'pending' ? 'text-[#FFC65C] font-bold' : 'text-slate-200'">
                 {{ selectedMeterPoint.lastCheckDate }} ~ {{ selectedMeterPoint.nextCheckDate }}
               </span>
             </div>
@@ -3366,16 +3959,16 @@
           <!-- 异常状态极简提醒 (仅在故障/待检定时显示) -->
           <div
             v-if="selectedMeterPoint.meterStatus === 'fault'"
-            class="p-2.5 rounded-lg bg-rose-950/40 border border-rose-500/40 text-[11px] text-rose-200 flex items-start gap-1.5"
+            class="p-2.5 rounded-lg bg-rose-950/40 border border-[#FF6B7A]/40 text-[11px] text-rose-200 flex items-start gap-1.5 font-spec-cn"
           >
-            <span class="text-rose-400 font-bold shrink-0">异常诊断:</span>
+            <span class="text-[#FF6B7A] font-bold shrink-0">异常诊断:</span>
             <span>{{ selectedMeterPoint.faultDesc || '设备通信中断，已连续脱网超24小时' }}</span>
           </div>
           <div
             v-else-if="selectedMeterPoint.meterStatus === 'pending'"
-            class="p-2.5 rounded-lg bg-amber-950/40 border border-amber-500/40 text-[11px] text-amber-200 flex items-start gap-1.5"
+            class="p-2.5 rounded-lg bg-amber-950/40 border border-[#FFC65C]/40 text-[11px] text-amber-200 flex items-start gap-1.5 font-spec-cn"
           >
-            <span class="text-amber-400 font-bold shrink-0">定检催告:</span>
+            <span class="text-[#FFC65C] font-bold shrink-0">定检催告:</span>
             <span>{{ selectedMeterPoint.pendingReason || '法定周期已满，请安排送检核验' }}</span>
           </div>
         </div>
@@ -3433,24 +4026,24 @@
     <!-- ================= 4. MODAL: 标准化对比偏差复核与任务跟踪中心 ================= -->
     <div
       v-if="showReviewTaskModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 font-spec-cn"
       @click.self="showReviewTaskModal = false"
     >
-      <div class="bg-[#091b36] border border-cyan-500/50 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden text-white transition-all animate-fade-in flex flex-col max-h-[85vh]">
+      <div class="spec-card rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden text-white transition-all animate-fade-in flex flex-col max-h-[85vh] border border-[rgba(70,180,235,0.4)]">
         <!-- Modal Header -->
-        <div class="px-6 py-4 bg-gradient-to-r from-[#0c254a] to-[#07172f] border-b border-[#1b4372] flex items-center justify-between shrink-0">
+        <div class="px-6 py-4 bg-gradient-to-r from-[#071F38] to-[#0A2E50] border-b border-[rgba(70,180,235,0.3)] flex items-center justify-between shrink-0">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+            <div class="w-9 h-9 rounded-xl bg-[#00E5FF]/10 border border-[#00E5FF]/40 flex items-center justify-center text-[#00E5FF]">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 11l3 3L22 4"></path>
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-white tracking-wide">
+              <h3 class="text-base font-bold text-white tracking-wide font-spec-cn">
                 取水数据对比与复核任务跟踪中心
               </h3>
-              <p class="text-xs text-slate-400 mt-0.5">
+              <p class="text-xs text-[#5D8AAA] mt-0.5 font-spec-cn">
                 针对取用水户下发复核指令，实施全流程穿透式跟踪与闭环核销
               </p>
             </div>
@@ -3466,32 +4059,32 @@
         </div>
 
         <!-- Modal Summary Metrics -->
-        <div class="px-6 py-3 bg-[#0a2346]/80 border-b border-[#1b4372] grid grid-cols-4 gap-3 text-center shrink-0">
+        <div class="px-6 py-3 bg-[rgba(6,26,46,0.85)] border-b border-[rgba(70,180,235,0.2)] grid grid-cols-4 gap-3 text-center shrink-0">
           <div
             class="p-2 rounded-lg border transition cursor-pointer"
-            :class="reviewTaskStatusFilter === 'all' ? 'bg-cyan-500/20 border-cyan-400 text-cyan-200' : 'bg-white/5 border-white/10 text-slate-300'"
+            :class="reviewTaskStatusFilter === 'all' ? 'bg-[#00E5FF]/20 border-[#00E5FF] text-[#00E5FF]' : 'bg-[rgba(10,36,58,0.5)] border-[rgba(70,180,235,0.2)] text-slate-300'"
             @click="reviewTaskStatusFilter = 'all'"
           >
-            <span class="text-[10px] block font-medium">复核任务总数</span>
-            <span class="text-lg font-bold font-mono text-cyan-300 mt-0.5 block">{{ reviewTaskList.length }}</span>
+            <span class="text-[10px] block font-medium font-spec-cn">复核任务总数</span>
+            <span class="text-lg font-bold font-spec-num text-[#00E5FF] mt-0.5 block">{{ reviewTaskList.length }}</span>
           </div>
           <div
             class="p-2 rounded-lg border transition cursor-pointer"
-            :class="reviewTaskStatusFilter === 'pending' ? 'bg-amber-500/25 border-amber-400 text-amber-200' : 'bg-amber-950/20 border-amber-500/30 text-amber-300'"
+            :class="reviewTaskStatusFilter === 'pending' ? 'bg-[#FFC65C]/20 border-[#FFC65C] text-[#FFC65C]' : 'bg-amber-950/20 border-amber-500/30 text-amber-300'"
             @click="reviewTaskStatusFilter = 'pending'"
           >
-            <span class="text-[10px] block font-medium">待现场核验</span>
-            <span class="text-lg font-bold font-mono text-amber-400 mt-0.5 block">
+            <span class="text-[10px] block font-medium font-spec-cn">待现场核验</span>
+            <span class="text-lg font-bold font-spec-num text-[#FFC65C] mt-0.5 block">
               {{ reviewTaskList.filter(t => t.status === 'pending').length }}
             </span>
           </div>
           <div
             class="p-2 rounded-lg border transition cursor-pointer"
-            :class="reviewTaskStatusFilter === 'in_progress' ? 'bg-blue-500/25 border-blue-400 text-blue-200' : 'bg-blue-950/20 border-blue-500/30 text-blue-300'"
+            :class="reviewTaskStatusFilter === 'in_progress' ? 'bg-[#38BDF8]/20 border-[#38BDF8] text-[#38BDF8]' : 'bg-blue-950/20 border-blue-500/30 text-blue-300'"
             @click="reviewTaskStatusFilter = 'in_progress'"
           >
-            <span class="text-[10px] block font-medium">核查进行中</span>
-            <span class="text-lg font-bold font-mono text-blue-400 mt-0.5 block">
+            <span class="text-[10px] block font-medium font-spec-cn">核查进行中</span>
+            <span class="text-lg font-bold font-spec-num text-[#38BDF8] mt-0.5 block">
               {{ reviewTaskList.filter(t => t.status === 'in_progress').length }}
             </span>
           </div>
@@ -3500,8 +4093,8 @@
             :class="reviewTaskStatusFilter === 'closed' ? 'bg-slate-700/40 border-slate-400 text-slate-100' : 'bg-slate-800/20 border-slate-600/30 text-slate-300'"
             @click="reviewTaskStatusFilter = 'closed'"
           >
-            <span class="text-[10px] block font-medium">已完成水量核定</span>
-            <span class="text-lg font-bold font-mono text-slate-200 mt-0.5 block">
+            <span class="text-[10px] block font-medium font-spec-cn">已完成水量核定</span>
+            <span class="text-lg font-bold font-spec-num text-[#3DDC97] mt-0.5 block">
               {{ reviewTaskList.filter(t => t.status === 'closed').length }}
             </span>
           </div>
@@ -3512,44 +4105,44 @@
           <div
             v-for="task in filteredReviewTasks"
             :key="task.id"
-            class="p-4 rounded-xl bg-[#0c2344] border border-[#1b4372] space-y-2 hover:border-cyan-500/50 transition"
+            class="p-4 rounded-xl bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] space-y-2 hover:border-[#00E5FF]/50 transition"
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="font-mono text-xs font-bold text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
+                <span class="font-spec-num text-xs font-bold text-[#00E5FF] bg-[#00E5FF]/15 px-2 py-0.5 rounded border border-[#00E5FF]/30">
                   {{ task.taskCode }}
                 </span>
-                <span class="font-bold text-sm text-white">{{ task.targetName }}</span>
+                <span class="font-bold text-sm text-white font-spec-cn">{{ task.targetName }}</span>
               </div>
 
               <span
-                class="px-2.5 py-0.5 rounded-full text-xs font-bold border"
+                class="px-2.5 py-0.5 rounded-full text-xs font-bold border font-spec-cn"
                 :class="task.status === 'pending'
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse'
+                  ? 'bg-[#FFC65C]/20 text-[#FFC65C] border-[#FFC65C]/40 animate-pulse'
                   : task.status === 'in_progress'
-                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/40'
-                    : 'bg-slate-700/30 text-slate-200 border-slate-600/40'"
+                    ? 'bg-[#38BDF8]/20 text-[#38BDF8] border-[#38BDF8]/40'
+                    : 'bg-[#3DDC97]/20 text-[#3DDC97] border-[#3DDC97]/40'"
               >
                 ● {{ task.statusLabel }}
               </span>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 text-slate-300 bg-black/20 p-2.5 rounded-lg border border-white/5">
-              <div><span class="text-slate-400">偏差特征：</span><span class="text-rose-400 font-bold">{{ task.deviationInfo }}</span></div>
-              <div><span class="text-slate-400">责任专员：</span>{{ task.inspector }}</div>
-              <div><span class="text-slate-400">调度时限：</span><span class="font-mono text-amber-300">{{ task.deadline }}</span></div>
+            <div class="grid grid-cols-3 gap-2 text-slate-300 bg-black/20 p-2.5 rounded-lg border border-white/5 font-spec-cn">
+              <div><span class="text-[#5D8AAA]">偏差特征：</span><span class="text-[#FF6B7A] font-bold font-spec-num">{{ task.deviationInfo }}</span></div>
+              <div><span class="text-[#5D8AAA]">责任专员：</span>{{ task.inspector }}</div>
+              <div><span class="text-[#5D8AAA]">调度时限：</span><span class="font-spec-num text-[#FFC65C]">{{ task.deadline }}</span></div>
             </div>
 
-            <div class="text-slate-300 flex items-start gap-2 bg-[#08182f] p-2.5 rounded-lg border border-[#143b6b]">
-              <span class="text-cyan-400 font-bold shrink-0">现场进展与复核结果：</span>
+            <div class="text-slate-300 flex items-start gap-2 bg-[rgba(6,26,46,0.8)] p-2.5 rounded-lg border border-[rgba(70,180,235,0.2)] font-spec-cn">
+              <span class="text-[#00E5FF] font-bold shrink-0">现场进展与复核结果：</span>
               <span class="leading-relaxed">{{ task.result || '专员排班中，等待现场核验反馈。' }}</span>
             </div>
 
-            <div class="flex items-center justify-end gap-2 pt-1">
+            <div class="flex items-center justify-end gap-2 pt-1 font-spec-cn">
               <button
                 v-if="task.status === 'pending'"
                 type="button"
-                class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold transition cursor-pointer"
+                class="px-3 py-1 rounded bg-[#00E5FF]/20 hover:bg-[#00E5FF]/30 text-[#00E5FF] border border-[#00E5FF]/50 font-semibold transition cursor-pointer"
                 @click="task.status = 'in_progress'; task.statusLabel = '核查进行中'; task.result = '专员已到达现场，正在校验超声流量计读数与出厂标定曲线。'"
               >
                 开始现场核查
@@ -3557,7 +4150,7 @@
               <button
                 v-if="task.status === 'in_progress'"
                 type="button"
-                class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition cursor-pointer"
+                class="px-3 py-1 rounded bg-[#3DDC97]/20 hover:bg-[#3DDC97]/30 text-[#3DDC97] border border-[#3DDC97]/50 font-semibold transition cursor-pointer"
                 @click="task.status = 'closed'; task.statusLabel = '已完成复核修正'; task.result = '现场核实完成，误差系水表阻尼卡滞，已现场校正并完成历史电量-水量折算修订。'"
               >
                 核定修正并销号闭环
@@ -3573,21 +4166,21 @@
             </div>
           </div>
 
-          <div v-if="filteredReviewTasks.length === 0" class="text-center py-8 text-slate-400 text-xs">
+          <div v-if="filteredReviewTasks.length === 0" class="text-center py-8 text-[#5D8AAA] text-xs font-spec-cn">
             暂无该状态下的复核任务
           </div>
         </div>
 
         <!-- Modal Footer -->
-        <div class="px-6 py-3.5 bg-[#06152b] border-t border-[#1b4372] flex items-center justify-between text-xs shrink-0">
-          <div class="text-slate-400 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>标准化复核引擎闭环率：99.2%</span>
+        <div class="px-6 py-3.5 bg-[rgba(4,14,26,0.9)] border-t border-[rgba(70,180,235,0.2)] flex items-center justify-between text-xs shrink-0 font-spec-cn">
+          <div class="text-[#5D8AAA] flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#3DDC97]"></span>
+            <span>标准化复核引擎闭环率：<span class="font-spec-num text-white">99.2%</span></span>
           </div>
 
           <button
             type="button"
-            class="px-5 py-1.5 rounded-lg bg-[#102b52] hover:bg-[#153868] text-cyan-300 border border-cyan-500/40 font-semibold transition cursor-pointer"
+            class="px-5 py-1.5 rounded-lg bg-[#00E5FF]/15 hover:bg-[#00E5FF]/25 text-[#00E5FF] border border-[#00E5FF]/40 font-semibold transition cursor-pointer"
             @click="showReviewTaskModal = false"
           >
             关闭
@@ -3599,31 +4192,31 @@
     <!-- ================= 8. 区县计划水量与直报水量管控比对弹窗 (支持实时微调直报/计划水量，直观验证红色边缘联动) ================= -->
     <div
       v-if="showWaterQuotaModal"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs select-none"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm select-none font-spec-cn"
       @click.self="showWaterQuotaModal = false"
     >
-      <div class="bg-[#091b36] border border-[#1b4372] rounded-2xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div class="spec-card rounded-2xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-[rgba(70,180,235,0.4)]">
         <!-- Modal Header -->
-        <div class="px-6 py-4 bg-[#06152b] border-b border-[#1b4372] flex items-center justify-between shrink-0">
+        <div class="px-6 py-4 bg-gradient-to-r from-[#071F38] to-[#0A2E50] border-b border-[rgba(70,180,235,0.3)] flex items-center justify-between shrink-0">
           <div class="flex items-center gap-3">
-            <span class="w-3.5 h-3.5 rounded-sm bg-gradient-to-br from-rose-500 to-amber-500 shadow-[0_0_8px_#ef4444]"></span>
+            <span class="w-3.5 h-3.5 rounded-sm bg-gradient-to-br from-[#FF6B7A] to-[#FFC65C] shadow-[0_0_8px_#FF6B7A]"></span>
             <div>
               <div class="flex items-center gap-2.5">
-                <h3 class="text-base font-bold text-white tracking-wide">
+                <h3 class="text-base font-bold text-white tracking-wide font-spec-cn">
                   西宁市区县计划水量与直报水量管控比对
                 </h3>
-                <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-rose-500/20 text-rose-300 border border-rose-500/50">
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold font-spec-num bg-[#FF6B7A]/20 text-[#FF6B7A] border border-[#FF6B7A]/50">
                   {{ exceededDistrictsList.length }} 个区县直报超计划 (已标红)
                 </span>
               </div>
-              <p class="text-xs text-slate-400 mt-0.5">
+              <p class="text-xs text-[#5D8AAA] mt-0.5 font-spec-cn">
                 规则联动：在地图区县名称处展示计划与直报水量；若直报水量大于计划水量，相应行政区划边缘自动以红色发光标记
               </p>
             </div>
           </div>
           <button
             type="button"
-            class="text-slate-400 hover:text-white transition cursor-pointer p-1.5 rounded-lg hover:bg-white/10"
+            class="text-[#5D8AAA] hover:text-white transition cursor-pointer p-1.5 rounded-lg hover:bg-white/10"
             @click="showWaterQuotaModal = false"
           >
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3633,65 +4226,65 @@
         </div>
 
         <!-- Modal Body -->
-        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4 font-spec-cn">
           <!-- KPI Summary Strip -->
           <div class="grid grid-cols-4 gap-3">
-            <div class="bg-[#0b2142] p-3 rounded-xl border border-cyan-500/30">
-              <div class="text-[11px] text-slate-300">全市核定计划总量</div>
-              <div class="text-xl font-bold font-mono text-cyan-300 mt-1">
-                {{ Object.values(districtWaterQuotaMap).reduce((s, i) => s + i.planned, 0).toFixed(1) }} <span class="text-xs font-normal">万m³</span>
+            <div class="bg-[rgba(10,36,58,0.55)] p-3 rounded-xl border border-[rgba(70,180,235,0.25)]">
+              <div class="text-[11px] text-[#5D8AAA]">全市核定计划总量</div>
+              <div class="text-xl font-bold font-spec-num text-[#00E5FF] mt-1">
+                {{ Object.values(districtWaterQuotaMap).reduce((s, i) => s + i.planned, 0).toFixed(1) }} <span class="text-xs font-normal font-spec-cn">万m³</span>
               </div>
             </div>
-            <div class="bg-[#0b2142] p-3 rounded-xl border border-sky-500/30">
-              <div class="text-[11px] text-slate-300">全市实际直报总量</div>
-              <div class="text-xl font-bold font-mono text-sky-300 mt-1">
-                {{ Object.values(districtWaterQuotaMap).reduce((s, i) => s + i.reported, 0).toFixed(1) }} <span class="text-xs font-normal">万m³</span>
+            <div class="bg-[rgba(10,36,58,0.55)] p-3 rounded-xl border border-[rgba(70,180,235,0.25)]">
+              <div class="text-[11px] text-[#5D8AAA]">全市实际直报总量</div>
+              <div class="text-xl font-bold font-spec-num text-[#38BDF8] mt-1">
+                {{ Object.values(districtWaterQuotaMap).reduce((s, i) => s + i.reported, 0).toFixed(1) }} <span class="text-xs font-normal font-spec-cn">万m³</span>
               </div>
             </div>
-            <div class="bg-[#0b2142] p-3 rounded-xl border border-rose-500/40">
-              <div class="text-[11px] text-slate-300">直报超计划区县数</div>
-              <div class="text-xl font-bold font-mono text-rose-400 mt-1">
-                {{ exceededDistrictsList.length }} <span class="text-xs font-normal">个区县 (边缘红标)</span>
+            <div class="bg-[rgba(10,36,58,0.55)] p-3 rounded-xl border border-[#FF6B7A]/35">
+              <div class="text-[11px] text-[#5D8AAA]">直报超计划区县数</div>
+              <div class="text-xl font-bold font-spec-num text-[#FF6B7A] mt-1">
+                {{ exceededDistrictsList.length }} <span class="text-xs font-normal font-spec-cn">个区县 (边缘红标)</span>
               </div>
             </div>
-            <div class="bg-[#0b2142] p-3 rounded-xl border border-emerald-500/30">
-              <div class="text-[11px] text-slate-300">合规受控区县数</div>
-              <div class="text-xl font-bold font-mono text-emerald-400 mt-1">
-                {{ 7 - exceededDistrictsList.length }} <span class="text-xs font-normal">个区县 (正常边缘)</span>
+            <div class="bg-[rgba(10,36,58,0.55)] p-3 rounded-xl border border-[#3DDC97]/30">
+              <div class="text-[11px] text-[#5D8AAA]">合规受控区县数</div>
+              <div class="text-xl font-bold font-spec-num text-[#3DDC97] mt-1">
+                {{ 7 - exceededDistrictsList.length }} <span class="text-xs font-normal font-spec-cn">个区县 (正常边缘)</span>
               </div>
             </div>
           </div>
 
           <!-- District Quotas Table -->
-          <div class="border border-[#1b4372] rounded-xl overflow-hidden bg-[#061427]">
+          <div class="border border-[rgba(70,180,235,0.2)] rounded-xl overflow-hidden bg-[rgba(6,26,46,0.8)]">
             <table class="w-full text-left text-xs">
-              <thead class="bg-[#081b36] text-slate-300 border-b border-[#1b4372]">
+              <thead class="bg-[rgba(10,36,58,0.6)] text-[#5D8AAA] border-b border-[rgba(70,180,235,0.2)]">
                 <tr>
-                  <th class="py-2.5 px-3">行政区县</th>
-                  <th class="py-2.5 px-2">水量梯级</th>
-                  <th class="py-2.5 px-3 text-right">计划水量 (万m³)</th>
-                  <th class="py-2.5 px-3 text-right">直报水量 (万m³)</th>
-                  <th class="py-2.5 px-3 text-right">差额 (直报-计划)</th>
-                  <th class="py-2.5 px-2 text-center">管控状态</th>
-                  <th class="py-2.5 px-2 text-center">地图边缘标记</th>
-                  <th class="py-2.5 px-3 text-center">动态调节测试</th>
+                  <th class="py-2.5 px-3 font-spec-cn">行政区县</th>
+                  <th class="py-2.5 px-2 font-spec-cn">水量梯级</th>
+                  <th class="py-2.5 px-3 text-right font-spec-cn">计划水量 (万m³)</th>
+                  <th class="py-2.5 px-3 text-right font-spec-cn">直报水量 (万m³)</th>
+                  <th class="py-2.5 px-3 text-right font-spec-cn">差额 (直报-计划)</th>
+                  <th class="py-2.5 px-2 text-center font-spec-cn">管控状态</th>
+                  <th class="py-2.5 px-2 text-center font-spec-cn">地图边缘标记</th>
+                  <th class="py-2.5 px-3 text-center font-spec-cn">动态调节测试</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[#1b4372]/60 font-mono">
+              <tbody class="divide-y divide-[rgba(70,180,235,0.12)] divide-dashed font-spec-num">
                 <tr
                   v-for="d in Object.values(districtWaterQuotaMap)"
                   :key="d.name"
                   class="transition-colors hover:bg-white/5"
                   :class="d.reported > d.planned ? 'bg-rose-950/20' : ''"
                 >
-                  <td class="py-2.5 px-3 font-sans font-bold text-white flex items-center gap-1.5">
+                  <td class="py-2.5 px-3 font-spec-cn font-bold text-white flex items-center gap-1.5">
                     <span
                       class="w-2 h-2 rounded-full"
-                      :class="d.reported > d.planned ? 'bg-rose-500' : 'bg-emerald-400'"
+                      :class="d.reported > d.planned ? 'bg-[#FF6B7A]' : 'bg-[#3DDC97]'"
                     ></span>
                     <span>{{ d.name }}</span>
                   </td>
-                  <td class="py-2.5 px-2 font-sans">
+                  <td class="py-2.5 px-2 font-spec-cn">
                     <span
                       class="px-1.5 py-0.5 rounded text-[10px] font-bold"
                       :style="{
@@ -3706,38 +4299,38 @@
                   <td class="py-2.5 px-3 text-right text-slate-300 font-bold">
                     {{ d.planned.toFixed(1) }}
                   </td>
-                  <td class="py-2.5 px-3 text-right font-bold" :class="d.reported > d.planned ? 'text-rose-400 font-black' : 'text-sky-300'">
+                  <td class="py-2.5 px-3 text-right font-bold" :class="d.reported > d.planned ? 'text-[#FF6B7A] font-black' : 'text-[#38BDF8]'">
                     {{ d.reported.toFixed(1) }}
                   </td>
-                  <td class="py-2.5 px-3 text-right font-bold" :class="d.reported > d.planned ? 'text-rose-400' : 'text-emerald-400'">
+                  <td class="py-2.5 px-3 text-right font-bold" :class="d.reported > d.planned ? 'text-[#FF6B7A]' : 'text-[#3DDC97]'">
                     {{ d.reported > d.planned ? '+' + (d.reported - d.planned).toFixed(1) : (d.reported - d.planned).toFixed(1) }}
                   </td>
-                  <td class="py-2.5 px-2 text-center font-sans">
+                  <td class="py-2.5 px-2 text-center font-spec-cn">
                     <span
                       v-if="d.reported > d.planned"
-                      class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/25 text-rose-300 border border-rose-500/60 inline-flex items-center gap-1"
+                      class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FF6B7A]/20 text-[#FF6B7A] border border-[#FF6B7A]/50 inline-flex items-center gap-1"
                     >
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#FF6B7A] animate-pulse"></span>
                       超计划
                     </span>
                     <span
                       v-else
-                      class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                      class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#3DDC97]/20 text-[#3DDC97] border border-[#3DDC97]/40"
                     >
                       合规安全
                     </span>
                   </td>
-                  <td class="py-2.5 px-2 text-center font-sans">
+                  <td class="py-2.5 px-2 text-center font-spec-cn">
                     <span
                       v-if="d.reported > d.planned"
-                      class="text-xs font-bold text-rose-400 flex items-center justify-center gap-1"
+                      class="text-xs font-bold text-[#FF6B7A] flex items-center justify-center gap-1"
                     >
-                      <span class="w-2.5 h-1 rounded bg-rose-500 shadow-[0_0_6px_#ef4444]"></span>
+                      <span class="w-2.5 h-1 rounded bg-[#FF6B7A] shadow-[0_0_6px_#FF6B7A]"></span>
                       红色边缘标记
                     </span>
                     <span
                       v-else
-                      class="text-xs text-slate-400 flex items-center justify-center gap-1"
+                      class="text-xs text-[#5D8AAA] flex items-center justify-center gap-1"
                     >
                       <span class="w-2.5 h-1 rounded bg-slate-500"></span>
                       标准边缘
@@ -3763,10 +4356,10 @@
                       </button>
                       <button
                         type="button"
-                        class="px-2 py-0.5 rounded transition cursor-pointer text-[10px] font-bold border ml-1"
+                        class="px-2 py-0.5 rounded transition cursor-pointer text-[10px] font-bold border ml-1 font-spec-cn"
                         :class="d.reported > d.planned
-                          ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border-emerald-500/40'
-                          : 'bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border-rose-500/40'"
+                          ? 'bg-[#3DDC97]/20 hover:bg-[#3DDC97]/30 text-[#3DDC97] border-[#3DDC97]/40'
+                          : 'bg-[#FF6B7A]/20 hover:bg-[#FF6B7A]/30 text-[#FF6B7A] border-[#FF6B7A]/40'"
                         @click="toggleDistrictExceed(d.name)"
                       >
                         {{ d.reported > d.planned ? '设为合规' : '设为超量' }}
@@ -3779,21 +4372,21 @@
           </div>
 
           <!-- Description Callout -->
-          <div class="p-3 bg-[#08182f] border border-cyan-500/30 rounded-xl text-xs text-slate-300 flex items-start gap-2.5">
-            <span class="text-cyan-400 font-bold text-sm shrink-0">💡</span>
-            <div class="space-y-1 leading-relaxed">
+          <div class="p-3 bg-[rgba(6,26,46,0.8)] border border-[rgba(70,180,235,0.25)] rounded-xl text-xs text-slate-300 flex items-start gap-2.5">
+            <span class="text-[#00E5FF] font-bold text-sm shrink-0">💡</span>
+            <div class="space-y-1 leading-relaxed font-spec-cn">
               <div>
                 <strong>当前比对规则：</strong>系统针对西宁全域 4区3县（湟中区、大通县、城北区、城东区、城西区、城中区、湟源县）实时计算直报水量与计划水量的管控关系。
               </div>
-              <div class="text-slate-400 text-[11px]">
-                当 <code class="text-rose-300 bg-black/40 px-1 py-0.5 rounded">直报水量 > 计划水量</code> 时，地图对应的行政区划多边形边缘将采用红色（<span class="text-rose-400 font-bold">#ef4444</span>）发光描边显著高亮，区县中心胶囊显示红底警示标与直报红字；当直报水量受控在计划以内时，恢复为水量梯级色与标准边界。
+              <div class="text-[#5D8AAA] text-[11px]">
+                当 <code class="text-[#FF6B7A] bg-black/40 px-1 py-0.5 rounded font-spec-num">直报水量 > 计划水量</code> 时，地图对应的行政区划多边形边缘将采用红色（<span class="text-[#FF6B7A] font-bold font-spec-num">#FF6B7A</span>）发光描边显著高亮，区县中心胶囊显示红底警示标与直报红字；当直报水量受控在计划以内时，恢复为水量梯级色与标准边界。
               </div>
             </div>
           </div>
         </div>
 
         <!-- Modal Footer -->
-        <div class="px-6 py-3.5 bg-[#06152b] border-t border-[#1b4372] flex items-center justify-between text-xs shrink-0">
+        <div class="px-6 py-3.5 bg-[rgba(4,14,26,0.9)] border-t border-[rgba(70,180,235,0.2)] flex items-center justify-between text-xs shrink-0 font-spec-cn">
           <button
             type="button"
             class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition cursor-pointer"
@@ -3804,13 +4397,167 @@
 
           <button
             type="button"
-            class="px-5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition cursor-pointer shadow-md"
+            class="px-5 py-1.5 rounded-lg bg-[#00E5FF]/20 hover:bg-[#00E5FF]/30 text-[#00E5FF] border border-[#00E5FF]/50 font-semibold transition cursor-pointer shadow-[0_0_12px_rgba(0,229,255,0.25)]"
             @click="showWaterQuotaModal = false"
           >
             返回地图查看
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- ================= 9. DEV ANNOTATION DRAWER & BADGES SYSTEM (开发标注抽屉组件) ================= -->
+    <div
+      v-if="scenarioMode === 'comprehensive'"
+      class="pointer-events-none fixed inset-0 z-50 overflow-hidden"
+    >
+      <!-- Collapsed floating pill button on the right edge -->
+      <transition name="fade">
+        <button
+          v-if="!showAnnotationPanel"
+          type="button"
+          @click="showAnnotationPanel = true"
+          class="pointer-events-auto fixed right-0 top-24 z-50 px-3 py-2 rounded-l-xl bg-gradient-to-r from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_20px_rgba(255,184,0,0.85)] border-y-2 border-l-2 border-white flex items-center gap-2 cursor-pointer hover:pl-4 transition-all duration-200 group"
+          title="点击展开开发标注面板 (快捷键 A)"
+        >
+          <span class="w-2.5 h-2.5 rounded-full bg-[#0A1626] animate-pulse"></span>
+          <span class="font-spec-cn tracking-wide">开发标注 · 10项</span>
+          <span class="text-[10px] bg-black/20 text-[#0A1626] px-1 py-0.2 rounded font-mono font-bold">A</span>
+        </button>
+      </transition>
+
+      <!-- Expanded Right-Side Specification Panel -->
+      <transition name="slide-right">
+        <aside
+          v-if="showAnnotationPanel"
+          id="dev-anno-source"
+          class="pointer-events-auto fixed top-0 right-0 h-full w-[380px] 2xl:w-[420px] bg-[#071628]/96 backdrop-blur-xl border-l-2 border-[#00E5FF]/40 shadow-[-12px_0_40px_rgba(0,0,0,0.85)] z-50 flex flex-col font-spec-cn text-white select-none animate-slide-in"
+        >
+          <!-- Panel Header Bar -->
+          <div class="px-4 py-3 bg-gradient-to-r from-[#071F38] via-[#0A2E50] to-[#071F38] border-b border-[rgba(70,180,235,0.3)] flex items-center justify-between shrink-0">
+            <!-- Title with Amber Dot -->
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#FFB800] shadow-[0_0_8px_#FFB800] border border-white"></span>
+              <span class="font-bold text-sm tracking-wide text-white">开发标注 · 共 10 项</span>
+            </div>
+
+            <!-- 3 Action Buttons -->
+            <div class="flex items-center gap-1.5 text-xs">
+              <!-- 标注展开/收起 (切换标点可见性) -->
+              <button
+                type="button"
+                @click="showAnnotationBadges = !showAnnotationBadges"
+                class="px-2 py-1 rounded bg-[rgba(10,36,58,0.8)] hover:bg-[#3FD0FF]/20 text-[#9BEAFF] border border-[rgba(70,180,235,0.35)] cursor-pointer transition text-[11px] font-medium"
+                :title="showAnnotationBadges ? '点击隐藏页面黄色标注圆圈' : '点击显示页面黄色标注圆圈'"
+              >
+                {{ showAnnotationBadges ? '标点隐藏' : '标点展开' }}
+              </button>
+
+              <!-- 复制清单 -->
+              <button
+                type="button"
+                @click="copyAnnotationList"
+                class="px-2 py-1 rounded bg-[rgba(10,36,58,0.8)] hover:bg-[#3FD0FF]/20 text-[#9BEAFF] border border-[rgba(70,180,235,0.35)] cursor-pointer transition text-[11px] font-medium flex items-center gap-1"
+                title="复制所有10项卡片规格说明为文本格式"
+              >
+                <svg class="w-3 h-3 text-[#3FD0FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>复制清单</span>
+              </button>
+
+              <!-- 折叠 -->
+              <button
+                type="button"
+                @click="showAnnotationPanel = false"
+                class="px-2 py-1 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 cursor-pointer transition text-[11px] font-medium"
+                title="折叠标注面板 (快捷键 A)"
+              >
+                折叠
+              </button>
+            </div>
+          </div>
+
+          <!-- Subtitle & Usage Hint -->
+          <div class="px-3.5 py-2 bg-[#051322]/80 border-b border-[rgba(70,180,235,0.18)] text-[10.5px] text-[#8FB6D4] leading-relaxed shrink-0">
+            <span class="text-[#FFC65C] font-semibold">编码说明:</span>
+            <span class="text-slate-300 ml-1">HTML中的 <code class="text-[#00E5FF] font-mono bg-black/40 px-1 py-0.5 rounded">#dev-anno-source</code>; 编号与页面黄色圆圈一一对应; 快捷键 <kbd class="px-1 py-0.2 rounded bg-white/10 text-white font-mono font-bold">A</kbd> 开关标注框，悬停清单条目可高亮对应模块。</span>
+          </div>
+
+          <!-- Scrollable Annotation Items List -->
+          <div class="flex-1 overflow-y-auto custom-dark-scrollbar p-3 space-y-2.5">
+            <div
+              v-for="item in annotationList"
+              :key="item.id"
+              :id="'anno-card-' + item.id"
+              class="p-3 rounded-lg border transition-all duration-200 cursor-pointer"
+              :class="activeAnnotationId === item.id
+                ? 'bg-[rgba(18,52,86,0.9)] border-[#FFB800] shadow-[0_0_16px_rgba(255,184,0,0.35)] scale-[1.01]'
+                : 'bg-[rgba(10,36,58,0.55)] border-[rgba(70,180,235,0.2)] hover:border-[#3FD0FF]/60 hover:bg-[rgba(12,42,70,0.7)]'"
+              @mouseenter="activeAnnotationId = item.id"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToPageElement(item.id)"
+            >
+              <!-- Item Title Bar with Circular Badge -->
+              <div class="flex items-center gap-2 pb-1.5 border-b border-[rgba(70,180,235,0.18)] mb-2">
+                <span class="w-5 h-5 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-[11px] flex items-center justify-center border border-white shrink-0 shadow-sm">
+                  {{ item.id }}
+                </span>
+                <h4 class="font-bold text-xs 2xl:text-sm text-white truncate font-spec-cn flex-1">
+                  {{ item.title }}
+                </h4>
+                <span class="text-[10px] text-[#5D8AAA] font-mono shrink-0">#{{ item.id }}</span>
+              </div>
+
+              <!-- Structured Content -->
+              <div class="space-y-1.5 text-xs">
+                <!-- 1. 数据来源 -->
+                <div class="leading-relaxed">
+                  <span class="text-[#00E5FF] font-semibold">数据来源: </span>
+                  <span class="text-slate-200 text-[11px]">{{ item.source }}</span>
+                </div>
+
+                <!-- 2. 交互 -->
+                <div class="leading-relaxed">
+                  <span class="text-[#FFC65C] font-semibold">交互: </span>
+                  <span class="text-slate-200 text-[11px]">{{ item.interaction }}</span>
+                </div>
+
+                <!-- 3. 开发要点 -->
+                <div>
+                  <div class="text-[#9BEAFF] font-semibold mb-1">开发要点:</div>
+                  <div class="space-y-1 pl-2 border-l-2 border-[#00E5FF]/30 text-slate-300 text-[11px] leading-relaxed">
+                    <div v-for="(p, pIdx) in item.keyPoints" :key="pIdx">
+                      {{ pIdx + 1 }}、{{ p }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Footer Status Strip -->
+          <div class="px-4 py-2.5 bg-[#051322] border-t border-[rgba(70,180,235,0.25)] flex items-center justify-between text-[11px] text-[#8FB6D4] shrink-0 font-spec-cn">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#3DDC97]"></span>
+              <span>联动状态: <span class="text-white font-bold">{{ activeAnnotationId ? `高亮模块 #${activeAnnotationId}` : '就绪待选' }}</span></span>
+            </div>
+            <span class="text-[#5D8AAA] font-mono">10 / 10 模块已对齐</span>
+          </div>
+        </aside>
+      </transition>
+
+      <!-- Copy Success Toast Notification -->
+      <transition name="fade">
+        <div
+          v-if="copySuccessToast"
+          class="pointer-events-auto fixed bottom-14 right-6 z-50 bg-[#072444]/95 border border-[#3DDC97] text-white px-4 py-2 rounded-xl shadow-[0_0_20px_rgba(61,220,151,0.5)] flex items-center gap-2 text-xs font-semibold backdrop-blur-md"
+        >
+          <span class="text-[#3DDC97] text-sm">✓</span>
+          <span>10项开发标注清单已成功复制到剪贴板！</span>
+        </div>
+      </transition>
     </div>
 
   </div>
@@ -3834,6 +4581,181 @@ function navigate(menu: string) {
 const currentTimeStr = ref('10:30:25');
 let timer: number | null = null;
 
+// ================= 开发标注 (Design Specification & Callout System) =================
+interface AnnotationItem {
+  id: number;
+  title: string;
+  source: string;
+  interaction: string;
+  keyPoints: string[];
+}
+
+const showAnnotationPanel = ref(false);
+const showAnnotationBadges = ref(true);
+const activeAnnotationId = ref<number | null>(null);
+const copySuccessToast = ref(false);
+
+const annotationList = ref<AnnotationItem[]>([
+  {
+    id: 1,
+    title: '顶部标签栏 / 全局控制',
+    source: '时间取浏览器本地时间；实时气象接口获取西宁市气温(18℃)；常态化预警待办工单中枢(12起待办)。',
+    interaction: '顶部依次展示星期、气温、当前时间；常态化预警铃铛可唤起调度面板；点击工作台退出大屏模式。',
+    keyPoints: [
+      '顶部名匾采用SVG切角科技底衬，标题居中自适应。',
+      '快捷键 A 开关右侧标注框，悬停清单条目可高亮对应模块。',
+      '全局时钟秒级精准自更新，断网时自动降级为本地时钟。',
+    ],
+  },
+  {
+    id: 2,
+    title: '行政区域用水对比 (左1)',
+    source: '全域及7区县取用水数据库，包含计量水量、直报水量、税务水量、许可水量与计划水量五维融合数据。',
+    interaction: '区县下拉与时间范围联动；鼠标悬浮柱体或数据节点弹出5维指标对比浮窗；点击区划联动全域地图定位。',
+    keyPoints: [
+      '三维同色水蓝柱族（计量/直报/税务）与双轨管控折线（许可金黄/计划虚白）在同一SVG坐标系下归一化渲染。',
+      '柱体支持分组动态计算高度，具备平滑过渡动画。',
+      '顶部内置五维指标汇总胶囊条，实时联动所选区划与时段。',
+    ],
+  },
+  {
+    id: 3,
+    title: '用水时间变化趋势 (左2)',
+    source: '近12个月历史取水时序数据库、年度水资源配置计划分解月度指标、历年同期均值与水行政许可红线。',
+    interaction: '鼠标悬停任意月份节点展示当月取用水多维对比浮窗；数据曲线高亮放大提示；联动区划筛选过滤。',
+    keyPoints: [
+      '实际取水采用平滑贝塞尔曲线叠加天蓝色纵向渐变光晕面积（LinearGradient）。',
+      '月计划与许可水量采用不同线型区分（虚线与点划线），便于直观研判超指标风险。',
+      '月份坐标轴自适应12个月跨度，提供同比变化率实时计算。',
+    ],
+  },
+  {
+    id: 4,
+    title: '行业用水结构占比 (左3)',
+    source: '重点取水户行业分类数据库，涵盖规上工业、农业灌区、城镇供水、生态环境及特种行业。',
+    interaction: '环形图扇区悬浮高亮放大；点击行业卡片筛选对应行业用水明细与占比趋势。',
+    keyPoints: [
+      '采用SVG Ring仪表盘展示规上工业与农业灌区双核心比重。',
+      '提供行业用水量与占比双重指标标注，保证极端小数值依然具备视觉辨识度。',
+      '内嵌结构健康度评估微标签，辅助研判产业节水成效。',
+    ],
+  },
+  {
+    id: 5,
+    title: '西宁全域 GIS 数字孪生底图 (核心)',
+    source: '西宁市国土三调矢量底图、湟水河全水系地理矢量、各区县水量使用情况与直报计划差值比对引擎。',
+    interaction: '鼠标移入区县矢量多边形即时弹出直报/计划水量卡片；点击区县触发全屏联动；支持图层开关与视角重置。',
+    keyPoints: [
+      '按水量使用情况4个等级（>100万、>70万、>50万、<50万方）色块动态着色渲染区县图层。',
+      '若直报水量超过计划指标，自动叠加红色呼吸警示光晕与警示角标。',
+      '矢量湟水河主干道与南北川支流具备水流流动动态渐变。',
+    ],
+  },
+  {
+    id: 6,
+    title: '核心指标与直报看板 (地图上方)',
+    source: '全域水资源综合调度引擎，融合全网实时遥测、取水户直报系统、税务涉税信息及预警研判中枢。',
+    interaction: '点击各指标胶囊快速联动聚焦对应业务模块或打开专项管控弹窗。',
+    keyPoints: [
+      '横向6栏均分高科技微边框卡片，包含总取水量、直报水量、税务偏差、预警事件等核心数据。',
+      '数据采用科技大字体呈现，超许可等告警指标内置红色呼吸闪烁指示器。',
+    ],
+  },
+  {
+    id: 7,
+    title: '综合管控场景切换与图例联动 (中下)',
+    source: '场景模式控制器、水资源使用情况分级标准规范及地图图层配置中心。',
+    interaction: '点击胶囊在“综合应用场景”与“专项业务应用场景”间平滑切换；点击图例色块反向过滤高亮地图区县。',
+    keyPoints: [
+      '支持图例展开/收起切换，不遮挡中央数字孪生地图核心水系。',
+      '直报超计划高风险区县具备一键比对管控弹窗直达能力。',
+    ],
+  },
+  {
+    id: 8,
+    title: '常态化预警监测 (右1)',
+    source: '取用水常态化预警中枢，对标接近计划(80%-100%)、超计划(≥100%)、超许可(红线)三级预警规则。',
+    interaction: '点击预警统计卡片过滤不同严重等级；点击表格事项明细触发该区县与涉事单位的联合诊断。',
+    keyPoints: [
+      '三级预警徽标采用暖黄、鲜橙、亮红梯度警戒色，视觉层级分明。',
+      '实时预警列表以微秒级时间戳排序，提供占指标比值实时换算。',
+    ],
+  },
+  {
+    id: 9,
+    title: '业务关联研判 (右2)',
+    source: '水行政许可执法台账、企业涉税取水量比对核查库与取水工程规范化档案。',
+    interaction: '点击误差率TOP排行定位到具体取水户；点击证照问题环形图筛选对应违规类型。',
+    keyPoints: [
+      '展示许可误差率、证照问题数、治理完成率四大关键健康度量化指标。',
+      '微型多色环形图直观呈现5大证照违规类型（计量超许可、直报超许可、违规新增等）占比结构。',
+    ],
+  },
+  {
+    id: 10,
+    title: '计量点接入与到报率监控 (右3)',
+    source: '规模以上农业与工业计量遥测终端(RTU)、水资源监控传输协议前置机心跳上报日志。',
+    interaction: '切换规模农业/规上工业对比视图；鼠标悬浮趋势折线查看近7日到报率波动；点击异常派单直达运维。',
+    keyPoints: [
+      '分别监控农业与工业两类关键站点的接入率与到报率指标。',
+      '采用双折线平滑渲染近7日接入率趋势，低到报率时段提供红点异常告警标记。',
+    ],
+  },
+]);
+
+async function copyAnnotationList() {
+  const text = annotationList.value.map(item => {
+    const points = item.keyPoints.map((p, idx) => `  ${idx + 1}、${p}`).join('\n');
+    return `【${item.id} ${item.title}】\n- 数据来源: ${item.source}\n- 交互: ${item.interaction}\n- 开发要点:\n${points}`;
+  }).join('\n\n');
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    copySuccessToast.value = true;
+    setTimeout(() => {
+      copySuccessToast.value = false;
+    }, 2500);
+  } catch {
+    copySuccessToast.value = true;
+    setTimeout(() => {
+      copySuccessToast.value = false;
+    }, 2500);
+  }
+}
+
+function scrollToAnnotation(id: number) {
+  showAnnotationPanel.value = true;
+  activeAnnotationId.value = id;
+  nextTick(() => {
+    const el = document.getElementById('anno-card-' + id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+}
+
+function scrollToPageElement(id: number) {
+  activeAnnotationId.value = id;
+  const el = document.getElementById('dev-anno-' + id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function handleAnnotationKeydown(e: KeyboardEvent) {
+  if ((e.key === 'a' || e.key === 'A') && !['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) {
+    showAnnotationPanel.value = !showAnnotationPanel.value;
+  }
+}
+
 onMounted(() => {
   const updateClock = () => {
     const d = new Date();
@@ -3844,10 +4766,12 @@ onMounted(() => {
   };
   updateClock();
   timer = window.setInterval(updateClock, 1000);
+  window.addEventListener('keydown', handleAnnotationKeydown);
 });
 
 onUnmounted(() => {
   if (timer) clearInterval(timer);
+  window.removeEventListener('keydown', handleAnnotationKeydown);
 });
 
 // Fullscreen toggle
@@ -4079,23 +5003,23 @@ function getDistrictFill(districtName: string): string {
 function getDistrictFillOpacity(districtName: string): number {
   const isSelectedOrHovered = hoveredDistrictName.value === districtName || filterParams.value.district === districtName || filterParams.value.district === normalizeDistrictName(districtName);
   if (scenarioMode.value === 'comprehensive' && activeLayers.value.waterUsage) {
-    if (isSelectedOrHovered) return 0.72;
+    if (isSelectedOrHovered) return 0.85;
     if (selectedUsageTierFilter.value) {
       if (selectedUsageTierFilter.value === 'exceeded') {
-        return isDirectReportExceeded(districtName) ? 0.68 : 0.15;
+        return isDirectReportExceeded(districtName) ? 0.78 : 0.25;
       }
       const tier = getDistrictTier(districtName);
-      if (tier && tier.id === selectedUsageTierFilter.value) return 0.65;
-      return 0.16; // 非高亮等级透明淡化
+      if (tier && tier.id === selectedUsageTierFilter.value) return 0.76;
+      return 0.22; // 非高亮等级透明淡化
     }
     const tier = getDistrictTier(districtName);
-    if (!tier) return 0.35;
-    if (tier.id === 'gt100') return 0.58;
-    if (tier.id === 'gt70') return 0.48;
-    if (tier.id === 'gt50') return 0.42;
-    return 0.35;
+    if (!tier) return 0.46;
+    if (tier.id === 'gt100') return 0.68;
+    if (tier.id === 'gt70') return 0.60;
+    if (tier.id === 'gt50') return 0.54;
+    return 0.46;
   }
-  return isSelectedOrHovered ? 0.35 : 0.14;
+  return isSelectedOrHovered ? 0.42 : 0.20;
 }
 
 /**
@@ -5088,27 +6012,28 @@ function selectSearchWarning(warn: WarningEventPoint) {
   globalSearchText.value = '';
 }
 
-// 2. 用水时间变化趋势 3项序列: 实际取水 (带面积渐变) / 历史同期 / 许可水量
+// 2. 用水时间变化趋势 4项序列: 实际取水 (带面积渐变) / 月计划水量 / 历史同期 / 许可水量
 interface MonthlyTrendItem {
   month: string;
   actual: number;      // 实际取水 (万m³)
+  planned: number;     // 月计划水量 (万m³)
   history: number;     // 历史同期 (万m³)
   licensed: number;    // 许可水量 (万m³)
 }
 
 const monthlyTrendData = ref<MonthlyTrendItem[]>([
-  { month: '1月', actual: 4850, history: 4620, licensed: 7500 },
-  { month: '2月', actual: 4320, history: 4180, licensed: 7200 },
-  { month: '3月', actual: 6980, history: 6750, licensed: 9800 },
-  { month: '4月', actual: 9450, history: 9120, licensed: 12500 },
-  { month: '5月', actual: 12850, history: 12400, licensed: 15600 },
-  { month: '6月', actual: 14120, history: 13650, licensed: 16800 },
-  { month: '7月', actual: 14680, history: 14100, licensed: 17200 },
-  { month: '8月', actual: 13950, history: 13520, licensed: 16500 },
-  { month: '9月', actual: 10840, history: 10450, licensed: 13800 },
-  { month: '10月', actual: 8250, history: 7980, licensed: 11200 },
-  { month: '11月', actual: 5920, history: 5740, licensed: 8800 },
-  { month: '12月', actual: 5120, history: 4950, licensed: 7800 },
+  { month: '1月', actual: 4850, planned: 5200, history: 4620, licensed: 7500 },
+  { month: '2月', actual: 4320, planned: 4700, history: 4180, licensed: 7200 },
+  { month: '3月', actual: 6980, planned: 7350, history: 6750, licensed: 9800 },
+  { month: '4月', actual: 9450, planned: 9900, history: 9120, licensed: 12500 },
+  { month: '5月', actual: 12850, planned: 13200, history: 12400, licensed: 15600 },
+  { month: '6月', actual: 14120, planned: 14500, history: 13650, licensed: 16800 },
+  { month: '7月', actual: 14680, planned: 15100, history: 14100, licensed: 17200 },
+  { month: '8月', actual: 13950, planned: 14400, history: 13520, licensed: 16500 },
+  { month: '9月', actual: 10840, planned: 11300, history: 10450, licensed: 13800 },
+  { month: '10月', actual: 8250, planned: 8700, history: 7980, licensed: 11200 },
+  { month: '11月', actual: 5920, planned: 6400, history: 5740, licensed: 8800 },
+  { month: '12月', actual: 5120, planned: 5500, history: 4950, licensed: 7800 },
 ]);
 
 const hoveredTrendIdx = ref<number | null>(null);
@@ -5131,13 +6056,13 @@ function getSmoothLinePath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-// 用水时间变化趋势坐标计算: viewBox="0 0 380 110"
+// 用水时间变化趋势坐标计算: viewBox="0 0 380 120"
 const trendChartData = computed(() => {
-  const xStart = 34;
-  const xEnd = 366;
-  const yBaseline = 90;
-  const yTop = 14;
-  const maxY = 20000;
+  const xStart = 36;
+  const xEnd = 368;
+  const yBaseline = 94;
+  const yTop = 16;
+  const maxY = 18000;
   const count = monthlyTrendData.value.length;
   const stepX = (xEnd - xStart) / (count - 1);
 
@@ -5145,6 +6070,13 @@ const trendChartData = computed(() => {
     x: xStart + i * stepX,
     y: yBaseline - (d.actual / maxY) * (yBaseline - yTop),
     val: d.actual,
+    item: d
+  }));
+
+  const plannedPts = monthlyTrendData.value.map((d, i) => ({
+    x: xStart + i * stepX,
+    y: yBaseline - (d.planned / maxY) * (yBaseline - yTop),
+    val: d.planned,
     item: d
   }));
 
@@ -5164,15 +6096,18 @@ const trendChartData = computed(() => {
 
   const actualLine = getSmoothLinePath(actualPts);
   const actualArea = `${actualLine} L ${actualPts[count - 1].x.toFixed(1)},${yBaseline} L ${actualPts[0].x.toFixed(1)},${yBaseline} Z`;
+  const plannedLine = getSmoothLinePath(plannedPts);
   const historyLine = getSmoothLinePath(historyPts);
   const licensedLine = getSmoothLinePath(licensedPts);
 
   return {
     actualPts,
+    plannedPts,
     historyPts,
     licensedPts,
     actualLine,
     actualArea,
+    plannedLine,
     historyLine,
     licensedLine,
     yBaseline,
@@ -5335,15 +6270,104 @@ function dispatchWarningWorkOrder() {
 // 专项业务应用场景 4 大专业模块数据结构与交互
 // =========================================================================
 
-// 1. 计量设备总体情况
+// 1. 计量设施总体情况 (站点总数、正常站点、停用站点、故障异常、待检定)
 const meterDeviceOverview = ref({
-  total: 318,
-  online: 284,
-  offline: 14,
-  fault: 8,
-  pending: 12,
-  onlineRate: '89.3%',
+  total: 318,       // 站点总数
+  online: 284,      // 正常站点
+  offline: 14,      // 停用站点
+  fault: 8,         // 故障异常
+  pending: 12,      // 待检定
+  onlineRate: '89.3%', // 正常率
 });
+
+// 区域计量设施在线分析 (按 国控水资源(监控)、自计量、中央发展基金、省级发展基金 4大类统计)
+export interface FacilitySourceCategoryStat {
+  id: string;
+  name: string;             // 类别全称
+  shortName: string;        // 简称
+  total: number;            // 站点总数
+  normal: number;           // 正常站点
+  disabled: number;         // 停用站点
+  fault: number;            // 故障站点
+  pending: number;          // 待检站点
+  rate: number;             // 正常率 %
+  percentage: number;       // 占全域总站点比例 %
+  color: string;            // 主色
+  strokeColor: string;      // 边框色
+  dashOffset: number;       // 环形图 offset
+  dashLength: number;       // 环形图 length
+}
+
+const facilitySourceStats = ref<FacilitySourceCategoryStat[]>([
+  {
+    id: 'national',
+    name: '国控水资源(监控)',
+    shortName: '国控监控',
+    total: 126,
+    normal: 116,
+    disabled: 4,
+    fault: 2,
+    pending: 4,
+    rate: 92.1,
+    percentage: 39.6,
+    color: '#3FD0FF',
+    strokeColor: '#00E5FF',
+    dashLength: 89.6,
+    dashOffset: 0,
+  },
+  {
+    id: 'self',
+    name: '企业自建自计量',
+    shortName: '自建/自计量',
+    total: 98,
+    normal: 86,
+    disabled: 6,
+    fault: 3,
+    pending: 3,
+    rate: 87.8,
+    percentage: 30.8,
+    color: '#1E7BE8',
+    strokeColor: '#3b82f6',
+    dashLength: 69.7,
+    dashOffset: -89.6,
+  },
+  {
+    id: 'central_fund',
+    name: '中央发展资金',
+    shortName: '中央资金',
+    total: 54,
+    normal: 48,
+    disabled: 2,
+    fault: 2,
+    pending: 2,
+    rate: 88.9,
+    percentage: 17.0,
+    color: '#FFC65C',
+    strokeColor: '#f59e0b',
+    dashLength: 38.4,
+    dashOffset: -159.3,
+  },
+  {
+    id: 'provincial_fund',
+    name: '省级发展资金',
+    shortName: '省级资金',
+    total: 40,
+    normal: 34,
+    disabled: 2,
+    fault: 1,
+    pending: 3,
+    rate: 85.0,
+    percentage: 12.6,
+    color: '#3DDC97',
+    strokeColor: '#10b981',
+    dashLength: 28.5,
+    dashOffset: -197.7,
+  },
+]);
+
+// 统计图显示模式: 'bar' (柱状对比图) | 'donut' (占比环形图)
+const facilityChartMode = ref<'bar' | 'donut'>('bar');
+const hoveredFacilityCategory = ref<string | null>(null);
 
 interface DistrictDeviceStat {
   district: string;
@@ -5400,12 +6424,79 @@ const anomalyTypeStats = ref([
   { type: '通信掉线', count: 8, percentage: 18.2, color: '#64748b', desc: '连续超24小时未上传' },
 ]);
 
-const anomalyWorkOrderStatus = ref({
-  pending: 5,          // 待处置
-  processing: 8,       // 处置中
-  revisionNeeded: 4,   // 待水量修订
-  completed: 47,       // 已完成
-  total: 64,
+// 各市州 / 区县异常告警工单处置情况统计
+export interface CityWorkOrderStat {
+  district: string;       // 行政区划
+  pending: number;        // 待处置
+  processing: number;     // 处置中
+  revisionNeeded: number; // 待水量修订
+  completed: number;      // 已完成修订
+  total: number;          // 告警工单总数
+}
+
+// 青海省 8 个市州告警工单情况统计
+const provinceCityWorkOrderStats = ref<CityWorkOrderStat[]>([
+  { district: '西宁市', pending: 6, processing: 8, revisionNeeded: 4, completed: 58, total: 76 },
+  { district: '海东市', pending: 4, processing: 5, revisionNeeded: 3, completed: 42, total: 54 },
+  { district: '海西州', pending: 5, processing: 6, revisionNeeded: 5, completed: 39, total: 55 },
+  { district: '海南州', pending: 2, processing: 3, revisionNeeded: 2, completed: 28, total: 35 },
+  { district: '海北州', pending: 2, processing: 3, revisionNeeded: 1, completed: 24, total: 30 },
+  { district: '黄南州', pending: 1, processing: 2, revisionNeeded: 1, completed: 18, total: 22 },
+  { district: '玉树州', pending: 1, processing: 1, revisionNeeded: 1, completed: 14, total: 17 },
+  { district: '果洛州', pending: 1, processing: 1, revisionNeeded: 0, completed: 12, total: 14 },
+]);
+
+// 西宁市 7 个区县告警工单情况统计
+const xiningDistrictWorkOrderStats = ref<CityWorkOrderStat[]>([
+  { district: '城东区', pending: 1, processing: 2, revisionNeeded: 1, completed: 12, total: 16 },
+  { district: '城中区', pending: 1, processing: 1, revisionNeeded: 1, completed: 8,  total: 11 },
+  { district: '城西区', pending: 0, processing: 1, revisionNeeded: 0, completed: 9,  total: 10 },
+  { district: '城北区', pending: 2, processing: 2, revisionNeeded: 1, completed: 14, total: 19 },
+  { district: '湟中区', pending: 1, processing: 1, revisionNeeded: 1, completed: 7,  total: 10 },
+  { district: '大通县', pending: 1, processing: 1, revisionNeeded: 0, completed: 5,  total: 7 },
+  { district: '湟源县', pending: 0, processing: 0, revisionNeeded: 0, completed: 3,  total: 3 },
+]);
+
+// 异常工单处置统计 (西宁市 7 个区县，与地图选中区县实时联动)
+const currentWorkOrderStats = computed(() => {
+  return xiningDistrictWorkOrderStats.value;
+});
+
+// 当地图中选中特定区县时，实时联动过滤该区县数据
+const activeDistrictWorkOrderStat = computed(() => {
+  if (filterParams.value.district === '西宁市') return null;
+  const target = normalizeDistrictName(filterParams.value.district);
+  return xiningDistrictWorkOrderStats.value.find(d => d.district === target) || null;
+});
+
+const currentWorkOrderTotals = computed(() => {
+  if (activeDistrictWorkOrderStat.value) {
+    return {
+      pending: activeDistrictWorkOrderStat.value.pending,
+      processing: activeDistrictWorkOrderStat.value.processing,
+      revisionNeeded: activeDistrictWorkOrderStat.value.revisionNeeded,
+      completed: activeDistrictWorkOrderStat.value.completed,
+      total: activeDistrictWorkOrderStat.value.total,
+    };
+  }
+  const list = xiningDistrictWorkOrderStats.value;
+  return {
+    pending: list.reduce((s, i) => s + i.pending, 0),
+    processing: list.reduce((s, i) => s + i.processing, 0),
+    revisionNeeded: list.reduce((s, i) => s + i.revisionNeeded, 0),
+    completed: list.reduce((s, i) => s + i.completed, 0),
+    total: list.reduce((s, i) => s + i.total, 0),
+  };
+});
+
+const anomalyWorkOrderStatus = computed(() => {
+  return {
+    pending: currentWorkOrderTotals.value.pending,
+    processing: currentWorkOrderTotals.value.processing,
+    revisionNeeded: currentWorkOrderTotals.value.revisionNeeded,
+    completed: currentWorkOrderTotals.value.completed,
+    total: currentWorkOrderTotals.value.total,
+  };
 });
 
 const operationEfficiencyMetrics = ref({
@@ -5429,6 +6520,7 @@ const maintenanceTeamRanks = ref<MaintenanceTeamRank[]>([
   { rank: 2, name: '城北区水政智控巡维队', totalOrders: 22, resolvedOrders: 21, avgHours: 1.6, score: 95.4 },
   { rank: 3, name: '湟中区农水智联运维所', totalOrders: 18, resolvedOrders: 17, avgHours: 2.1, score: 93.8 },
   { rank: 4, name: '青海汇智测控运维服务部', totalOrders: 15, resolvedOrders: 14, avgHours: 2.4, score: 91.2 },
+  { rank: 5, name: '海东水务管护维保二队', totalOrders: 14, resolvedOrders: 13, avgHours: 2.6, score: 89.8 },
 ]);
 
 // 4. 标准化对比分析引擎与复核跟踪
@@ -5701,5 +6793,26 @@ function dispatchReviewTask(item: StandardCompareItem) {
 }
 .custom-dark-scrollbar::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Slide right transition for annotation panel */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+.slide-right-enter-from,
+.slide-right-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

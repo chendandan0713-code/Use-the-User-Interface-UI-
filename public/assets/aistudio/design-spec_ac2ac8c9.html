@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>大屏 UI 设计方案 · 边框规范与设计系统</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#02070E; --bg2:#061423; --panel:rgba(8,35,60,.55);
+    --cyan:#3FD0FF; --cyan-d:#1E7BE8; --cyan-l:#9BEAFF;
+    --text:#DCF2FF; --text2:#8FB6D4; --text3:#5D8AAA;
+    --gold:#FFC65C; --green:#3DDC97; --red:#FF6B7A;
+    --line:rgba(70,180,235,.16); --line2:rgba(70,180,235,.34);
+    --num:"Bahnschrift","DIN Alternate","Segoe UI",sans-serif;
+    --cn:"HarmonyOS Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 620px at 50% -10%,rgba(30,120,200,.20),transparent 70%),
+      radial-gradient(1600px 900px at 50% 40%,#071627 0%,#04101B 55%,#02070E 100%);
+    background-attachment:fixed;
+    color:var(--text);font-family:var(--cn);font-size:15px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px 120px}
+  a{color:var(--cyan)}
+
+  /* ---------- 页头 ---------- */
+  header{padding:76px 0 44px;position:relative}
+  .eyebrow{font-size:12.5px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;
+    display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .eyebrow::after{content:"";flex:1;height:1px;
+    background:linear-gradient(90deg,rgba(63,208,255,.5),transparent)}
+  h1{font-size:42px;line-height:1.3;font-weight:700;letter-spacing:2px;
+    background:linear-gradient(180deg,#FFFFFF,#9BD9F5);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{max-width:760px;margin-top:18px;font-size:16px;color:var(--text2);line-height:1.9}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{font-size:12.5px;color:#A9CDE6;border:1px solid var(--line2);padding:5px 12px;
+    background:rgba(10,36,58,.6);letter-spacing:.5px}
+  .chip b{color:var(--cyan-l);font-weight:600}
+
+  /* ---------- 章节 ---------- */
+  section{padding:54px 0 8px;border-top:1px solid rgba(70,180,235,.10);margin-top:40px}
+  .sec-h{display:flex;align-items:flex-start;gap:14px;margin-bottom:8px}
+  .sec-num{font-family:var(--num);font-size:13px;color:var(--cyan);letter-spacing:1px;
+    border:1px solid rgba(63,208,255,.4);padding:2px 8px;margin-top:6px;flex:0 0 auto}
+  h2{font-size:25px;font-weight:600;letter-spacing:1.2px}
+  .sec-desc{color:var(--text2);font-size:14.5px;margin:10px 0 28px;max-width:820px}
+  h3{font-size:16.5px;font-weight:600;color:#CFE9FA;margin:26px 0 12px;letter-spacing:.5px;
+    padding-left:12px;position:relative}
+  h3::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(180deg,#7FE6FF,rgba(30,123,232,0))}
+
+  /* ---------- 卡片 ---------- */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{position:relative;background:linear-gradient(180deg,rgba(11,42,72,.55),rgba(6,22,40,.28));
+    border:1px solid var(--line);padding:20px 20px 22px}
+  .card::before,.card::after{content:"";position:absolute;width:12px;height:12px;border:1.5px solid rgba(90,220,255,.5)}
+  .card::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+  .card::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+  .card h4{font-size:15.5px;font-weight:600;color:#E4F6FF;margin-bottom:8px;letter-spacing:.5px}
+  .card p{font-size:13.5px;color:var(--text2);line-height:1.8}
+  .card .idx{font-family:var(--num);font-size:12px;color:var(--cyan);letter-spacing:1px;display:block;margin-bottom:10px}
+
+  /* ---------- 表格 ---------- */
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid rgba(70,180,235,.10);vertical-align:top}
+  th{font-size:12px;letter-spacing:1.5px;color:var(--text3);font-weight:500;text-transform:uppercase;
+     background:rgba(10,36,58,.5)}
+  td{color:#B9D6E8}
+  td b{color:#E4F6FF;font-weight:600}
+  .mono{font-family:var(--num);letter-spacing:.4px;color:#8FD8F5}
+
+  /* ---------- 色卡 ---------- */
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .sw{border:1px solid var(--line);background:rgba(6,22,40,.5)}
+  .sw .c{height:64px}
+  .sw .t{padding:10px 12px}
+  .sw .t b{display:block;font-size:13px;color:#E4F6FF;font-weight:600}
+  .sw .t span{font-family:var(--num);font-size:11.5px;color:var(--text3);letter-spacing:.5px}
+  .sw .t em{display:block;font-style:normal;font-size:11.5px;color:var(--text3);margin-top:2px}
+
+  /* ---------- 解剖图 ---------- */
+  .anatomy{display:grid;grid-template-columns:1fr 372px;gap:18px;align-items:start}
+  .anatomy-box{position:relative;background:radial-gradient(ellipse at 50% 45%,#081B2E,#02080F 75%);
+    border:1px solid var(--line);padding:16px}
+  .legend{display:flex;flex-direction:column;gap:2px}
+  .li{display:flex;gap:12px;padding:11px 0;border-bottom:1px dashed rgba(70,180,235,.12)}
+  .li:last-child{border-bottom:0}
+  .li i{font-style:normal;flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+    border:1px solid rgba(127,230,255,.7);color:#9BEAFF;font-family:var(--num);font-size:11.5px;
+    display:grid;place-items:center;margin-top:2px;background:rgba(10,44,74,.9)}
+  .li div{font-size:13px;color:var(--text2);line-height:1.7}
+  .li div b{display:block;color:#E4F6FF;font-size:13.5px;font-weight:600;margin-bottom:2px}
+
+  /* ---------- 悬浮弹窗 ---------- */
+  .tip{position:relative;width:216px;padding:12px 14px 12px;
+    background:rgba(6,26,46,.96);
+    -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+    border:1px solid rgba(63,208,255,.45);
+    box-shadow:0 12px 30px rgba(0,10,20,.70),inset 0 0 24px rgba(30,120,200,.10)}
+  .tip::before,.tip::after{content:"";position:absolute;width:11px;height:11px;border:1.5px solid rgba(90,220,255,.65)}
+  .tip::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+  .tip::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+  .tip .bar{position:absolute;left:-1px;top:-1px;bottom:-1px;width:2px;
+    background:linear-gradient(180deg,#7FE6FF,#1E7BE8)}
+  .tip h5{font-size:13px;font-weight:600;color:#E4F6FF;letter-spacing:.6px;padding-left:6px}
+  .tip .sub{font-size:11px;color:var(--text3);padding-left:6px;margin-top:2px;font-family:var(--num);letter-spacing:.4px}
+  .tip .rows{margin:9px 0 0;padding:8px 0 0;border-top:1px solid rgba(70,180,235,.14)}
+  .tip .rw{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text2);padding:3px 6px}
+  .tip .rw i{width:7px;height:7px;border-radius:1px;flex:0 0 auto}
+  .tip .rw .v{margin-left:auto;font-family:var(--num);font-size:14.5px;color:#CFE9FA;letter-spacing:.3px}
+  .tip .rw .v small{font-size:11px;color:var(--text3);margin-left:3px}
+  .tip .ft{margin-top:8px;padding:8px 6px 0;border-top:1px solid rgba(70,180,235,.12);
+    display:flex;justify-content:space-between;font-size:11.5px;color:var(--text3)}
+  .tip .ft b{font-family:var(--num);font-size:12.5px}
+  .tip .ft b.up{color:var(--green)}
+  .tip .ft b.down{color:var(--red)}
+  .tip.warn{border-color:rgba(255,107,122,.5);box-shadow:0 12px 30px rgba(0,10,20,.7),inset 0 0 24px rgba(200,50,63,.10)}
+  .tip.warn .bar{background:linear-gradient(180deg,#FF9AA4,#C8323F)}
+  .tip.warn::before,.tip.warn::after{border-color:rgba(255,154,164,.7)}
+  .tip.warn .tagx{display:inline-block;font-size:10.5px;color:#FF9AA4;border:1px solid rgba(255,107,122,.5);
+    padding:1px 5px;margin-left:6px}
+  .tip .aw{position:absolute;left:50%;bottom:-6px;width:10px;height:10px;margin-left:-5px;
+    background:rgba(6,26,46,.96);border-right:1px solid rgba(63,208,255,.45);
+    border-bottom:1px solid rgba(63,208,255,.45);transform:rotate(45deg)}
+  .tip.warn .aw{border-color:rgba(255,107,122,.5)}
+
+  .tip-stage{position:relative;background:linear-gradient(180deg,rgba(11,42,72,.45),rgba(6,22,40,.2));
+    border:1px solid var(--line);padding:26px 20px 34px;overflow:visible}
+  .ts-head{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;
+    color:var(--text3);letter-spacing:.5px;padding:0 2px 10px}
+  .ts-head b{color:#A8CDE6;font-weight:600;font-size:13px}
+  .ts-chart{display:flex;align-items:flex-end;gap:16px;height:150px;margin-top:150px;padding-bottom:22px;
+    border-bottom:1px solid rgba(70,180,235,.14);position:relative;
+    background-image:repeating-linear-gradient(180deg,rgba(70,170,220,.10) 0 1px,transparent 1px 30px)}
+  .ts-bar{position:relative;flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center}
+  .ts-bar > i{width:28px;height:var(--h);border-radius:1px 1px 0 0;
+    background:linear-gradient(180deg,#7FE6FF,#1E7BE8);transition:filter .15s,box-shadow .15s}
+  .ts-bar:hover > i{filter:brightness(1.22);box-shadow:0 0 18px rgba(99,224,255,.6)}
+  .ts-bar > b{position:absolute;bottom:-20px;font-size:11px;color:var(--text3);font-family:var(--num)}
+  .ts-bar .tip{position:absolute;left:50%;bottom:calc(var(--h) + 18px);z-index:5;
+    transform:translate(-50%,6px);opacity:0;pointer-events:none;
+    transition:opacity .12s ease,transform .12s ease}
+  .ts-bar:hover .tip{opacity:1;transform:translate(-50%,0)}
+  /* 首尾两列演示边缘避让：贴边时改为左对齐 / 右对齐 */
+  .ts-bar:first-child .tip{left:0;transform:translate(0,6px)}
+  .ts-bar:first-child:hover .tip{transform:translate(0,0)}
+  .ts-bar:last-child .tip{left:auto;right:0;transform:translate(0,6px)}
+  .ts-bar:last-child:hover .tip{transform:translate(0,0)}
+  /* 常显示例：用于文档静态展示 */
+  .ts-bar.show .tip{opacity:1;transform:translate(-50%,0)}
+  .tip-hint{font-size:11.5px;color:var(--text3);text-align:center;margin-top:16px;letter-spacing:.5px}
+
+  /* ---------- 代码 ---------- */
+  pre{background:rgba(4,18,32,.85);border:1px solid var(--line);border-left:2px solid rgba(63,208,255,.5);
+    padding:16px 18px;overflow:auto;font-family:ui-monospace,Consolas,"Courier New",monospace;
+    font-size:12.5px;line-height:1.85;color:#A9CDE6}
+  pre .k{color:#7FE6FF} pre .s{color:#FFD98A} pre .c{color:#4E7590}
+
+  /* ---------- 小样 ---------- */
+  .demo{background:linear-gradient(180deg,rgba(11,42,72,.4),rgba(6,22,40,.2));border:1px solid var(--line);padding:18px}
+  .kpi-demo{display:flex;gap:28px;align-items:flex-end}
+  .kpi-demo b{font-family:var(--num);font-size:34px;line-height:1;
+    background:linear-gradient(180deg,#FFF,#79D8FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kpi-demo span{display:block;font-size:12.5px;color:var(--text2);margin-top:6px}
+  .row-demo{display:flex;align-items:center;gap:10px;padding:9px 4px;font-size:13.5px;color:#BBD8EA;
+    border-bottom:1px dashed rgba(70,170,220,.12)}
+  .row-demo:last-child{border-bottom:0}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
+  .dot.ok{background:var(--green);box-shadow:0 0 8px var(--green)}
+  .dot.bad{background:var(--red);box-shadow:0 0 8px var(--red)}
+  .dot.warn{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+  .tag{font-size:12px;border:1px solid rgba(63,208,255,.4);color:#8FD8F5;padding:2px 8px}
+  ul{list-style:none}
+  ul li{position:relative;padding-left:18px;font-size:13.8px;color:var(--text2);line-height:1.9}
+  ul li::before{content:"";position:absolute;left:2px;top:12px;width:5px;height:5px;
+    background:var(--cyan);transform:rotate(45deg)}
+  .warn-box{border:1px solid rgba(255,198,92,.35);background:rgba(60,40,10,.25);padding:14px 18px;
+    font-size:13.5px;color:#E9D2A4;line-height:1.8}
+  .warn-box b{color:var(--gold)}
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid rgba(70,180,235,.10);
+    font-size:12.5px;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  @media (max-width:1080px){
+    .anatomy{grid-template-columns:1fr}
+    .g4,.swatches{grid-template-columns:1fr 1fr}
+    .g2{grid-template-columns:1fr}
+    h1{font-size:30px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">UI DESIGN SPECIFICATION · V1.0</div>
+  <h1>数据大屏界面设计方案<br>——以「科技质感外边框」为核心</h1>
+  <p class="lede">
+    基于参考截图还原并重构大屏外边框语言：深海军蓝底色、双层细描线、22px 切角、L 形角标、六角名匾与刻度侧翼。
+    在此基础上补齐栅格、色彩、字体与组件规范，使边框可复用到任意业务大屏，同时保证远距离可读与操作习惯的连贯。
+  </p>
+  <div class="meta">
+    <span class="chip">画布 <b>1920 × 1080</b></span>
+    <span class="chip">随分辨率等比缩放</span>
+    <span class="chip">主色 <b>#3FD0FF</b></span>
+    <span class="chip">底色 <b>#02070E → #08233C</b></span>
+    <span class="chip">适配 <b>3m 外可读</b></span>
+    <span class="chip">含 <b>悬浮弹窗</b> 规范</span>
+  </div>
+</header>
+
+<section>
+  <div class="sec-h"><span class="sec-num">01</span><h2>设计原则</h2></div>
+  <p class="sec-desc">大屏不是放大的网页。它有三个硬约束：观看距离远、没有鼠标、信息只在固定位置刷新。方案围绕这三点收敛装饰与信息层级。</p>
+  <div class="grid g4">
+    <div class="card"><span class="idx">P-01</span><h4>一屏一焦点</h4>
+      <p>中央地图区占约 44% 视觉权重，左右两栏为支撑信息。装饰线条透明度一律 ≤ .46，不参与信息竞争。</p></div>
+    <div class="card"><span class="idx">P-02</span><h4>边框让位于内容</h4>
+      <p>所有框线与角标收在距边缘 18px 内，内容安全区保留 48px；标题牌与侧翼只占顶部 68px 高。</p></div>
+    <div class="card"><span class="idx">P-03</span><h4>三级明度对比</h4>
+      <p>主文字 #DCF2FF、次文字 #8FB6D4、辅助 #5D8AAA，与底色的对比度分别为 13:1 / 6.4:1 / 3.4:1，保证 3m 外层级可辨。</p></div>
+    <div class="card"><span class="idx">P-04</span><h4>色彩不是唯一编码</h4>
+      <p>状态区分同时用「颜色 + 文字 + 形状」三重编码，异常状态必须以文案标注「故障／告警」，不做纯色点表达。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">02</span><h2>外边框结构解剖</h2></div>
+  <p class="sec-desc">边框由 6 个图层叠加而成，从内到外依次为：外发光 → 主框线 → 内框线 → 角部构件 → 顶部名匾与侧翼 → 侧边／底部收口。下面按层标注位置与参数。</p>
+
+  <div class="anatomy">
+    <div class="anatomy-box">
+      <svg viewBox="0 0 960 540" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <defs>
+          <linearGradient id="swL" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0"/>
+            <stop offset="40%" stop-color="#3FD0FF" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#9BEAFF" stop-opacity=".95"/>
+          </linearGradient>
+          <linearGradient id="swR" x1="1" y1="0" x2="0" y2="0">
+            <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0"/>
+            <stop offset="40%" stop-color="#3FD0FF" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#9BEAFF" stop-opacity=".95"/>
+          </linearGradient>
+          <linearGradient id="pl" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0E3A62"/><stop offset="100%" stop-color="#06182C"/>
+          </linearGradient>
+          <pattern id="tk" width="9" height="5" patternUnits="userSpaceOnUse">
+            <rect width="1" height="5" fill="#3FD0FF" opacity=".55"/>
+          </pattern>
+          <pattern id="tkv" width="5" height="9" patternUnits="userSpaceOnUse">
+            <rect width="5" height="1" fill="#3FD0FF" opacity=".5"/>
+          </pattern>
+        </defs>
+
+        <!-- 外发光 -->
+        <path d="M20 9 H940 L951 20 V520 L940 531 H20 L9 520 V20 Z" stroke="#2BA8E8" stroke-width="6" opacity=".20"/>
+        <!-- 主框线 -->
+        <path d="M20 9 H940 L951 20 V520 L940 531 H20 L9 520 V20 Z" stroke="#60D6FF" stroke-opacity=".78" stroke-width="1.5"/>
+        <!-- 内框线 -->
+        <path d="M22.5 13.5 H937.5 L946.5 22.5 V517.5 L937.5 526.5 H22.5 L13.5 517.5 V22.5 Z"
+              stroke="#60D6FF" stroke-opacity=".30" stroke-width="1"/>
+        <!-- 角标 -->
+        <g stroke="#7FE3FF" stroke-opacity=".75" stroke-width="2">
+          <path d="M4 43 V4 H43"/><path d="M917 4 H956 V43"/>
+          <path d="M4 497 V536 H43"/><path d="M956 497 V536 H917"/>
+        </g>
+        <g stroke="#7FE3FF" stroke-opacity=".3" stroke-width="1">
+          <path d="M4 63 V4 M4 4 H63"/><path d="M897 4 H956 M956 4 V63"/>
+          <path d="M4 477 V536 M4 536 H63"/><path d="M956 477 V536 M897 536 H956"/>
+        </g>
+        <g stroke="#8CE8FF" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".95">
+          <path d="M18 10.5 L10.5 18"/><path d="M942 10.5 L949.5 18"/>
+          <path d="M10.5 522 L18 529.5"/><path d="M949.5 522 L942 529.5"/>
+        </g>
+        <g fill="#B7F2FF">
+          <circle cx="6.5" cy="6.5" r="1.6"/><circle cx="953.5" cy="6.5" r="1.6"/>
+          <circle cx="6.5" cy="533.5" r="1.6"/><circle cx="953.5" cy="533.5" r="1.6"/>
+        </g>
+        <!-- 侧边梳齿 -->
+        <rect x="5.5" y="226" width="5" height="88" fill="url(#tkv)"/>
+        <rect x="949.5" y="226" width="5" height="88" fill="url(#tkv)"/>
+        <g stroke="#7FE3FF" stroke-opacity=".3" stroke-width="1">
+          <path d="M9 86 H15 M9 98 H15 M9 110 H15"/><path d="M951 86 H945 M951 98 H945 M951 110 H945"/>
+        </g>
+        <!-- 侧翼 -->
+        <line x1="28" y1="19" x2="332" y2="19" stroke="url(#swL)" stroke-width="1.6"/>
+        <line x1="60" y1="23.5" x2="332" y2="23.5" stroke="url(#swL)" stroke-width="1" opacity=".45"/>
+        <rect x="75" y="15.5" width="150" height="4.5" fill="url(#tk)" opacity=".8"/>
+        <path d="M325 16.5 L328 19 L325 21.5 L322 19 Z" fill="#B7F2FF"/>
+        <line x1="932" y1="19" x2="628" y2="19" stroke="url(#swR)" stroke-width="1.6"/>
+        <line x1="900" y1="23.5" x2="628" y2="23.5" stroke="url(#swR)" stroke-width="1" opacity=".45"/>
+        <rect x="735" y="15.5" width="150" height="4.5" fill="url(#tk)" opacity=".8"/>
+        <path d="M635 16.5 L638 19 L635 21.5 L632 19 Z" fill="#B7F2FF"/>
+        <!-- 名匾 -->
+        <path d="M353 4 H607 L625 19 L607 34 H353 L335 19 Z" fill="url(#pl)" stroke="#54DAFF" stroke-width="1.6" stroke-opacity=".95"/>
+        <path d="M358 8 H602 L615 19 L602 30 H358 L345 19 Z" stroke="#7FE3FF" stroke-opacity=".4" stroke-width="1"/>
+        <line x1="414" y1="34.5" x2="546" y2="34.5" stroke="#B7F2FF" stroke-width="1.6" stroke-opacity=".9"/>
+        <text x="480" y="26" text-anchor="middle" fill="#F2FBFF" font-size="16" letter-spacing="3"
+              font-family="HarmonyOS Sans SC,PingFang SC,Microsoft YaHei,sans-serif">平 台 名 称</text>
+        <!-- 底部收口 -->
+        <path d="M429 531 H531 L521 523 H439 Z" fill="#08243E" stroke="#4FD8FF" stroke-opacity=".55" stroke-width="1"/>
+        <line x1="450" y1="527" x2="510" y2="527" stroke="#9BEAFF" stroke-width="1.4" stroke-opacity=".85"/>
+        <circle cx="480" cy="527" r="1.8" fill="#D8F8FF"/>
+        <!-- 内区示意 -->
+        <rect x="24" y="50" width="912" height="460" stroke="#3FD0FF" stroke-opacity=".10" stroke-dasharray="4 6"/>
+        <text x="480" y="286" text-anchor="middle" fill="#4E7590" font-size="11" letter-spacing="3"
+              font-family="Bahnschrift,sans-serif">CONTENT SAFE AREA · 48 / 100 / 34</text>
+
+        <!-- 编号标记 -->
+        <g font-family="Bahnschrift,sans-serif" font-size="9" text-anchor="middle">
+          <g fill="#02121F" stroke="#7FE6FF" stroke-width="1">
+            <circle cx="640" cy="19" r="8"/><circle cx="150" cy="19" r="8"/>
+            <circle cx="480" cy="531" r="8"/><circle cx="9" cy="504" r="8"/>
+            <circle cx="9" cy="270" r="8"/><circle cx="480" cy="13.5" r="8"/>
+          </g>
+          <g fill="#9BEAFF" stroke="none">
+            <text x="640" y="22">1</text><text x="150" y="22">2</text>
+            <text x="480" y="534">3</text><text x="9" y="507">4</text>
+            <text x="9" y="273">5</text><text x="480" y="16.5">6</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <div class="li"><i>1</i><div><b>六角名匾（Title Plate）</b>
+        580×60，左右斜边水平投影 30px；主描边 1.4px #54DAFF、内描边 0.35、底部亮线 264×1.6 带模糊。名匾中心对齐画布中线。</div></div>
+      <div class="li"><i>2</i><div><b>双侧翼（Wings）</b>
+        主线 1.4px 渐变（透明度 0 → .95），副线 1px／45%；梳齿 300×9、节距 16px；端头菱形 4px 作视觉收尾。</div></div>
+      <div class="li"><i>3</i><div><b>外框线 / 内框线</b>
+        外框 1.2px rgba(96,214,255,.46)，内框 1px rgba(96,214,255,.15)，二者间距 9px。双线是"科技感"的关键，也是强弱层次所在。</div></div>
+      <div class="li"><i>4</i><div><b>切角与角标</b>
+        切角 22px（斜边高亮 3px 圆头 + 模糊 2.5）；L 形角标 2px／长 78，内侧再落一层 1px／长 118／透明度 .30，形成三线夹角层次。</div></div>
+      <div class="li"><i>5</i><div><b>侧边梳齿</b>
+        10×176 竖向刻度（节距 16px）+ 三条短枝刻度，对称分布于左右两侧中段，用来平衡顶部侧翼的重量。</div></div>
+      <div class="li"><i>6</i><div><b>外发光层</b>
+        同一条路径描 12px、不透明度 .10、高斯模糊 6，让深色屏体从背景中"浮起"，替代大面积光晕。</div></div>
+    </div>
+  </div>
+
+  <div class="warn-box" style="margin-top:18px">
+    <b>为什么要双层线：</b>单线在 2K/4K 拼接屏上会被像素放大成"锯齿硬边"，双线（1.2px + 1px、间距 9px）在两个分辨率下都保持"细而不抖"，且渐变叠色后不会发白。
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">03</span><h2>栅格与尺寸规范</h2></div>
+  <p class="sec-desc">以 1920×1080 为基准画布，整体按 min(视口宽/1920, 视口高/1080) 等比缩放，避免不同屏体下比例失真。</p>
+  <table>
+    <thead><tr><th style="width:190px">项目</th><th style="width:210px">数值</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><b>画布</b></td><td class="mono">1920 × 1080</td><td>16:9；非标屏按 3840×1080 双屏时把三栏改为 2 栏 ×2 组</td></tr>
+      <tr><td><b>框线内缩</b></td><td class="mono">18px</td><td>主框线到画布边缘；角标再外扩到 8px</td></tr>
+      <tr><td><b>内容安全区</b></td><td class="mono">L/R 48 · T 100 · B 34</td><td>顶部 100px 让位给名匾（0–68）与状态栏（60–86）</td></tr>
+      <tr><td><b>三栏宽</b></td><td class="mono">470 / 844 / 470</td><td>中栏留白最宽，承载地图；栏间距 20px</td></tr>
+      <tr><td><b>模块纵向节奏</b></td><td class="mono">8 / 12 / 16 / 20 / 24</td><td>面板间距 16，面板内边距 12–14，行高取 16 的整数倍</td></tr>
+      <tr><td><b>面板标题高</b></td><td class="mono">34px</td><td>六角徽标 16×17 + 标题 18px/600 + 渐隐下划线</td></tr>
+      <tr><td><b>列表行高</b></td><td class="mono">33px</td><td>虚线分隔 rgba(70,170,220,.10)，末行不画分隔</td></tr>
+      <tr><td><b>KPI 尺寸</b></td><td class="mono">34 / 24 / 30</td><td>大屏主指标 34px，次级 24px，紧凑版 30px</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">04</span><h2>色彩系统</h2></div>
+  <p class="sec-desc">四组用途色：底色、线条、文字、语义。语义色仅用于状态与数值强调，不得用于装饰线条，否则整屏会"到处在报警"。</p>
+
+  <h3>底色与线条</h3>
+  <div class="swatches">
+    <div class="sw"><div class="c" style="background:#02070E"></div><div class="t"><b>最深底</b><span>#02070E</span><em>画布外缘 / 渐晕收口</em></div></div>
+    <div class="sw"><div class="c" style="background:#061423"></div><div class="t"><b>次深底</b><span>#061423</span><em>画布主底</em></div></div>
+    <div class="sw"><div class="c" style="background:#08233C"></div><div class="t"><b>亮部底</b><span>#08233C</span><em>中心径向高光</em></div></div>
+    <div class="sw"><div class="c" style="background:rgba(8,35,60,.55);border:1px solid rgba(70,180,235,.2)"></div><div class="t"><b>面板填充</b><span>rgba(8,35,60,.55)</span><em>自上而下渐淡至 .28</em></div></div>
+    <div class="sw"><div class="c" style="background:#3FD0FF"></div><div class="t"><b>主强调</b><span>#3FD0FF</span><em>框线 / 图元 / 链接</em></div></div>
+    <div class="sw"><div class="c" style="background:#1E7BE8"></div><div class="t"><b>次强调</b><span>#1E7BE8</span><em>渐变暗端</em></div></div>
+    <div class="sw"><div class="c" style="background:#9BEAFF"></div><div class="t"><b>高光</b><span>#9BEAFF</span><em>切角 / 端头 / 光斑</em></div></div>
+    <div class="sw"><div class="c" style="background:rgba(70,180,235,.16)"></div><div class="t"><b>描边</b><span>rgba(70,180,235,.16)</span><em>面板 1px 边框</em></div></div>
+  </div>
+
+  <h3>文字与语义</h3>
+  <div class="swatches">
+    <div class="sw"><div class="c" style="background:#DCF2FF"></div><div class="t"><b>主文字</b><span>#DCF2FF</span><em>对底色 13:1</em></div></div>
+    <div class="sw"><div class="c" style="background:#8FB6D4"></div><div class="t"><b>次文字</b><span>#8FB6D4</span><em>对底色 6.4:1</em></div></div>
+    <div class="sw"><div class="c" style="background:#5D8AAA"></div><div class="t"><b>辅助文字</b><span>#5D8AAA</span><em>≥10.5px 才可用</em></div></div>
+    <div class="sw"><div class="c" style="background:#FFC65C"></div><div class="t"><b>金额 / 关注</b><span>#FFC65C</span><em>金额、待处理</em></div></div>
+    <div class="sw"><div class="c" style="background:#3DDC97"></div><div class="t"><b>正常</b><span>#3DDC97</span><em>运行良好</em></div></div>
+    <div class="sw"><div class="c" style="background:#FF6B7A"></div><div class="t"><b>异常</b><span>#FF6B7A</span><em>故障 / 未处理</em></div></div>
+    <div class="sw"><div class="c" style="background:#9B8CFF"></div><div class="t"><b>第四类目</b><span>#9B8CFF</span><em>仅图表分类用</em></div></div>
+    <div class="sw"><div class="c" style="background:linear-gradient(180deg,#FFFFFF,#79D8FF)"></div><div class="t"><b>数值渐变</b><span>#FFF → #79D8FF</span><em>34px 以上数值</em></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">05</span><h2>字体与层级</h2></div>
+  <p class="sec-desc">中文用思源黑体／鸿蒙黑体，数字统一 Bahnschrift + tabular-nums（等宽数字），保证数值跳动时列宽不抖。</p>
+  <table>
+    <thead><tr><th style="width:150px">层级</th><th style="width:120px">字号 / 字重</th><th style="width:150px">字体</th><th>使用场景</th></tr></thead>
+    <tbody>
+      <tr><td><b>平台标题</b></td><td class="mono">27px / 700</td><td>中文黑体 · 字距 5</td><td>名匾内，≤14 字；超出改两行或缩写</td></tr>
+      <tr><td><b>面板标题</b></td><td class="mono">18px / 600</td><td>中文黑体 · 字距 .8</td><td>模块名，配六角徽标</td></tr>
+      <tr><td><b>主数值</b></td><td class="mono">34px / 600</td><td>Bahnschrift</td><td>KPI 主指标，3m 外可读</td></tr>
+      <tr><td><b>次数值</b></td><td class="mono">24px / 600</td><td>Bahnschrift</td><td>并列指标、金额</td></tr>
+      <tr><td><b>正文</b></td><td class="mono">13.5px / 400</td><td>中文黑体</td><td>列表项、评论内容</td></tr>
+      <tr><td><b>辅助</b></td><td class="mono">12.5px / 400</td><td>中文黑体</td><td>标签、表头、单位</td></tr>
+      <tr><td><b>图例下限</b></td><td class="mono">10.5px</td><td>中文黑体</td><td>坐标轴、图表图例，不得再小</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">06</span><h2>组件规范</h2></div>
+  <p class="sec-desc">所有模块复用同一套组件，保证"每一块看起来是同一台机器产的"。</p>
+
+  <div class="grid g2">
+    <div class="card"><h4>面板容器</h4>
+      <p>1px 描边 rgba(70,180,235,.18) + 内阴影 34px；左上／右下各一段 12px 角线（1.5px，#5ADCFF 50%）。<br>
+      标题行底部 1px 渐变线（左亮右隐）+ 64px 高亮段带 10px 外发光；徽标为双层六角形。</p></div>
+    <div class="card"><h4>溢出处理</h4>
+      <p>列表超出时不做滚动条，改为底部 14% 渐隐遮罩（mask-image），并配「查看全部 ›」入口。<br>
+      大屏无鼠标，滚动条既无效又破坏版式完整性。</p></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="demo">
+      <h3 style="margin-top:0">KPI 组 / 状态行</h3>
+      <div class="kpi-demo">
+        <div><b>3013</b><span>进园人数</span></div>
+        <div><b style="background:linear-gradient(180deg,#FFF6E2,#FFC65C);-webkit-background-clip:text;background-clip:text;color:transparent">699,987.65</b><span>票务销售额</span></div>
+        <div><b>328</b><span>空车位</span></div>
+      </div>
+      <div style="margin-top:22px">
+        <div class="row-demo"><span style="flex:1">AQI 检测 · 此处为设备位置</span>
+          <span style="color:#3DDC97"><i class="dot ok"></i>良好</span></div>
+        <div class="row-demo"><span style="flex:1">A05 清洁机器人 · 此处为设备位置</span>
+          <span style="color:#FF9AA4"><i class="dot bad"></i>故障</span></div>
+        <div class="row-demo"><span style="flex:1">A06 摄像头 · 一号大门左侧</span>
+          <span style="color:#E9D2A4"><i class="dot warn"></i>告警</span></div>
+      </div>
+    </div>
+    <div class="demo">
+      <h3 style="margin-top:0">规范要点</h3>
+      <ul>
+        <li>状态 = 色点 + 文案，缺一不可（色弱用户 + 远距离都能识别）</li>
+        <li>数值右对齐、等宽；单位降一级字号并置灰</li>
+        <li>同屏语义色不超过 3 种，第四种起改用中性色分类</li>
+        <li>标签用 <span class="tag">设备状态</span> 这类描边小标签，不用实心块</li>
+        <li>金额统一两位小数 + 千分位；单位「万元」在轴标题声明</li>
+        <li>空数据展示「暂无数据」，不留空白网格</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">07</span><h2>统计图悬浮弹窗（Tooltip）</h2></div>
+  <p class="sec-desc">
+    悬浮弹窗是图表的「数据补读层」：图表只负责趋势，精确数值交给弹窗。它必须压得住底层图形，又不能挡住正在看的那个点——
+    所以统一采用<b style="color:var(--cyan-l)">深色实底 + 细描边 + 与面板同款角线</b>的语言，视觉上像"从面板里长出来的一块"。
+  </p>
+
+  <h3>定位与避让</h3>
+  <div class="anatomy-box" style="margin-bottom:14px">
+    <svg viewBox="0 0 720 214" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" fill="none"
+         font-family="Bahnschrift,HarmonyOS Sans SC,PingFang SC,Microsoft YaHei,sans-serif">
+      <!-- 左：默认右上 -->
+      <rect x="6" y="24" width="300" height="150" fill="rgba(11,42,72,.35)" stroke="#3FD0FF" stroke-opacity=".20"/>
+      <g stroke="#3FD0FF" stroke-opacity=".10"><path d="M6 74 H306 M6 124 H306"/></g>
+      <g fill="url(#bg1)">
+        <rect x="66" y="106" width="22" height="70"/><rect x="126" y="76" width="22" height="100"/><rect x="186" y="120" width="22" height="56"/>
+      </g>
+      <defs><linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7FE6FF" stop-opacity=".9"/><stop offset="100%" stop-color="#1E7BE8" stop-opacity=".55"/>
+      </linearGradient></defs>
+      <circle cx="137" cy="76" r="3.6" fill="#FFFFFF" stroke="#4FD8FF" stroke-width="1.6"/>
+      <path d="M141 76 L212 70" stroke="#7FE6FF" stroke-opacity=".8" stroke-dasharray="3 4"/>
+      <text x="150" y="64" font-size="10" fill="#8FD8F5">12px</text>
+      <g>
+        <rect x="212" y="48" width="92" height="60" fill="rgba(6,26,46,.96)" stroke="#3FD0FF" stroke-opacity=".55"/>
+        <rect x="212" y="48" width="2" height="60" fill="#3FD0FF" fill-opacity=".8"/>
+        <g fill="#8FB6D4" font-size="7.5">
+          <rect x="220" y="56" width="42" height="4" fill="#DCF2FF" fill-opacity=".85"/>
+          <rect x="220" y="66" width="30" height="3.5" fill="#8FB6D4" fill-opacity=".7"/>
+          <rect x="278" y="66" width="18" height="3.5" fill="#CFE9FA" fill-opacity=".8"/>
+          <rect x="220" y="76" width="30" height="3.5" fill="#8FB6D4" fill-opacity=".7"/>
+          <rect x="278" y="76" width="18" height="3.5" fill="#CFE9FA" fill-opacity=".8"/>
+          <rect x="220" y="88" width="76" height="3" fill="#5D8AAA" fill-opacity=".55"/>
+        </g>
+      </g>
+      <text x="156" y="196" font-size="10" fill="#5D8AAA" text-anchor="middle">默认：触发点右上，偏移 12px</text>
+
+      <!-- 分隔 -->
+      <path d="M338 100 H382" stroke="#3FD0FF" stroke-opacity=".3" stroke-dasharray="3 4"/>
+      <text x="382" y="96" font-size="14" fill="#3FD0FF" text-anchor="end">触边</text>
+
+      <!-- 右：翻转 -->
+      <rect x="410" y="24" width="300" height="150" fill="rgba(11,42,72,.35)" stroke="#3FD0FF" stroke-opacity=".20"/>
+      <g stroke="#3FD0FF" stroke-opacity=".10"><path d="M410 74 H710 M410 124 H710"/></g>
+      <g fill="url(#bg1)">
+        <rect x="470" y="106" width="22" height="70"/><rect x="530" y="120" width="22" height="56"/><rect x="644" y="66" width="22" height="110"/>
+      </g>
+      <circle cx="655" cy="66" r="3.6" fill="#FFFFFF" stroke="#4FD8FF" stroke-width="1.6"/>
+      <path d="M651 66 L588 62" stroke="#7FE6FF" stroke-opacity=".8" stroke-dasharray="3 4"/>
+      <text x="596" y="52" font-size="10" fill="#8FD8F5">距边 &lt; 24px</text>
+      <g>
+        <rect x="496" y="40" width="92" height="60" fill="rgba(6,26,46,.96)" stroke="#3FD0FF" stroke-opacity=".55"/>
+        <rect x="496" y="40" width="2" height="60" fill="#3FD0FF" fill-opacity=".8"/>
+        <g fill="#8FB6D4" font-size="7.5">
+          <rect x="504" y="48" width="42" height="4" fill="#DCF2FF" fill-opacity=".85"/>
+          <rect x="504" y="58" width="30" height="3.5" fill="#8FB6D4" fill-opacity=".7"/>
+          <rect x="562" y="58" width="18" height="3.5" fill="#CFE9FA" fill-opacity=".8"/>
+          <rect x="504" y="68" width="30" height="3.5" fill="#8FB6D4" fill-opacity=".7"/>
+          <rect x="562" y="68" width="18" height="3.5" fill="#CFE9FA" fill-opacity=".8"/>
+          <rect x="504" y="80" width="76" height="3" fill="#5D8AAA" fill-opacity=".55"/>
+        </g>
+      </g>
+      <text x="560" y="196" font-size="10" fill="#5D8AAA" text-anchor="middle">贴边时整体翻到对侧，绝不越界</text>
+    </svg>
+  </div>
+  <ul style="margin-bottom:8px">
+    <li><b style="color:#E4F6FF">轴向吸附</b>：柱状图吸附到柱中心、折线图吸附到最近数据点，不随光标逐像素移动（否则整块会抖）</li>
+    <li><b style="color:#E4F6FF">四向翻转</b>：默认右上；距视口边缘 &lt; 24px 时依次尝试 左上 → 右下 → 左下</li>
+    <li><b style="color:#E4F6FF">永不遮挡</b>：弹窗边界与被指向图元保持 ≥ 12px 间距</li>
+    <li><b style="color:#E4F6FF">大屏适配</b>：无鼠标场景改为点击锁定（再次点击或点空白关闭），弹窗固定在触发点右侧，不做跟随动画</li>
+  </ul>
+
+  <h3>视觉规格</h3>
+  <table>
+    <thead><tr><th style="width:150px">项目</th><th style="width:250px">数值</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><b>宽度</b></td><td class="mono">180 / 216 / 340</td><td>最小 / 常用 / 最大；超宽时改两列布局，不做横向拉伸</td></tr>
+      <tr><td><b>内边距</b></td><td class="mono">12 · 14</td><td>上下 12、左右 14；多行条目行高 26px</td></tr>
+      <tr><td><b>背景</b></td><td class="mono">rgba(6,26,46,.96)</td><td>不透明度 ≥ .94 才能压住底层图表；外加 4px 背景模糊</td></tr>
+      <tr><td><b>描边</b></td><td class="mono">1px rgba(63,208,255,.45)</td><td>异常态换 rgba(255,107,122,.5)</td></tr>
+      <tr><td><b>角线</b></td><td class="mono">11×11 · 1.5px</td><td>左上 + 右下，与面板角线同一套语言</td></tr>
+      <tr><td><b>左侧色条</b></td><td class="mono">2px 渐变</td><td>与所指向图元同色，是"这块属于哪个序列"的第一识别点</td></tr>
+      <tr><td><b>投影</b></td><td class="mono">0 12px 30px rgba(0,10,20,.7)</td><td>外加内发光 rgba(30,120,200,.10) 保持通透</td></tr>
+      <tr><td><b>字号</b></td><td class="mono">标题 13 · 数值 14.5 · 单位 11</td><td>数值下限 14.5px，正文下限 12px</td></tr>
+      <tr><td><b>条目上限</b></td><td class="mono">8 条</td><td>超出折叠为「其余 N 项」，不加滚动条</td></tr>
+    </tbody>
+  </table>
+
+  <h3>三种类型与实时示例</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="tip-stage">
+      <div class="ts-head"><span>示例 · <b>近 4 日客流</b></span><span>中间为常显样例，其余悬浮查看</span></div>
+      <div class="ts-chart">
+        <div class="ts-bar" style="--h:38%"><i></i><b>10-16</b>
+          <div class="tip">
+            <i class="bar"></i>
+            <h5>10月16日</h5><div class="sub">单值型 · 柱状</div>
+            <div class="rows">
+              <div class="rw"><i style="background:#7FE6FF"></i>进园人数<span class="v">2,486<small>人</small></span></div>
+            </div>
+            <div class="ft"><span>峰值时段</span><b>14:00 - 15:00</b></div>
+            <i class="aw"></i>
+          </div>
+        </div>
+        <div class="ts-bar show" style="--h:56%"><i></i><b>10-17</b>
+          <div class="tip">
+            <i class="bar"></i>
+            <h5>10月17日</h5><div class="sub">多序列型 · 含环比</div>
+            <div class="rows">
+              <div class="rw"><i style="background:#7FE6FF"></i>进园人数<span class="v">3,412<small>人</small></span></div>
+              <div class="rw"><i style="background:#FFD98A"></i>预约人数<span class="v">2,108<small>人</small></span></div>
+            </div>
+            <div class="ft"><span>环比</span><b class="up">+12.4%</b></div>
+            <i class="aw"></i>
+          </div>
+        </div>
+        <div class="ts-bar" style="--h:28%"><i style="background:linear-gradient(180deg,#FF9AA4,#C8323F)"></i><b>10-18</b>
+          <div class="tip warn">
+            <i class="bar"></i>
+            <h5>10月18日<span class="tagx">告警</span></h5><div class="sub">告警标注型</div>
+            <div class="rows">
+              <div class="rw"><i style="background:#FF9AA4"></i>进园人数<span class="v">1,024<small>人</small></span></div>
+            </div>
+            <div class="ft"><span>低于阈值 1,500</span><b class="down">-58.2%</b></div>
+            <i class="aw"></i>
+          </div>
+        </div>
+        <div class="ts-bar" style="--h:64%"><i></i><b>10-19</b>
+          <div class="tip">
+            <i class="bar"></i>
+            <h5>10月19日</h5><div class="sub">完整型 · 四类信息</div>
+            <div class="rows">
+              <div class="rw"><i style="background:#7FE6FF"></i>进园人数<span class="v">3,986<small>人</small></span></div>
+              <div class="rw"><i style="background:#FFD98A"></i>预约人数<span class="v">2,540<small>人</small></span></div>
+              <div class="rw"><i style="background:#9B8CFF"></i>团队游客<span class="v">1,206<small>人</small></span></div>
+            </div>
+            <div class="ft"><span>环比</span><b class="up">+31.7%</b></div>
+            <i class="aw"></i>
+          </div>
+        </div>
+      </div>
+      <div class="tip-hint">悬浮其他柱体依次查看 单值型 · 告警型 · 完整型 · 大屏无鼠标时改为点击锁定</div>
+    </div>
+
+    <div class="demo">
+      <h3 style="margin-top:0">类型与交互时序</h3>
+      <ul>
+        <li><b style="color:#E4F6FF">单值型</b>：标题 + 一条数值 + 一行补充（峰值时段／占比），宽度取最小 180</li>
+        <li><b style="color:#E4F6FF">多序列型</b>：每个序列一行，色点 + 名称左对齐、数值右对齐等宽，底部固定一行「环比」</li>
+        <li><b style="color:#E4F6FF">告警标注型</b>：描边与色条转红，标题后加「告警」小标签，必须写明触发原因（低于阈值 X）</li>
+      </ul>
+      <h3>时序参数</h3>
+      <ul>
+        <li>移入延迟 <span class="mono">80ms</span> 出现（防抖，避免扫过时满屏乱闪）</li>
+        <li>淡入 <span class="mono">120ms</span> + 上移 4px；移出 <span class="mono">100ms</span> 淡出</li>
+        <li>数据变化时只更新数值，不重播入场动画</li>
+      </ul>
+      <h3>禁忌</h3>
+      <ul>
+        <li>不用白底／浅底——破坏深色一致性，值班环境刺眼</li>
+        <li>不放操作按钮、链接、滚动条——大屏点不到，鼠标场景也只是补读</li>
+        <li>不同时弹出多个（同图保持单例）</li>
+        <li>涨跌不靠颜色单独编码，必须带 <span class="mono">+</span> / <span class="mono">−</span> 符号；正向 <span class="mono">#3DDC97</span>、负向 <span class="mono">#FF6B7A</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>实现要点</h3>
+  <pre><span class="c">/* 1. 容器：绝对定位 + 轴向吸附，不用 left/top 跟随光标 */</span>
+<span class="k">.tip</span> {
+  <span class="k">position</span>: absolute;
+  <span class="k">background</span>: <span class="s">rgba(6,26,46,.96)</span>;
+  <span class="k">border</span>: 1px solid <span class="s">rgba(63,208,255,.45)</span>;
+  <span class="k">box-shadow</span>: 0 12px 30px <span class="s">rgba(0,10,20,.70)</span>;
+  <span class="k">opacity</span>: 0;
+  <span class="k">transition</span>: opacity .12s ease, transform .12s ease;  <span class="c">/* 120ms 淡入 */</span>
+}
+<span class="k">.hit:hover .tip</span> { <span class="k">opacity</span>: 1; <span class="k">transform</span>: translate(-50%,0); }
+
+<span class="c">/* 2. 角线：与面板同款，左上 + 右下 —— 保证"同一台机器产的" */</span>
+<span class="k">.tip::before</span>, <span class="k">.tip::after</span> {
+  <span class="k">content</span>: <span class="s">""</span>; <span class="k">position</span>: absolute; <span class="k">width</span>: 11px; <span class="k">height</span>: 11px;
+  <span class="k">border</span>: 1.5px solid <span class="s">rgba(90,220,255,.65)</span>;
+}
+
+<span class="c">/* 3. 边缘避让：距视口边缘 &lt; 24px 翻到对侧 */</span>
+<span class="k">function</span> place(tip, x, y) {
+  <span class="k">var</span> r = tip.getBoundingClientRect();
+  <span class="k">var</span> flipX = (x + 12 + r.width)  &gt; innerWidth  - <span class="s">24</span>;
+  <span class="k">var</span> flipY = (y - 12 - r.height) &lt; <span class="s">24</span>;
+  tip.style.left = (flipX ? x - 12 - r.width : x + 12) + <span class="s">'px'</span>;
+  tip.style.top  = (flipY ? y + 12 : y - 12 - r.height) + <span class="s">'px'</span>;
+}</pre>
+
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">08</span><h2>动效与可用性</h2></div>
+  <div class="grid g2">
+    <div class="card"><h4>动效参数</h4>
+      <p>中心环呼吸 3.6s ease-in-out；雷达扫描 9s linear；面板数据刷新 200ms 淡入 + 上移 4px；<br>
+      刷新频率 ≥ 5s 的模块才允许入场动效，避免持续抢注意力。</p></div>
+    <div class="card"><h4>安全边界</h4>
+      <p><b style="color:var(--gold)">禁止</b>大面积闪烁、频率 &gt; 3Hz 的闪动（光敏性癫痫风险）、<br>
+      大面积高饱和红／绿填充（值班室长时间注视易疲劳）。</p></div>
+  </div>
+
+  <h3>大屏可用性自查</h3>
+  <table>
+    <thead><tr><th style="width:230px">检查项</th><th style="width:170px">标准</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><b>首屏模块数</b></td><td class="mono">≤ 7 个</td><td>超过 7 个需要分屏或轮播，人眼一次只能抓 5±2 个信息块</td></tr>
+      <tr><td><b>单模块指标数</b></td><td class="mono">≤ 5 个</td><td>主指标 1 个 + 辅助 4 个，其余进详情页</td></tr>
+      <tr><td><b>最小字号</b></td><td class="mono">10.5px</td><td>3m 观看距离下的下限，图例也在内</td></tr>
+      <tr><td><b>对比度</b></td><td class="mono">主文字 ≥ 7:1</td><td>次文字 ≥ 4.5:1；禁止 #5D8AAA 以下灰蓝承载正文</td></tr>
+      <tr><td><b>色彩独立性</b></td><td class="mono">三重编码</td><td>颜色 + 文字 + 图标／形状，任一维度单独可辨</td></tr>
+      <tr><td><b>鼠标依赖</b></td><td class="mono">零悬停</td><td>所有关键信息直接可见，hover 只做补充，不做必要信息载体</td></tr>
+      <tr><td><b>刷新一致性</b></td><td class="mono">布局零抖动</td><td>数字位宽固定，避免 9→10 位时整行位移</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="sec-h"><span class="sec-num">09</span><h2>复用到其他大屏</h2></div>
+  <p class="sec-desc">边框是独立图层，与内容解耦。改造只涉及四个位置，无需动内容结构。</p>
+  <pre><span class="c">// 1. 换平台名称（≤14 字，字号 26–28）</span>
+&lt;h1&gt;西宁市取用水平台<span class="c"> </span>&lt;/h1&gt;
+
+<span class="c">// 2. 换主色：只需改 4 处 —— 主框线、名匾描边、侧翼渐变、图表渐变</span>
+<span class="k">--cyan</span>: <span class="s">#3FD0FF</span>;              <span class="c">/* 主强调 */</span>
+<span class="k">stroke</span>=<span class="s">"rgba(96,214,255,.46)"</span>  <span class="c">/* 主框线 */</span>
+<span class="k">#lgPlate</span> 渐变：<span class="s">#0E3A62 → #06182C</span>
+
+<span class="c">// 3. 等比缩放（避免非 16:9 屏体变形）</span>
+<span class="k">function</span> fit() {
+  <span class="k">var</span> s = Math.min(innerWidth / <span class="s">1920</span>, innerHeight / <span class="s">1080</span>);
+  stage.style.setProperty(<span class="s">'--s'</span>, s);
+}
+
+<span class="c">// 4. 超宽拼接屏（3840×1080）：三栏改四栏，中栏地图保持 1fr</span>
+<span class="k">grid-template-columns</span>: <span class="s">470px 1fr 470px</span>;  <span class="c">/* → 470px 1fr 470px 470px */</span></pre>
+
+  <h3>交付物</h3>
+  <ul>
+    <li><b>screen-frame.html</b> —— 可直接打开的 1920×1080 大屏模板，含完整外边框、内容栅格与示例组件；按 <span class="mono">A</span> 键可切换结构标注层</li>
+    <li><b>design-spec.html</b> —— 本规范页：外边框解剖、栅格尺寸、色彩、字体、组件规范、<b>统计图悬浮弹窗</b>、动效与可用性自查、复用指引</li>
+  </ul>
+</section>
+
+<footer>
+  <span>UI 设计方案 · 大屏外边框与设计系统 · V1.0</span>
+  <span>1920×1080 · 深色科技风 · 3m 远读优化</span>
+</footer>
+</div>
+</body>
+</html>

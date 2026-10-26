@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数字化平台大屏 · 外边框设计方案</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg0:#02070E; --bg1:#061423; --bg2:#08233C;
+    --line:rgba(70,180,235,.18); --line2:rgba(70,180,235,.34);
+    --cyan:#3FD0FF; --cyan-d:#1E7BE8; --cyan-l:#9BEAFF;
+    --text:#DCF2FF; --text2:#8FB6D4; --text3:#5D8AAA;
+    --gold:#FFC65C; --green:#3DDC97; --red:#FF6B7A; --purple:#9B8CFF;
+    --num:"Bahnschrift","DIN Alternate","Segoe UI",sans-serif;
+    --cn:"HarmonyOS Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  html,body{height:100%;background:#01060C;overflow:hidden;font-family:var(--cn);color:var(--text)}
+  #viewport{position:fixed;inset:0;display:grid;place-items:center}
+
+  /* ---------- 舞台 1920×1080 ---------- */
+  #stage{
+    position:relative;width:1920px;height:1080px;flex:0 0 auto;
+    transform:scale(var(--s,1));transform-origin:center center;
+    background:
+      radial-gradient(1100px 560px at 50% -6%, rgba(34,124,206,.28), transparent 70%),
+      radial-gradient(900px 460px at 50% 106%, rgba(18,84,150,.20), transparent 72%),
+      radial-gradient(1500px 980px at 50% 48%, #081B2E 0%, #04101E 56%, #02080F 100%);
+    overflow:hidden;
+  }
+  /* 环境层 */
+  .amb{position:absolute;inset:0;pointer-events:none}
+  .amb-grid{
+    background-image:
+      linear-gradient(rgba(74,168,226,.055) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(74,168,226,.055) 1px,transparent 1px);
+    background-size:48px 48px;
+    -webkit-mask-image:radial-gradient(circle at 50% 46%,#000 30%,transparent 78%);
+            mask-image:radial-gradient(circle at 50% 46%,#000 30%,transparent 78%);
+  }
+  .amb-vignette{background:radial-gradient(circle at 50% 50%,transparent 52%,rgba(0,4,10,.78) 100%)}
+  .amb-beam{
+    background:radial-gradient(680px 240px at 50% 0%,rgba(80,200,255,.22),transparent 70%);
+    filter:blur(2px);
+  }
+
+  /* ---------- 边框 SVG ---------- */
+  .frame{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .spin-slow{transform-origin:960px 380px;animation:spin 26s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- 顶部状态 ---------- */
+  .hud{position:absolute;left:0;right:0;top:60px;height:26px;display:flex;align-items:center;
+       justify-content:space-between;padding:0 56px;font-size:14px;color:var(--text2);pointer-events:none}
+  .hud-l{display:flex;align-items:center;gap:10px}
+  .hud-l b{color:var(--green);font-weight:600}
+  .hud .sep{width:1px;height:12px;background:var(--line2);display:inline-block}
+  .hud-r{display:flex;align-items:center;gap:10px;font-family:var(--num);letter-spacing:.6px;color:#A9CDE6}
+
+  /* ---------- 内容栅格 ---------- */
+  .content{position:absolute;left:48px;right:48px;top:100px;bottom:34px;display:grid;
+           grid-template-columns:470px 1fr 470px;gap:20px}
+  .col{display:flex;flex-direction:column;gap:16px;min-height:0}
+  .col-l{display:grid;grid-template-rows:1fr 1fr 1.14fr;gap:16px}
+  .col-c{display:grid;grid-template-rows:92px 1fr 296px;gap:16px}
+  .col-r{display:grid;grid-template-rows:288px 1fr 284px;gap:16px}
+
+  /* ---------- 面板 ---------- */
+  .panel{
+    position:relative;min-height:0;padding:12px 14px 14px;
+    background:linear-gradient(180deg,rgba(11,42,72,.55),rgba(6,22,40,.28));
+    border:1px solid var(--line);
+    box-shadow:inset 0 0 34px rgba(30,120,200,.08);
+    display:flex;flex-direction:column;
+  }
+  .panel::before,.panel::after{content:"";position:absolute;width:12px;height:12px;border:1.5px solid rgba(90,220,255,.55)}
+  .panel::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+  .panel::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+
+  .panel-head{display:flex;align-items:center;gap:10px;padding:0 0 9px;position:relative;flex:0 0 auto}
+  .panel-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+    background:linear-gradient(90deg,rgba(63,208,255,.55),rgba(63,208,255,.10) 55%,transparent)}
+  .panel-head::before{content:"";position:absolute;left:0;bottom:-1px;width:64px;height:2px;
+    background:linear-gradient(90deg,#7FE6FF,rgba(63,208,255,0));box-shadow:0 0 10px rgba(99,224,255,.8)}
+  .panel-head h3{font-size:18px;font-weight:600;letter-spacing:.8px;
+    background:linear-gradient(180deg,#FFFFFF,#A8E4FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .badge{position:relative;width:16px;height:17px;flex:0 0 auto;
+    background:linear-gradient(180deg,#7FE6FF,#1E7BE8);
+    clip-path:polygon(50% 0,100% 26%,100% 74%,50% 100%,0 74%,0 26%);
+    filter:drop-shadow(0 0 6px rgba(99,224,255,.7))}
+  .badge::before{content:"";position:absolute;inset:2.5px;background:#062036;
+    clip-path:polygon(50% 0,100% 26%,100% 74%,50% 100%,0 74%,0 26%)}
+  .badge::after{content:"";position:absolute;inset:6px;background:#8CEEFF;
+    clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+  .head-tools{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)}
+  .head-tools .link{color:#6FCFF0;cursor:pointer}
+
+  /* ---------- 通用文字/数值 ---------- */
+  .num{font-family:var(--num);font-variant-numeric:tabular-nums;letter-spacing:.5px}
+  .kpi-row{display:grid;grid-auto-flow:column;flex:1;gap:8px;align-items:center;padding:6px 0 10px}
+  .kpi{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;
+       padding:8px 0;border-radius:2px}
+  .kpi+.kpi::before{content:"";position:absolute;left:-4px;top:18%;height:64%;width:1px;
+    background:linear-gradient(180deg,transparent,rgba(90,190,240,.35),transparent)}
+  .kpi b{font-family:var(--num);font-size:34px;font-weight:600;line-height:1;
+    background:linear-gradient(180deg,#FFFFFF,#79D8FF);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 12px rgba(80,200,255,.45))}
+  .kpi span{font-size:12.5px;color:var(--text2);letter-spacing:.5px}
+  .kpi-row.tight{padding:0 0 4px}
+  .kpi-row.tight .kpi{padding:4px 0;gap:3px}
+  .kpi-row.tight .kpi b{font-size:29px}
+
+  .sec-title{display:flex;align-items:center;justify-content:space-between;
+    font-size:13px;color:#A8CDE6;padding:8px 0 6px;flex:0 0 auto}
+  .sec-title .legend{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--text3)}
+  .sec-title .legend i{width:8px;height:8px;background:linear-gradient(180deg,#7FE6FF,#1E7BE8);display:inline-block;margin-right:4px;border-radius:1px}
+  .sec-title .legend i.g{background:linear-gradient(180deg,#FFD98A,#F0A229)}
+
+  /* ---------- 柱状图 ---------- */
+  .bars{flex:1;display:flex;align-items:flex-end;gap:6px;padding:2px 2px 0;min-height:0;
+        border-bottom:1px solid rgba(70,170,220,.16);
+        background-image:repeating-linear-gradient(180deg,rgba(70,170,220,.10) 0 1px,transparent 1px 26px)}
+  .grp{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:3px;height:100%;position:relative}
+  .grp i{width:7px;height:var(--h);border-radius:1px 1px 0 0;
+    background:linear-gradient(180deg,#7FE6FF,#1E7BE8);box-shadow:0 0 8px rgba(63,208,255,.5)}
+  .grp i.alt{background:linear-gradient(180deg,#FFD98A,#E8961F);box-shadow:0 0 8px rgba(255,198,92,.45)}
+  .grp b{position:absolute;bottom:-20px;font-size:10.5px;color:var(--text3);font-weight:400;font-family:var(--num)}
+  .bars-wrap{position:relative;flex:1;display:flex;min-height:0;padding-bottom:20px}
+
+  /* ---------- 进度条 ---------- */
+  .prow{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:7px 0}
+  .prow>span:first-child{width:52px;flex:0 0 auto;color:#A8CDE6}
+  .track{position:relative;flex:1;height:7px;background:rgba(60,140,200,.16);border-radius:1px;overflow:hidden}
+  .track>i{position:absolute;left:0;top:0;bottom:0;width:var(--w);
+    background:linear-gradient(90deg,#1E7BE8,#7FE6FF);box-shadow:0 0 10px rgba(99,224,255,.6)}
+  .track.gold>i{background:linear-gradient(90deg,#C77E12,#FFD98A)}
+  .prow em{font-family:var(--num);font-style:normal;width:52px;text-align:right;color:#CFE9FA;font-size:13.5px}
+
+  /* ---------- 评论卡 ---------- */
+  .msg{display:flex;gap:10px;padding:8px 10px;background:rgba(10,40,68,.5);
+       border-left:2px solid rgba(63,208,255,.55);font-size:12.5px;line-height:1.5}
+  .msg+.msg{margin-top:7px}
+  .msg .who{color:#79D8FF;flex:0 0 auto}
+  .msg .txt{color:#C6E2F4}
+  .msg .time{color:var(--text3);font-family:var(--num);font-size:11px;margin-left:auto;flex:0 0 auto}
+
+  /* ---------- 中央 KPI 条 ---------- */
+  .kpi-strip{display:flex;align-items:center;justify-content:center;gap:0;
+    background:linear-gradient(180deg,rgba(11,42,72,.42),transparent);
+    border-top:1px solid rgba(70,180,235,.10);border-bottom:1px solid rgba(70,180,235,.10);
+    position:relative}
+  .kpi-strip .ki{position:relative;padding:0 34px;text-align:center}
+  .kpi-strip .ki+.ki::before{content:"";position:absolute;left:0;top:12%;height:76%;width:1px;
+    background:linear-gradient(180deg,transparent,rgba(90,190,240,.28),transparent)}
+  .kpi-strip .ki b{display:block;font-family:var(--num);font-size:34px;line-height:1.05;
+    background:linear-gradient(180deg,#FFFFFF,#6FD3FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kpi-strip .ki span{font-size:12px;color:var(--text2);letter-spacing:.5px}
+  .kpi-strip .ki.hot b{background:linear-gradient(180deg,#FFE3A6,#FFB647);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ---------- 地图区 ---------- */
+  .map-area{position:relative;min-height:0;overflow:hidden;
+    border:1px solid rgba(70,180,235,.09);
+    background:radial-gradient(ellipse 62% 66% at 50% 48%,rgba(26,104,176,.26),rgba(4,16,30,.04) 70%,transparent 88%)}
+  .map-area svg{position:absolute;inset:0;width:100%;height:100%}
+  .map-dots{position:absolute;inset:0;
+    background-image:radial-gradient(circle,rgba(96,196,240,.75) 1px,transparent 1px);
+    background-size:24px 24px;
+    -webkit-mask-image:radial-gradient(ellipse 70% 72% at 50% 48%,#000 12%,transparent 84%);
+            mask-image:radial-gradient(ellipse 70% 72% at 50% 48%,#000 12%,transparent 84%)}
+  .map-sweep{position:absolute;inset:0;
+    background:conic-gradient(from 0deg at 50% 48%,transparent 0deg,rgba(127,230,255,0) 296deg,rgba(127,230,255,.16) 352deg,rgba(127,230,255,0) 360deg);
+    -webkit-mask-image:radial-gradient(ellipse 34% 42% at 50% 48%,transparent 8%,#000 55%,transparent 92%);
+            mask-image:radial-gradient(ellipse 34% 42% at 50% 48%,transparent 8%,#000 55%,transparent 92%);
+    animation:sweep 9s linear infinite}
+  @keyframes sweep{to{transform:rotate(360deg)}}
+  .map-scan{position:absolute;left:0;right:0;height:70px;
+    background:linear-gradient(180deg,transparent,rgba(127,230,255,.07) 60%,rgba(127,230,255,.18) 99%,transparent);
+    animation:scan 7s ease-in-out infinite}
+  @keyframes scan{0%,100%{transform:translateY(-70px);opacity:0}12%{opacity:1}88%{opacity:1}50%{transform:translateY(480px)}}
+  .map-cross{position:absolute;inset:0;
+    background-image:linear-gradient(90deg,transparent 49.92%,rgba(79,182,232,.12) 50%,transparent 50.08%),
+                     linear-gradient(180deg,transparent 49.92%,rgba(79,182,232,.12) 50%,transparent 50.08%)}
+  .map-corner{position:absolute;width:22px;height:22px;border:1px solid rgba(99,224,255,.40)}
+  .mc1{left:10px;top:10px;border-right:0;border-bottom:0}
+  .mc2{right:10px;top:10px;border-left:0;border-bottom:0}
+  .mc3{left:10px;bottom:10px;border-right:0;border-top:0}
+  .mc4{right:10px;bottom:10px;border-left:0;border-top:0}
+  .fade-list{position:relative;min-height:0;overflow:hidden;
+    -webkit-mask-image:linear-gradient(180deg,#000 86%,transparent 100%);
+            mask-image:linear-gradient(180deg,#000 86%,transparent 100%)}
+  .pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:8px;
+    padding:8px 14px 8px 10px;background:rgba(8,40,70,.86);border:1px solid rgba(99,224,255,.55);
+    box-shadow:0 0 26px rgba(63,208,255,.35);white-space:nowrap;font-size:14px;color:#EAF9FF}
+  .pin .dot{width:8px;height:8px;border-radius:50%;background:#7FE6FF;box-shadow:0 0 12px #7FE6FF}
+  .map-tip{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:11.5px;color:rgba(141,182,212,.5);letter-spacing:1px}
+  .map-link{position:absolute;right:16px;bottom:14px;font-size:12.5px;color:#6FCFF0;cursor:pointer}
+  .map-tag{position:absolute;left:16px;top:12px;font-size:12px;color:var(--text3);letter-spacing:1px}
+
+  /* ---------- 车位格 ---------- */
+  .slots{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:40px;align-content:start;gap:7px;flex:1;min-height:0;margin-top:8px}
+  .slot{display:flex;align-items:center;gap:8px;padding:7px 9px;background:rgba(10,40,68,.45);
+        border:1px solid rgba(70,180,235,.14);position:relative}
+  .slot b{font-family:var(--num);font-size:15px;color:#CFE9FA;width:32px}
+  .slot .bar{flex:1;height:5px;background:rgba(60,140,200,.18)}
+  .slot .bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,#1E7BE8,#7FE6FF)}
+  .slot em{font-style:normal;font-family:var(--num);font-size:13px;color:#8FD8F5;width:38px;text-align:right}
+  .slot.warn .bar i{background:linear-gradient(90deg,#C77E12,#FFD98A)}
+
+  /* ---------- 排名 ---------- */
+  .rank{display:flex;align-items:center;gap:10px;padding:9px 8px;font-size:13.5px;color:#C6E2F4;
+        border-bottom:1px dashed rgba(70,170,220,.10)}
+  .rank:last-child{border-bottom:0}
+  .rank .rk{width:20px;height:20px;flex:0 0 auto;display:grid;place-items:center;font-family:var(--num);font-size:12.5px;
+    color:#7FC8E8;border:1px solid rgba(90,190,240,.35);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+  .rank.top1 .rk{color:#1B1200;background:linear-gradient(180deg,#FFE3A6,#F0A229);border-color:transparent}
+  .rank.top2 .rk{color:#0F1B24;background:linear-gradient(180deg,#EAF6FF,#9DB6C7);border-color:transparent}
+  .rank.top3 .rk{color:#1B1200;background:linear-gradient(180deg,#FFCB8A,#C97A28);border-color:transparent}
+  .rank .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rank .amt{font-family:var(--num);color:#FFD98A;font-size:14px}
+  .rank .unit{font-size:11px;color:var(--text3);margin-left:2px}
+
+  /* ---------- 设备状态 ---------- */
+  .tabs{display:flex;gap:6px;margin-bottom:8px;flex:0 0 auto}
+  .tab{font-size:12.5px;padding:5px 14px;color:var(--text3);border:1px solid rgba(70,180,235,.20);cursor:pointer}
+  .tab.on{color:#0A1B29;background:linear-gradient(180deg,#9FEDFF,#37C0EC);border-color:transparent;font-weight:600}
+  .dev{display:flex;align-items:center;gap:10px;padding:7px 6px;font-size:12.5px;color:#BBD8EA;
+       border-bottom:1px dashed rgba(70,170,220,.10)}
+  .dev:last-child{border-bottom:0}
+  .dev .code{font-family:var(--num);color:#7FC8E8;width:64px;flex:0 0 auto;font-size:12px}
+  .dev .loc{flex:1;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dev .st{display:flex;align-items:center;gap:6px;width:60px;justify-content:flex-end;flex:0 0 auto}
+  .dev .st i{width:6px;height:6px;border-radius:50%}
+  .dev .st.ok i{background:var(--green);box-shadow:0 0 8px var(--green)}
+  .dev .st.bad i{background:var(--red);box-shadow:0 0 8px var(--red)}
+  .dev .st.bad{color:#FF9AA4}
+
+  /* ---------- 环形图 ---------- */
+  .donut{position:relative;width:108px;height:108px;flex:0 0 auto}
+  .donut svg{transform:rotate(-90deg)}
+  .donut .c{position:absolute;inset:0;display:grid;place-items:center;font-size:10.5px;color:var(--text2);text-align:center;line-height:1.25}
+  .donut .c b{display:block;font-family:var(--num);font-size:20px;color:#CFE9FA;letter-spacing:.5px}
+
+  /* ---------- 标注层 ---------- */
+  .annos{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}
+  .annos.on{opacity:1}
+  .anno{position:absolute;display:flex;align-items:center;gap:0;font-size:12px;color:#CFF0FF;white-space:nowrap}
+  .anno span{background:rgba(8,44,74,.94);border:1px solid rgba(99,224,255,.6);padding:3px 8px;
+    box-shadow:0 0 14px rgba(0,20,40,.8)}
+  .anno i{display:block;height:1px;background:repeating-linear-gradient(90deg,rgba(127,230,255,.9) 0 4px,transparent 4px 8px)}
+  .anno b{width:5px;height:5px;border-radius:50%;background:#7FE6FF;box-shadow:0 0 8px #7FE6FF;flex:0 0 auto}
+
+  /* ---------- 控制条 ---------- */
+  .ctrl{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:20;opacity:.32;
+    transition:opacity .2s;display:flex;gap:8px;align-items:center;font-size:12px;color:#9FC4DB}
+  .ctrl:hover{opacity:1}
+  .ctrl button{font:inherit;color:#BEE4FA;background:rgba(10,34,56,.85);border:1px solid rgba(90,190,240,.35);
+    padding:5px 12px;cursor:pointer;border-radius:2px}
+  .ctrl button:hover{background:rgba(20,64,100,.9);border-color:rgba(120,220,255,.6)}
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="stage">
+    <div class="amb amb-grid"></div>
+    <div class="amb amb-beam"></div>
+    <div class="amb amb-vignette"></div>
+
+    <!-- ================= 外边框 ================= -->
+    <svg class="frame" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="lgWingL" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0"/>
+          <stop offset="34%" stop-color="#3FD0FF" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#9BEAFF" stop-opacity=".95"/>
+        </linearGradient>
+        <linearGradient id="lgWingR" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0"/>
+          <stop offset="34%" stop-color="#3FD0FF" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#9BEAFF" stop-opacity=".95"/>
+        </linearGradient>
+        <linearGradient id="lgPlate" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0E3A62"/>
+          <stop offset="52%" stop-color="#0A2A48"/>
+          <stop offset="100%" stop-color="#06182C"/>
+        </linearGradient>
+        <linearGradient id="lgSide" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0"/>
+          <stop offset="22%" stop-color="#3FD0FF" stop-opacity=".38"/>
+          <stop offset="78%" stop-color="#3FD0FF" stop-opacity=".38"/>
+          <stop offset="100%" stop-color="#3FD0FF" stop-opacity="0"/>
+        </linearGradient>
+        <pattern id="pTickH" width="16" height="9" patternUnits="userSpaceOnUse">
+          <rect width="1" height="9" fill="#3FD0FF" opacity=".42"/>
+        </pattern>
+        <pattern id="pTickV" width="9" height="16" patternUnits="userSpaceOnUse">
+          <rect width="9" height="1" fill="#3FD0FF" opacity=".34"/>
+        </pattern>
+        <filter id="fGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="fGlowSm" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <path id="pFrame" d="M40 18 H1880 L1902 40 V1040 L1880 1062 H40 L18 1040 V40 Z"/>
+        <path id="pFrameIn" d="M45 27 H1875 L1893 45 V1035 L1875 1053 H45 L27 1035 V45 Z"/>
+      </defs>
+
+      <!-- 外发光 -->
+      <use href="#pFrame" stroke="#2BA8E8" stroke-width="12" opacity=".10" filter="url(#fGlow)"/>
+      <!-- 主框线 -->
+      <use href="#pFrame" stroke="rgba(96,214,255,.46)" stroke-width="1.2"/>
+      <!-- 内框线 -->
+      <use href="#pFrameIn" stroke="rgba(96,214,255,.15)" stroke-width="1"/>
+
+      <!-- 四角 L 形角标 -->
+      <g stroke="#7FE3FF" stroke-opacity=".72" stroke-width="2" stroke-linecap="square">
+        <path d="M8 86 V8 H86"/><path d="M1834 8 H1912 V86"/>
+        <path d="M8 994 V1072 H86"/><path d="M1912 994 V1072 H1834"/>
+      </g>
+      <!-- 角标内短枝 -->
+      <g stroke="#7FE3FF" stroke-opacity=".30" stroke-width="1">
+        <path d="M8 126 V8 M8 8 H126"/><path d="M1794 8 H1912 M1912 8 V126"/>
+        <path d="M8 954 V1072 M8 1072 H126"/><path d="M1912 954 V1072 M1794 1072 H1912"/>
+      </g>
+      <!-- 切角高亮 -->
+      <g stroke="#8CE8FF" stroke-width="3" stroke-linecap="round" filter="url(#fGlowSm)" stroke-opacity=".95">
+        <path d="M36.5 21.5 L21.5 36.5"/><path d="M1883.5 21.5 L1898.5 36.5"/>
+        <path d="M21.5 1043.5 L36.5 1058.5"/><path d="M1898.5 1043.5 L1883.5 1058.5"/>
+      </g>
+      <!-- 角点 -->
+      <g fill="#B7F2FF" filter="url(#fGlowSm)">
+        <circle cx="12.5" cy="12.5" r="2.2"/><circle cx="1907.5" cy="12.5" r="2.2"/>
+        <circle cx="12.5" cy="1067.5" r="2.2"/><circle cx="1907.5" cy="1067.5" r="2.2"/>
+      </g>
+
+      <!-- 左右侧边刻度 -->
+      <rect x="12" y="452" width="10" height="176" fill="url(#pTickV)" opacity=".55"/>
+      <rect x="1898" y="452" width="10" height="176" fill="url(#pTickV)" opacity=".55"/>
+      <line x1="18" y1="150" x2="18" y2="320" stroke="url(#lgSide)" stroke-width="1"/>
+      <line x1="1902" y1="150" x2="1902" y2="320" stroke="url(#lgSide)" stroke-width="1"/>
+      <g stroke="#7FE3FF" stroke-opacity=".28" stroke-width="1">
+        <path d="M18 172 H30 M18 196 H30 M18 220 H30"/>
+        <path d="M1902 172 H1890 M1902 196 H1890 M1902 220 H1890"/>
+        <path d="M18 858 H30 M18 882 H30 M18 906 H30"/>
+        <path d="M1902 858 H1890 M1902 882 H1890 M1902 906 H1890"/>
+      </g>
+      <g fill="#5FD8FF" opacity=".55">
+        <rect x="14" y="392" width="4" height="26"/><rect x="1902" y="392" width="4" height="26"/>
+        <rect x="14" y="662" width="4" height="26"/><rect x="1902" y="662" width="4" height="26"/>
+      </g>
+
+      <!-- 顶部侧翼 -->
+      <line x1="56" y1="38" x2="664" y2="38" stroke="url(#lgWingL)" stroke-width="1.4"/>
+      <line x1="120" y1="47" x2="664" y2="47" stroke="url(#lgWingL)" stroke-width="1" opacity=".45"/>
+      <rect x="150" y="31" width="300" height="9" fill="url(#pTickH)" opacity=".7"/>
+      <path d="M651 33 L656 38 L651 43 L646 38 Z" fill="#B7F2FF" filter="url(#fGlowSm)"/>
+      <line x1="1864" y1="38" x2="1256" y2="38" stroke="url(#lgWingR)" stroke-width="1.4"/>
+      <line x1="1800" y1="47" x2="1256" y2="47" stroke="url(#lgWingR)" stroke-width="1" opacity=".45"/>
+      <rect x="1470" y="31" width="300" height="9" fill="url(#pTickH)" opacity=".7"/>
+      <path d="M1269 33 L1274 38 L1269 43 L1264 38 Z" fill="#B7F2FF" filter="url(#fGlowSm)"/>
+
+      <!-- 六角名匾 -->
+      <g filter="url(#fGlow)">
+        <path d="M706 8 H1214 L1250 38 L1214 68 H706 L670 38 Z" fill="url(#lgPlate)" stroke="#54DAFF" stroke-width="1.4" stroke-opacity=".9"/>
+      </g>
+      <path d="M716 16 H1204 L1230 38 L1204 60 H716 L690 38 Z" stroke="#7FE3FF" stroke-opacity=".35" stroke-width="1"/>
+      <g stroke="#9BEAFF" stroke-width="2" stroke-linecap="round" opacity=".9">
+        <path d="M690 38 H674"/><path d="M1230 38 H1246"/>
+      </g>
+      <g fill="#5FD8FF" opacity=".28">
+        <path d="M706 8 L706 68 L670 38 Z"/><path d="M1214 8 L1214 68 L1250 38 Z" fill-opacity=".5"/>
+      </g>
+      <line x1="828" y1="68.5" x2="1092" y2="68.5" stroke="#B7F2FF" stroke-width="1.6" stroke-opacity=".85" filter="url(#fGlowSm)"/>
+      <line x1="880" y1="72" x2="1040" y2="72" stroke="#5FD8FF" stroke-width="1" stroke-opacity=".35"/>
+
+      <!-- 底部收口 -->
+      <path d="M858 1062 H1062 L1042 1046 H878 Z" fill="#08243E" stroke="#4FD8FF" stroke-opacity=".5" stroke-width="1"/>
+      <line x1="900" y1="1054" x2="1020" y2="1054" stroke="#9BEAFF" stroke-width="1.4" stroke-opacity=".8" filter="url(#fGlowSm)"/>
+      <circle cx="960" cy="1054" r="2.4" fill="#D8F8FF" filter="url(#fGlowSm)"/>
+      <g stroke="#4FD8FF" stroke-opacity=".30" stroke-width="1">
+        <path d="M150 1062 H840 M1080 1062 H1770"/>
+      </g>
+    </svg>
+
+    <!-- 标题文字 -->
+    <div style="position:absolute;left:50%;top:14px;transform:translateX(-50%);width:560px;height:48px;
+                display:grid;place-items:center;pointer-events:none">
+      <h1 style="font-size:27px;font-weight:700;letter-spacing:5px;color:#F2FBFF;
+                 text-shadow:0 0 18px rgba(99,224,255,.85),0 0 44px rgba(40,140,220,.6)">
+        阿坝非遗博览园数字化平台
+      </h1>
+    </div>
+
+    <!-- 顶部状态 -->
+    <div class="hud">
+      <div class="hud-l">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7FD8F5" stroke-width="1.6">
+          <circle cx="8.5" cy="8" r="3.4"/><path d="M8.5 1.6v1.6M8.5 12.8v1.6M1.9 8h1.6M13.5 8h1.6M3.9 3.4l1.1 1.1M12 11.5l1.1 1.1M13.1 3.4L12 4.5M4.9 11.5L3.9 12.4"/>
+          <path d="M11 19.5h7a3 3 0 0 0 0-6 4 4 0 0 0-7.7-.6" stroke="#A9CDE6"/>
+        </svg>
+        <span>多云</span><span class="num" style="color:#A9CDE6">10~18℃</span>
+        <i class="sep"></i>
+        <span>空气质量</span><b>优</b>
+      </div>
+      <div class="hud-r">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7FD8F5" stroke-width="1.6">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/>
+        </svg>
+        <span id="clock">2026年4月9日 15:30:12</span>
+      </div>
+    </div>
+
+    <!-- ================= 内容 ================= -->
+    <div class="content">
+      <!-- 左栏 -->
+      <div class="col col-l">
+        <section class="panel">
+          <div class="panel-head"><i class="badge"></i><h3>园区客流统计</h3></div>
+          <div class="kpi-row" style="flex:0 0 auto">
+            <div class="kpi"><b>3013</b><span>进园人数</span></div>
+            <div class="kpi"><b>3013</b><span>当天入园人</span></div>
+            <div class="kpi"><b>3013</b><span>当日统计</span></div>
+          </div>
+          <div class="sec-title">近7日客流量趋势
+            <span class="legend"><span><i></i>进园</span><span><i class="g"></i>预约</span></span>
+          </div>
+          <div class="bars-wrap">
+            <div class="bars">
+              <div class="grp"><i style="--h:52%"></i><i class="alt" style="--h:34%"></i><b>10-16</b></div>
+              <div class="grp"><i style="--h:74%"></i><i class="alt" style="--h:46%"></i><b>10-17</b></div>
+              <div class="grp"><i style="--h:44%"></i><i class="alt" style="--h:62%"></i><b>10-18</b></div>
+              <div class="grp"><i style="--h:88%"></i><i class="alt" style="--h:52%"></i><b>10-19</b></div>
+              <div class="grp"><i style="--h:60%"></i><i class="alt" style="--h:70%"></i><b>10-20</b></div>
+              <div class="grp"><i style="--h:96%"></i><i class="alt" style="--h:40%"></i><b>10-21</b></div>
+              <div class="grp"><i style="--h:68%"></i><i class="alt" style="--h:56%"></i><b>10-22</b></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><i class="badge"></i><h3>客源画像分析</h3>
+            <span class="head-tools"><span class="link">近7日</span></span></div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px">
+            <div class="prow"><span>团队</span><div class="track"><i style="--w:76%"></i></div><em>3013</em></div>
+            <div class="prow"><span>散客</span><div class="track"><i style="--w:92%"></i></div><em>4011</em></div>
+            <div class="prow"><span>本地</span><div class="track gold"><i style="--w:42%"></i></div><em>42%</em></div>
+            <div class="prow"><span>外地</span><div class="track gold"><i style="--w:58%"></i></div><em>58%</em></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><i class="badge"></i><h3>投诉建议统计</h3>
+            <span class="head-tools">数据截止 15:30</span></div>
+          <div class="kpi-row tight" style="flex:0 0 auto">
+            <div class="kpi"><b>84</b><span>投诉量总计</span></div>
+            <div class="kpi"><b style="background:linear-gradient(180deg,#E6FFF5,#3DDC97);-webkit-background-clip:text;background-clip:text">52</b><span>已处理</span></div>
+            <div class="kpi"><b style="background:linear-gradient(180deg,#FFE9EC,#FF6B7A);-webkit-background-clip:text;background-clip:text">32</b><span>未处理</span></div>
+          </div>
+          <div class="sec-title" style="padding-bottom:2px">实时评论<span class="head-tools"><span class="link">全部 84 条 ›</span></span></div>
+          <div class="fade-list" style="flex:1;padding-top:2px">
+            <div class="msg"><span class="who">游客</span><span class="txt">非遗工坊真不错，讲解很细致</span><span class="time">14:20</span></div>
+            <div class="msg"><span class="who">游客</span><span class="txt">场馆特别智能化，体验感很好</span><span class="time">13:58</span></div>
+            <div class="msg"><span class="who">游客</span><span class="txt">停车指引可以再明显一点</span><span class="time">13:31</span></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 中栏 -->
+      <div class="col col-c">
+        <div class="kpi-strip">
+          <div class="ki"><b>34</b><span>在园人数</span></div>
+          <div class="ki"><b>6</b><span>疑似人数</span></div>
+          <div class="ki hot"><b>21</b><span>待处理工单</span></div>
+          <div class="ki"><b>13</b><span>处理中工单</span></div>
+          <div class="ki"><b>9</b><span>已完成工单</span></div>
+        </div>
+
+        <div class="map-area">
+          <div class="map-dots"></div>
+          <div class="map-cross"></div>
+          <div class="map-sweep"></div>
+          <div class="map-scan"></div>
+          <i class="map-corner mc1"></i><i class="map-corner mc2"></i>
+          <i class="map-corner mc3"></i><i class="map-corner mc4"></i>
+          <svg viewBox="0 0 844 560" preserveAspectRatio="none">
+            <g fill="none" stroke="#3FD0FF">
+              <ellipse cx="422" cy="269" rx="286" ry="200" stroke-opacity=".18" stroke-dasharray="2 10"/>
+              <ellipse cx="422" cy="269" rx="226" ry="158" stroke-opacity=".13" stroke-dasharray="1 13"/>
+              <ellipse cx="422" cy="269" rx="160" ry="112" stroke-opacity=".09" stroke-dasharray="1 10"/>
+            </g>
+            <g fill="#7FE6FF" filter="url(#fGlowSm)">
+              <circle cx="248" cy="196" r="3"/><circle cx="330" cy="372" r="2.5"/>
+              <circle cx="566" cy="182" r="2.5"/><circle cx="608" cy="330" r="3"/>
+              <circle cx="422" cy="414" r="2.5"/><circle cx="476" cy="142" r="2"/>
+            </g>
+            <g stroke="#7FE6FF" stroke-opacity=".18">
+              <path d="M248 196 L422 269 M330 372 L422 269 M566 182 L422 269 M608 330 L422 269 M476 142 L422 269"/>
+            </g>
+            <circle cx="422" cy="269" r="44" stroke="#9BEAFF" stroke-opacity=".5" fill="none"/>
+            <circle cx="422" cy="269" r="44" stroke="#9BEAFF" stroke-opacity=".4" fill="none">
+              <animate attributeName="r" values="44;92;44" dur="3.6s" repeatCount="indefinite"/>
+              <animate attributeName="stroke-opacity" values=".42;0;.42" dur="3.6s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          <div class="map-tag">阿坝州全域 · 实时态势</div>
+          <div class="pin"><i class="dot"></i>阿坝州非遗博览园</div>
+          <div class="map-tip">3D 地图区域 · 可替换为自建底图</div>
+          <div class="map-link">查看园区热力图 ›</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:360px 1fr;gap:16px;min-height:0">
+          <section class="panel">
+            <div class="panel-head"><i class="badge"></i><h3>车位统计</h3></div>
+            <div style="display:flex;gap:24px;align-items:baseline;padding:6px 2px 0">
+              <div><span style="font-size:12px;color:var(--text2)">总车位</span>
+                <b class="num" style="font-size:24px;color:#CFE9FA;margin-left:6px">780</b></div>
+              <div><span style="font-size:12px;color:var(--text2)">空车位</span>
+                <b class="num" style="font-size:24px;color:#3DDC97;margin-left:6px">328</b></div>
+            </div>
+            <div class="slots">
+              <div class="slot"><b>A01</b><div class="bar"><i style="--w:95%"></i></div><em>95%</em></div>
+              <div class="slot"><b>A02</b><div class="bar"><i style="--w:61%"></i></div><em>61%</em></div>
+              <div class="slot warn"><b>A03</b><div class="bar"><i style="--w:88%"></i></div><em>88%</em></div>
+              <div class="slot"><b>A04</b><div class="bar"><i style="--w:45%"></i></div><em>45%</em></div>
+              <div class="slot"><b>A05</b><div class="bar"><i style="--w:72%"></i></div><em>72%</em></div>
+              <div class="slot"><b>A06</b><div class="bar"><i style="--w:34%"></i></div><em>34%</em></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head"><i class="badge"></i><h3>车流量趋势 / 来源省份</h3></div>
+            <div style="flex:1;min-height:0;position:relative">
+              <svg viewBox="0 0 420 180" preserveAspectRatio="none" style="width:100%;height:100%">
+                <defs>
+                  <linearGradient id="areaG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#4FD8FF" stop-opacity=".45"/>
+                    <stop offset="100%" stop-color="#4FD8FF" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <g stroke="#4FD8FF" stroke-opacity=".10">
+                  <path d="M0 40 H420 M0 80 H420 M0 120 H420 M0 160 H420"/>
+                </g>
+                <path d="M0 148 L42 120 L84 132 L126 92 L168 104 L210 62 L252 78 L294 44 L336 66 L378 38 L420 52 V180 H0 Z"
+                      fill="url(#areaG)"/>
+                <path d="M0 148 L42 120 L84 132 L126 92 L168 104 L210 62 L252 78 L294 44 L336 66 L378 38 L420 52"
+                      fill="none" stroke="#7FE6FF" stroke-width="2" stroke-linejoin="round"/>
+                <circle cx="294" cy="44" r="4" fill="#FFFFFF" stroke="#4FD8FF" stroke-width="2"/>
+              </svg>
+              <div style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;
+                          font-size:10.5px;color:var(--text3);font-family:var(--num)">
+                <span>川A</span><span>川B</span><span>川U</span><span>川V</span><span>川W</span><span>渝</span><span>甘</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- 右栏 -->
+      <div class="col col-r">
+        <section class="panel">
+          <div class="panel-head"><i class="badge"></i><h3>票务和商户销售额统计</h3></div>
+          <div style="display:flex;align-items:center;gap:18px;flex:1;min-height:0">
+            <div style="flex:1">
+              <div style="font-size:12px;color:var(--text2);letter-spacing:.5px">票务销售额（月）</div>
+              <div class="num" style="font-size:28px;font-weight:600;
+                   background:linear-gradient(180deg,#FFF6E2,#FFC65C);-webkit-background-clip:text;background-clip:text;color:transparent">
+                699,987.65</div>
+              <div style="font-size:12px;color:var(--text2);letter-spacing:.5px;margin-top:10px">园区总收入（月）</div>
+              <div class="num" style="font-size:28px;font-weight:600;
+                   background:linear-gradient(180deg,#EAF7FF,#7FD8F5);-webkit-background-clip:text;background-clip:text;color:transparent">
+                699,987.65</div>
+            </div>
+            <div class="donut">
+              <svg width="108" height="108" viewBox="0 0 108 108">
+                <circle cx="54" cy="54" r="43" fill="none" stroke="rgba(60,140,200,.18)" stroke-width="9"/>
+                <circle cx="54" cy="54" r="43" fill="none" stroke="url(#dn1)" stroke-width="9"
+                        stroke-dasharray="245 270"/>
+                <defs>
+                  <linearGradient id="dn1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#9BEAFF"/><stop offset="100%" stop-color="#1E7BE8"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="c"><span><b>206</b>学生票</span></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);padding-top:8px;
+                      border-top:1px solid rgba(70,180,235,.12)">
+            <span><i style="display:inline-block;width:7px;height:7px;background:#7FD8F5;margin-right:5px"></i>普通票 337</span>
+            <span><i style="display:inline-block;width:7px;height:7px;background:#FFC65C;margin-right:5px"></i>月销售额 337</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><i class="badge"></i><h3>商户销售额排名</h3>
+            <span class="head-tools"><span class="link">本月 ›</span></span></div>
+          <div style="display:flex;font-size:11.5px;color:var(--text3);padding:2px 8px 6px;letter-spacing:.5px">
+            <span style="width:30px">排名</span><span style="flex:1">商户名称</span><span>销售额</span>
+          </div>
+          <div class="fade-list" style="flex:1">
+            <div class="rank top1"><span class="rk">1</span><span class="nm">此处为商铺名称最多一行展示</span><span class="amt">52312.00</span></div>
+            <div class="rank top2"><span class="rk">2</span><span class="nm">阿坝特色美食餐厅</span><span class="amt">49182.00</span></div>
+            <div class="rank top3"><span class="rk">3</span><span class="nm">郭大路特色米线店</span><span class="amt">43592.00</span></div>
+            <div class="rank"><span class="rk">4</span><span class="nm">雪域冰川</span><span class="amt">39102.23</span></div>
+            <div class="rank"><span class="rk">5</span><span class="nm">儿童体验馆</span><span class="amt">42520.00</span></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><i class="badge"></i><h3>应急事件统计</h3></div>
+          <div class="tabs"><span class="tab on">设备状态</span><span class="tab">应急事件</span></div>
+          <div style="display:flex;font-size:11.5px;color:var(--text3);padding:0 6px 6px">
+            <span style="width:64px">设备</span><span style="flex:1">位置</span><span style="width:60px;text-align:right">运行状态</span>
+          </div>
+          <div class="fade-list" style="flex:1">
+            <div class="dev"><span class="code">AQI 检测</span><span class="loc">此处为设备位置</span><span class="st ok"><i></i>良好</span></div>
+            <div class="dev"><span class="code">A03 设备</span><span class="loc">一号大门入口</span><span class="st ok"><i></i>良好</span></div>
+            <div class="dev"><span class="code">A06 摄像头</span><span class="loc">景区大门左侧</span><span class="st ok"><i></i>良好</span></div>
+            <div class="dev"><span class="code">A03 摄像头</span><span class="loc">一号大门右侧</span><span class="st ok"><i></i>良好</span></div>
+            <div class="dev"><span class="code">A05 清洁人</span><span class="loc">此处为设备位置</span><span class="st bad"><i></i>故障</span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ================= 标注层 ================= -->
+    <div class="annos" id="annos">
+      <div class="anno" style="left:1288px;top:74px"><b></b><i style="width:22px;transform:rotate(-64deg);transform-origin:left center"></i><span>六角名匾 580×60 · 双描边 + 底部亮线</span></div>
+      <div class="anno" style="left:330px;top:92px"><i style="width:34px;transform:rotate(-90deg);transform-origin:left center"></i><b></b><span>侧翼：主线 1.4 + 副线 1 + 梳齿 300×9</span></div>
+      <div class="anno" style="left:150px;top:1000px"><i style="width:26px;transform:rotate(46deg);transform-origin:left center;transform-box:fill-box"></i><b></b><span>切角 22px + L 形角标 2px</span></div>
+      <div class="anno" style="left:700px;top:1028px"><i style="width:22px;transform:rotate(-90deg);transform-origin:left center"></i><b></b><span>外框 1.2px / 内框 1px（间距 9px）</span></div>
+      <div class="anno" style="left:36px;top:470px"><i style="width:22px"></i><b></b><span>侧边梳齿装饰</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="ctrl">
+  <button id="btnAnno">显示标注 (A)</button>
+  <button id="btnReset">复位</button>
+  <span style="opacity:.55">1920 × 1080 · 等比缩放</span>
+</div>
+
+<script>
+  var stage = document.getElementById('stage');
+  function fit(){
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.setProperty('--s', s);
+  }
+  window.addEventListener('resize', fit); fit();
+
+  var annos = document.getElementById('annos');
+  function toggle(){ annos.classList.toggle('on'); }
+  document.getElementById('btnAnno').onclick = toggle;
+  window.addEventListener('keydown', function(e){ if(e.key === 'a' || e.key === 'A') toggle(); });
+  document.getElementById('btnReset').onclick = function(){
+    annos.classList.remove('on');
+    var n = document.querySelectorAll('.slot .bar i'); n.forEach(function(el,i){ el.style.setProperty('--w',(50+i*12)+'%'); });
+  };
+
+  var wk = ['日','一','二','三','四','五','六'];
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+  function clock(){
+    var d = new Date();
+    document.getElementById('clock').textContent =
+      d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日  '+
+      pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())+' 星期'+wk[d.getDay()];
+  }
+  clock(); setInterval(clock, 1000);
+</script>
+</body>
+</html>

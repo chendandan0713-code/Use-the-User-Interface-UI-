@@ -846,17 +846,14 @@
       </div>
 
       <!-- ================= 3. LEFT COLUMN (区域用水态势分析) ================= -->
-      <aside
-        class="relative z-20 w-[395px] xl:w-[415px] 2xl:w-[440px] h-full p-1 xl:p-1.5 gap-2.5 pointer-events-auto shrink-0 overflow-y-auto custom-dark-scrollbar"
-        :class="scenarioMode === 'comprehensive' ? 'grid grid-rows-[2fr_1fr]' : 'flex flex-col'"
-      >
+      <aside class="relative z-20 w-[395px] xl:w-[415px] 2xl:w-[440px] h-full p-1 xl:p-1.5 flex flex-col gap-2.5 pointer-events-auto shrink-0 overflow-y-auto custom-dark-scrollbar">
         
         <!-- A. 综合应用场景 -->
         <template v-if="scenarioMode === 'comprehensive'">
-        <!-- ================= 区域用水态势分析 (大卡片: 筛选条件 + 五维统计 + 区域统计图 + 年度趋势) ================= -->
+        <!-- ================= 区域用水态势分析 (全景大卡片: 五维统计 + 区域对比 + 行业水源结构占比 + 年度时间趋势) ================= -->
         <div
           id="dev-anno-2"
-          class="spec-card rounded-lg p-3 min-h-0 flex flex-col relative transition-all duration-300"
+          class="spec-card rounded-lg p-3 h-full min-h-0 flex flex-col relative transition-all duration-300"
           :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 2 }"
         >
           <!-- Numbered Point 2 Badge (区域用水态势分析 - 左1) -->
@@ -888,47 +885,7 @@
           <!-- 标题底线 (规范 64px 高亮带外发光) -->
           <div class="spec-header-divider mb-2"></div>
 
-          <!-- 第一行：搜索条件 (行业类型 / 水源类型 / 年份) -->
-          <div class="grid grid-cols-3 gap-1.5 mb-2">
-            <label class="min-w-0">
-              <span class="block text-[9px] text-[#5D8AAA] mb-0.5">行业类型</span>
-              <select
-                v-model="filterParams.industry"
-                class="w-full min-w-0 bg-[#0b2447] border border-[#1b4372] rounded px-1.5 py-1 text-[#DCF2FF] text-[11px] focus:outline-none focus:border-[#3FD0FF] cursor-pointer"
-              >
-                <option value="all">全部行业</option>
-                <option value="agriculture">农业用水</option>
-                <option value="industry">工业用水</option>
-                <option value="urban">城镇公共</option>
-                <option value="residential">居民生活</option>
-                <option value="ecology">生态环境</option>
-                <option value="other">其他用水</option>
-              </select>
-            </label>
-            <label class="min-w-0">
-              <span class="block text-[9px] text-[#5D8AAA] mb-0.5">水源类型</span>
-              <select
-                v-model="filterParams.source"
-                class="w-full min-w-0 bg-[#0b2447] border border-[#1b4372] rounded px-1.5 py-1 text-[#DCF2FF] text-[11px] focus:outline-none focus:border-[#3FD0FF] cursor-pointer"
-              >
-                <option value="all">全部水源</option>
-                <option value="surface">地表水</option>
-                <option value="ground">地下水</option>
-              </select>
-            </label>
-            <label class="min-w-0">
-              <span class="block text-[9px] text-[#5D8AAA] mb-0.5">年份</span>
-              <select
-                v-model="filterParams.year"
-                class="w-full min-w-0 bg-[#0b2447] border border-[#1b4372] rounded px-1.5 py-1 text-[#DCF2FF] text-[11px] focus:outline-none focus:border-[#3FD0FF] cursor-pointer"
-              >
-                <option value="2026">2026年</option>
-                <option value="2025">2025年</option>
-              </select>
-            </label>
-          </div>
-
-          <!-- 第二行：五个统计数量 (计量 / 直报 / 税务 / 许可 / 计划) -->
+          <!-- 五个统计数量 (计量 / 直报 / 税务 / 许可 / 计划) -->
           <div class="bg-[rgba(10,36,58,0.5)] rounded p-1.5 mb-2 border border-[rgba(70,180,235,0.16)]">
             <div class="grid grid-cols-5 gap-1">
               <div class="text-center">
@@ -987,7 +944,7 @@
           </div>
 
           <!-- SVG 5-Parameter Combo Chart: 3 Bars (水蓝同色系) + 2 Lines (金白管控线) -->
-          <div class="w-full flex-1 min-h-[80px] relative">
+          <div class="w-full h-[96px] relative overflow-visible shrink-0">
             <svg viewBox="0 0 380 120" class="w-full h-full overflow-visible">
               <!-- Horizontal grids -->
               <g stroke="rgba(70,180,235,0.14)" stroke-width="0.8">
@@ -1010,8 +967,8 @@
                 v-for="(item, idx) in districtBarData"
                 :key="item.name"
                 class="cursor-pointer group"
-                @mouseenter="hoveredBarDistrict = item"
-                @mouseleave="hoveredBarDistrict = null"
+                @mouseenter="hoveredBarDistrict = item; hoveredBarDistrictIdx = idx"
+                @mouseleave="hoveredBarDistrict = null; hoveredBarDistrictIdx = null"
                 @click="filterParams.district = item.name"
               >
                 <!-- District Highlight Background Column on Hover -->
@@ -1021,8 +978,8 @@
                   width="33"
                   height="82"
                   fill="#3FD0FF"
-                  :fill-opacity="filterParams.district === item.name ? 0.12 : 0"
-                  class="group-hover:fill-opacity-15 transition-all rounded"
+                  :fill-opacity="filterParams.district === item.name || hoveredBarDistrictIdx === idx ? 0.14 : 0"
+                  class="transition-all rounded"
                   rx="3"
                 />
 
@@ -1072,7 +1029,7 @@
                   text-anchor="middle"
                   font-size="11"
                   font-weight="bold"
-                  :fill="filterParams.district === item.name ? '#3FD0FF' : '#8FB6D4'"
+                  :fill="filterParams.district === item.name || hoveredBarDistrictIdx === idx ? '#3FD0FF' : '#8FB6D4'"
                   class="group-hover:fill-[#9BEAFF] transition-colors"
                 >
                   {{ item.name }}
@@ -1095,18 +1052,18 @@
                 v-for="(item, idx) in districtBarData"
                 :key="'lic-' + item.name"
                 class="cursor-pointer"
-                @mouseenter="hoveredBarDistrict = item"
-                @mouseleave="hoveredBarDistrict = null"
+                @mouseenter="hoveredBarDistrict = item; hoveredBarDistrictIdx = idx"
+                @mouseleave="hoveredBarDistrict = null; hoveredBarDistrictIdx = null"
                 @click="filterParams.district = item.name"
               >
                 <circle
                   :cx="54.5 + idx * 46"
                   :cy="96 - (item.licensed / 35000) * 78"
-                  r="3.2"
+                  :r="hoveredBarDistrictIdx === idx ? 4 : 3.2"
                   fill="#FFC65C"
                   stroke="#ffffff"
                   stroke-width="1.6"
-                  class="hover:scale-125 transition-transform"
+                  class="transition-all"
                 >
                   <title>{{ item.name }} 许可水量: {{ item.licensed }} 万m³</title>
                 </circle>
@@ -1129,65 +1086,495 @@
                 v-for="(item, idx) in districtBarData"
                 :key="'plan-' + item.name"
                 class="cursor-pointer"
-                @mouseenter="hoveredBarDistrict = item"
-                @mouseleave="hoveredBarDistrict = null"
+                @mouseenter="hoveredBarDistrict = item; hoveredBarDistrictIdx = idx"
+                @mouseleave="hoveredBarDistrict = null; hoveredBarDistrictIdx = null"
                 @click="filterParams.district = item.name"
               >
                 <circle
                   :cx="54.5 + idx * 46"
                   :cy="96 - (item.planned / 35000) * 78"
-                  r="2.8"
+                  :r="hoveredBarDistrictIdx === idx ? 3.6 : 2.8"
                   fill="#ffffff"
                   stroke="#5D8AAA"
                   stroke-width="1.4"
-                  class="hover:scale-125 transition-transform"
+                  class="transition-all"
                 >
                   <title>{{ item.name }} 计划水量: {{ item.planned }} 万m³</title>
                 </circle>
               </g>
             </svg>
 
-            <!-- Hover Popover Tooltip for District 5 Parameters (Design Spec Section 07 Tooltip) -->
+            <!-- Hover Popover Tooltip for District Parameters (动态跟随柱位，紧凑实色无透明度) -->
             <div
-              v-if="hoveredBarDistrict"
-              class="spec-tooltip absolute top-1 right-2 p-2.5 text-xs shadow-2xl pointer-events-none z-30 min-w-[180px]"
+              v-if="hoveredBarDistrict && hoveredBarDistrictIdx !== null"
+              class="spec-tooltip absolute p-2 text-xs shadow-2xl pointer-events-none z-30 w-max max-w-[195px] border border-[#3FD0FF]/70 rounded"
+              :style="districtBarTooltipStyle"
             >
               <i class="tooltip-bar"></i>
-              <div class="font-bold text-[#DCF2FF] mb-1.5 border-b border-[rgba(70,180,235,0.18)] pb-1 flex items-center justify-between">
-                <span>{{ hoveredBarDistrict.name }} 水量明细</span>
-                <span class="text-[10px] text-[#5D8AAA] font-normal">万m³</span>
+              <div class="font-bold text-[#DCF2FF] mb-1 border-b border-[rgba(70,180,235,0.2)] pb-1 flex items-center justify-between gap-2">
+                <span>{{ hoveredBarDistrict.name }} 水量参数</span>
+                <span
+                  class="text-[9px] px-1 py-0.2 rounded font-normal"
+                  :class="hoveredBarDistrict.reported > hoveredBarDistrict.planned ? 'text-rose-300 bg-rose-500/25 border border-rose-500/40' : 'text-emerald-300 bg-emerald-500/25 border border-emerald-500/40'"
+                >
+                  {{ hoveredBarDistrict.reported > hoveredBarDistrict.planned ? '直报超计划' : '指标受控' }}
+                </span>
               </div>
-              <div class="space-y-1 font-spec-num text-[11px]">
+              <div class="space-y-0.5 font-spec-num text-[10.5px]">
                 <div class="text-[#3FD0FF] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-2 rounded-xs bg-[#3FD0FF]"></span>计量水量:</span>
-                  <span class="font-bold text-white">{{ hoveredBarDistrict.metered.toLocaleString() }}</span>
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-1.5 h-1.5 rounded-xs bg-[#3FD0FF]"></span>计量水量:</span>
+                  <span class="font-bold text-[#E4F6FF]">{{ hoveredBarDistrict.metered.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
                 </div>
                 <div class="text-[#9BEAFF] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-2 rounded-xs bg-[#9BEAFF]"></span>直报水量:</span>
-                  <span class="font-bold text-white">{{ hoveredBarDistrict.reported.toLocaleString() }}</span>
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-1.5 h-1.5 rounded-xs bg-[#9BEAFF]"></span>直报水量:</span>
+                  <span class="font-bold text-white">{{ hoveredBarDistrict.reported.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
                 </div>
                 <div class="text-[#60a5fa] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-2 rounded-xs bg-[#60a5fa]"></span>税务水量:</span>
-                  <span class="font-bold text-white">{{ hoveredBarDistrict.taxWater.toLocaleString() }}</span>
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-1.5 h-1.5 rounded-xs bg-[#60a5fa]"></span>税务水量:</span>
+                  <span class="font-bold text-[#E4F6FF]">{{ hoveredBarDistrict.taxWater.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
                 </div>
                 <div class="text-[#FFC65C] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2.5 h-0.5 bg-[#FFC65C]"></span>许可水量:</span>
-                  <span class="font-bold text-white">{{ hoveredBarDistrict.licensed.toLocaleString() }}</span>
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-0.5 bg-[#FFC65C]"></span>许可水量:</span>
+                  <span class="font-bold text-[#FFC65C]">{{ hoveredBarDistrict.licensed.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
                 </div>
                 <div class="text-[#DCF2FF] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2.5 h-0.5 border-t border-dashed border-[#DCF2FF]"></span>计划水量:</span>
-                  <span class="font-bold text-white">{{ hoveredBarDistrict.planned.toLocaleString() }}</span>
+                  <span class="flex items-center gap-1.5 text-[#8FB6D4] font-sans"><span class="w-2 h-0.5 border-t border-dashed border-[#DCF2FF]"></span>计划水量:</span>
+                  <span class="font-bold text-[#DCF2FF]">{{ hoveredBarDistrict.planned.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
+                </div>
+                <div class="flex justify-between gap-3 items-center pt-0.5 border-t border-[rgba(70,180,235,0.15)] text-[10px]">
+                  <span class="text-[#8FB6D4] font-sans">计划偏差:</span>
+                  <span
+                    class="font-bold font-spec-num"
+                    :class="hoveredBarDistrict.reported > hoveredBarDistrict.planned ? 'text-[#FF6B7A]' : 'text-[#3DDC97]'"
+                  >
+                    {{ (hoveredBarDistrict.reported - hoveredBarDistrict.planned > 0 ? '+' : '') + (hoveredBarDistrict.reported - hoveredBarDistrict.planned).toLocaleString() }} 万m³
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 第四个区域：用水时间变化趋势 (2026 / 2025 双年度) -->
+          <!-- 第三个区域：结构占比分析 (并排展示：左 行业用水 4类 + 右 水源类型 2类) -->
+          <div
+            id="dev-anno-4"
+            class="border-t border-[rgba(70,180,235,0.18)] pt-2 mt-1 relative rounded transition-all duration-300"
+            :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 4 }"
+          >
+            <!-- Numbered Point 4 Badge (行业与水源结构占比) -->
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+              class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-[11px] shadow-[0_0_10px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 4 }"
+              @mouseenter="activeAnnotationId = 4"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(4)"
+              title="开发标注 #4: 行业用水结构占比与水源类型占比"
+            >
+              4
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 relative">
+              <!-- 左栏：行业用水结构占比 (4类: 工业/农业/生活/环境) -->
+              <div class="bg-[rgba(10,36,58,0.45)] border border-[rgba(70,180,235,0.16)] rounded-lg p-2 flex flex-col justify-between transition-colors hover:border-[rgba(70,180,235,0.35)]">
+                <div class="flex items-center justify-between pb-1 mb-1 border-b border-[rgba(70,180,235,0.12)]">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-1 h-2.5 rounded-sm bg-[#3FD0FF] shadow-[0_0_5px_#3FD0FF]"></span>
+                    <span class="text-[11.5px] font-semibold text-[#DCF2FF] tracking-wide">行业用水结构</span>
+                  </div>
+                  <span class="text-[9px] text-[#8FB6D4] font-spec-num">4大行业</span>
+                </div>
+
+                <div class="flex items-center gap-2 py-0.5">
+                  <!-- Donut Chart -->
+                  <div class="w-14 h-14 relative shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 60 60" class="w-full h-full -rotate-90">
+                      <!-- 农业 41.4% -->
+                      <circle cx="30" cy="30" r="22" fill="transparent" stroke="#3FD0FF" stroke-width="8" stroke-dasharray="57.2 81.0" stroke-dashoffset="0" class="cursor-pointer hover:stroke-opacity-80" @mouseenter="hoveredStructureDetail = { type: 'industry', name: '农业用水', rate: '41.4%', volume: '23,656万m³', focus: '现代化灌区节水引湟灌溉', color: '#3FD0FF' }; hoveredStructureSide = 'left'" @mouseleave="hoveredStructureDetail = null" />
+                      <!-- 工业 34.1% -->
+                      <circle cx="30" cy="30" r="22" fill="transparent" stroke="#1E7BE8" stroke-width="8" stroke-dasharray="47.1 91.1" stroke-dashoffset="-57.2" class="cursor-pointer hover:stroke-opacity-80" @mouseenter="hoveredStructureDetail = { type: 'industry', name: '工业用水', rate: '34.1%', volume: '19,485万m³', focus: '规上电解铝/晶硅等工业生产', color: '#1E7BE8' }; hoveredStructureSide = 'left'" @mouseleave="hoveredStructureDetail = null" />
+                      <!-- 生活 17.2% -->
+                      <circle cx="30" cy="30" r="22" fill="transparent" stroke="#60a5fa" stroke-width="8" stroke-dasharray="23.8 114.4" stroke-dashoffset="-104.3" class="cursor-pointer hover:stroke-opacity-80" @mouseenter="hoveredStructureDetail = { type: 'industry', name: '生活用水', rate: '17.2%', volume: '9,828万m³', focus: '市政自来水公共供水管网', color: '#60a5fa' }; hoveredStructureSide = 'left'" @mouseleave="hoveredStructureDetail = null" />
+                      <!-- 环境 7.3% -->
+                      <circle cx="30" cy="30" r="22" fill="transparent" stroke="#818cf8" stroke-width="8" stroke-dasharray="10.1 128.1" stroke-dashoffset="-128.1" class="cursor-pointer hover:stroke-opacity-80" @mouseenter="hoveredStructureDetail = { type: 'industry', name: '生态环境', rate: '7.3%', volume: '4,171万m³', focus: '城市景观水系与湟水河补水', color: '#818cf8' }; hoveredStructureSide = 'left'" @mouseleave="hoveredStructureDetail = null" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                      <span class="text-[8.5px] text-[#8FB6D4] leading-tight">行业</span>
+                      <span class="text-[10px] font-bold font-spec-num text-[#9BEAFF] leading-tight">100%</span>
+                    </div>
+                  </div>
+
+                  <!-- 4类行业列表 (工业、农业、生活、环境) -->
+                  <div class="flex-1 space-y-0.5 text-[10px]">
+                    <div
+                      class="flex items-center justify-between cursor-pointer rounded px-1 py-0.2 hover:bg-[rgba(63,208,255,0.12)] transition-colors"
+                      @mouseenter="hoveredStructureDetail = { type: 'industry', name: '工业用水', rate: '34.1%', volume: '19,485万m³', focus: '规上电解铝/晶硅等工业生产', color: '#1E7BE8' }; hoveredStructureSide = 'left'"
+                      @mouseleave="hoveredStructureDetail = null"
+                    >
+                      <div class="flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-xs bg-[#1E7BE8] shrink-0"></span>
+                        <span class="text-[#8FB6D4]">工业</span>
+                      </div>
+                      <span class="font-bold font-spec-num text-[#9BEAFF]">34.1%</span>
+                    </div>
+                    <div
+                      class="flex items-center justify-between cursor-pointer rounded px-1 py-0.2 hover:bg-[rgba(63,208,255,0.12)] transition-colors"
+                      @mouseenter="hoveredStructureDetail = { type: 'industry', name: '农业用水', rate: '41.4%', volume: '23,656万m³', focus: '现代化灌区节水引湟灌溉', color: '#3FD0FF' }; hoveredStructureSide = 'left'"
+                      @mouseleave="hoveredStructureDetail = null"
+                    >
+                      <div class="flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-xs bg-[#3FD0FF] shrink-0"></span>
+                        <span class="text-[#8FB6D4]">农业</span>
+                      </div>
+                      <span class="font-bold font-spec-num text-[#3FD0FF]">41.4%</span>
+                    </div>
+                    <div
+                      class="flex items-center justify-between cursor-pointer rounded px-1 py-0.2 hover:bg-[rgba(63,208,255,0.12)] transition-colors"
+                      @mouseenter="hoveredStructureDetail = { type: 'industry', name: '生活用水', rate: '17.2%', volume: '9,828万m³', focus: '市政自来水公共供水管网', color: '#60a5fa' }; hoveredStructureSide = 'left'"
+                      @mouseleave="hoveredStructureDetail = null"
+                    >
+                      <div class="flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-xs bg-[#60a5fa] shrink-0"></span>
+                        <span class="text-[#8FB6D4]">生活</span>
+                      </div>
+                      <span class="font-bold font-spec-num text-[#60a5fa]">17.2%</span>
+                    </div>
+                    <div
+                      class="flex items-center justify-between cursor-pointer rounded px-1 py-0.2 hover:bg-[rgba(63,208,255,0.12)] transition-colors"
+                      @mouseenter="hoveredStructureDetail = { type: 'industry', name: '生态环境', rate: '7.3%', volume: '4,171万m³', focus: '城市景观水系与湟水河补水', color: '#818cf8' }; hoveredStructureSide = 'left'"
+                      @mouseleave="hoveredStructureDetail = null"
+                    >
+                      <div class="flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-xs bg-[#818cf8] shrink-0"></span>
+                        <span class="text-[#8FB6D4]">环境</span>
+                      </div>
+                      <span class="font-bold font-spec-num text-[#818cf8]">7.3%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 右栏：水源类型占比 (2类: 地表水/地下水) -->
+              <div class="bg-[rgba(10,36,58,0.45)] border border-[rgba(70,180,235,0.16)] rounded-lg p-2 flex flex-col justify-between transition-colors hover:border-[rgba(70,180,235,0.35)]">
+                <div class="flex items-center justify-between pb-1 mb-1 border-b border-[rgba(70,180,235,0.12)]">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-1 h-2.5 rounded-sm bg-[#00E5FF] shadow-[0_0_5px_#00E5FF]"></span>
+                    <span class="text-[11.5px] font-semibold text-[#DCF2FF] tracking-wide">水源类型占比</span>
+                  </div>
+                  <span class="text-[9px] text-[#8FB6D4] font-spec-num">2大类</span>
+                </div>
+
+                <div class="flex items-center gap-2 py-0.5">
+                  <!-- Donut Chart -->
+                  <div class="w-14 h-14 relative shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 60 60" class="w-full h-full -rotate-90">
+                      <!-- 地表水 78.4% -->
+                      <circle cx="30" cy="30" r="22" fill="transparent" stroke="#00E5FF" stroke-width="8" stroke-dasharray="108.4 29.8" stroke-dashoffset="0" class="cursor-pointer hover:stroke-opacity-80" @mouseenter="hoveredStructureDetail = { type: 'source', name: '地表水源', rate: '78.4%', volume: '44,830万m³', focus: '湟水河天然水系与黑泉水库', color: '#00E5FF' }; hoveredStructureSide = 'right'" @mouseleave="hoveredStructureDetail = null" />
+                      <!-- 地下水 21.6% -->
+                      <circle cx="30" cy="30" r="22" fill="transparent" stroke="#FFC65C" stroke-width="8" stroke-dasharray="29.8 108.4" stroke-dashoffset="-108.4" class="cursor-pointer hover:stroke-opacity-80" @mouseenter="hoveredStructureDetail = { type: 'source', name: '地下水源', rate: '21.6%', volume: '12,353万m³', focus: '深井自备水，红线刚性限采', color: '#FFC65C' }; hoveredStructureSide = 'right'" @mouseleave="hoveredStructureDetail = null" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                      <span class="text-[8.5px] text-[#8FB6D4] leading-tight">水源</span>
+                      <span class="text-[10px] font-bold font-spec-num text-[#00E5FF] leading-tight">100%</span>
+                    </div>
+                  </div>
+
+                  <!-- 2类水源指标项 + 描述 -->
+                  <div class="flex-1 space-y-1 text-[10px]">
+                    <div
+                      class="cursor-pointer rounded px-1 py-0.2 hover:bg-[rgba(63,208,255,0.12)] transition-colors"
+                      @mouseenter="hoveredStructureDetail = { type: 'source', name: '地表水源', rate: '78.4%', volume: '44,830万m³', focus: '湟水河天然水系与黑泉水库', color: '#00E5FF' }; hoveredStructureSide = 'right'"
+                      @mouseleave="hoveredStructureDetail = null"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1">
+                          <span class="w-1.5 h-1.5 rounded-xs bg-[#00E5FF] shrink-0"></span>
+                          <span class="text-[#8FB6D4]">地表水</span>
+                        </div>
+                        <span class="font-bold font-spec-num text-[#00E5FF]">78.4%</span>
+                      </div>
+                      <div class="text-[8.5px] text-[#5D8AAA] font-spec-num pl-2.5">44,830万m³</div>
+                    </div>
+                    <div
+                      class="cursor-pointer rounded px-1 py-0.2 hover:bg-[rgba(63,208,255,0.12)] transition-colors"
+                      @mouseenter="hoveredStructureDetail = { type: 'source', name: '地下水源', rate: '21.6%', volume: '12,353万m³', focus: '深井自备水，红线刚性限采', color: '#FFC65C' }; hoveredStructureSide = 'right'"
+                      @mouseleave="hoveredStructureDetail = null"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1">
+                          <span class="w-1.5 h-1.5 rounded-xs bg-[#FFC65C] shrink-0"></span>
+                          <span class="text-[#8FB6D4]">地下水</span>
+                        </div>
+                        <span class="font-bold font-spec-num text-[#FFC65C]">21.6%</span>
+                      </div>
+                      <div class="text-[8.5px] text-[#5D8AAA] font-spec-num pl-2.5">12,353万m³</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 结构占比悬浮参数弹窗 (实色纯底，紧凑跟随) -->
+              <div
+                v-if="hoveredStructureDetail"
+                class="spec-tooltip absolute top-0 z-30 p-2 text-xs shadow-2xl pointer-events-none w-max max-w-[195px] border border-[#3FD0FF]/70 rounded"
+                :style="hoveredStructureSide === 'left' ? { left: '8px' } : { right: '8px' }"
+              >
+                <i class="tooltip-bar" :style="{ background: hoveredStructureDetail.color }"></i>
+                <div class="font-bold text-[#DCF2FF] mb-1 border-b border-[rgba(70,180,235,0.2)] pb-1 flex items-center justify-between gap-3">
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-xs" :style="{ background: hoveredStructureDetail.color }"></span>
+                    {{ hoveredStructureDetail.name }}
+                  </span>
+                  <span class="font-spec-num font-bold text-white">{{ hoveredStructureDetail.rate }}</span>
+                </div>
+                <div class="space-y-0.5 text-[10px] font-spec-num">
+                  <div class="flex justify-between gap-2 text-[#8FB6D4]">
+                    <span class="font-sans">年核定水量:</span>
+                    <span class="font-bold text-[#E4F6FF]">{{ hoveredStructureDetail.volume }}</span>
+                  </div>
+                  <div class="text-[#8FB6D4] font-sans text-[9px] leading-tight pt-0.5">
+                    {{ hoveredStructureDetail.focus }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 第四个区域：【行政区划用水统计趋势】(跟着中间行政区划切换联动，以月为维度统计实际用水与计划用水) -->
+          <div
+            id="dev-anno-district-monthly"
+            class="border-t border-[rgba(70,180,235,0.18)] pt-2 mt-1 relative rounded transition-all duration-300"
+          >
+            <!-- 标题栏 & 联动状态提示 & 图例 -->
+            <div class="flex items-center justify-between pb-1">
+              <div class="flex items-center gap-1.5">
+                <span class="w-1 h-3 rounded-sm bg-[#3FD0FF] shadow-[0_0_6px_#3FD0FF]"></span>
+                <h3 class="text-xs font-semibold text-[#DCF2FF] tracking-wide">行政区划用水统计趋势</h3>
+                <span class="text-[10px] text-[#8FB6D4]">(万m³)</span>
+              </div>
+              <div class="flex items-center gap-2 text-[10px]">
+                <div class="flex items-center gap-1">
+                  <span class="w-2.5 h-2 rounded-xs bg-gradient-to-t from-[#1E7BE8] to-[#3FD0FF]"></span>
+                  <span class="text-[#3FD0FF] font-medium">实际用水</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="inline-flex items-center text-[#FFC65C] font-bold text-[9px] tracking-tighter">┄●┄</span>
+                  <span class="text-[#FFC65C] font-medium">计划用水</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 区划联动月度汇总指示条 -->
+            <div class="grid grid-cols-4 gap-1 p-1 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.16)] mb-1 text-center">
+              <div>
+                <div class="text-[9px] text-[#8FB6D4]">关联区划</div>
+                <div class="text-[11px] font-bold font-spec-cn text-[#00E5FF] mt-0.5 truncate flex items-center justify-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#00E5FF] shadow-[0_0_5px_#00E5FF]"></span>
+                  <span>{{ filterParams.district === '西宁市' ? '全市视角' : filterParams.district }}</span>
+                </div>
+              </div>
+              <div>
+                <div class="text-[9px] text-[#8FB6D4]">年实际用水</div>
+                <div class="text-[11px] font-bold font-spec-num text-[#E4F6FF] mt-0.5">
+                  {{ currentDistrictMonthTotals.totalActual.toLocaleString() }}
+                </div>
+              </div>
+              <div>
+                <div class="text-[9px] text-[#8FB6D4]">年计划指标</div>
+                <div class="text-[11px] font-bold font-spec-num text-[#FFC65C] mt-0.5">
+                  {{ currentDistrictMonthTotals.totalPlanned.toLocaleString() }}
+                </div>
+              </div>
+              <div>
+                <div class="text-[9px] text-[#8FB6D4]">综合执行率</div>
+                <div
+                  class="text-[11px] font-bold font-spec-num mt-0.5 flex items-center justify-center gap-0.5"
+                  :class="currentDistrictMonthTotals.executionRate > 100 ? 'text-[#FF6B7A]' : 'text-[#3DDC97]'"
+                >
+                  <span>{{ currentDistrictMonthTotals.executionRate }}%</span>
+                  <span v-if="currentDistrictMonthTotals.executionRate > 100" class="text-[8px]">⚠️</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SVG 实际用水(柱) vs 计划用水(折线) 月度对比图 -->
+            <div class="w-full h-[96px] relative overflow-visible shrink-0">
+              <svg viewBox="0 0 380 120" class="w-full h-full overflow-visible">
+                <defs>
+                  <linearGradient id="districtActualBarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#3FD0FF" />
+                    <stop offset="100%" stop-color="#0E5CAD" />
+                  </linearGradient>
+                  <linearGradient id="districtExceedBarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#FF6B7A" />
+                    <stop offset="100%" stop-color="#991B1B" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Horizontal Grid Lines -->
+                <g stroke="rgba(70,180,235,0.14)" stroke-width="0.8">
+                  <line x1="36" y1="16" x2="368" y2="16" />
+                  <line x1="36" y1="42" x2="368" y2="42" />
+                  <line x1="36" y1="68" x2="368" y2="68" />
+                  <line x1="36" y1="94" x2="368" y2="94" stroke="rgba(70,180,235,0.25)" stroke-width="1.2" />
+                </g>
+
+                <!-- Y-Axis labels -->
+                <g fill="#5D8AAA" font-size="9" font-family="var(--spec-num)" text-anchor="end">
+                  <text v-for="tick in districtMonthChartData.yTicks" :key="tick.label" x="32" :y="tick.y">
+                    {{ tick.label }}
+                  </text>
+                </g>
+
+                <!-- 1. 实际用水柱 (正常水蓝柱与超计划红柱) -->
+                <g>
+                  <rect
+                    v-for="(item, idx) in districtMonthChartData.items"
+                    :key="'bar-' + item.record.month"
+                    :x="item.barX"
+                    :y="item.barY"
+                    :width="item.barWidth"
+                    :height="item.barHeight"
+                    rx="1.5"
+                    :fill="item.isExceeded ? 'url(#districtExceedBarGrad)' : 'url(#districtActualBarGrad)'"
+                    :stroke="item.isExceeded ? '#FF8595' : (hoveredDistrictMonthIdx === idx ? '#E4F6FF' : '#3FD0FF')"
+                    :stroke-width="hoveredDistrictMonthIdx === idx ? 1.4 : 0.7"
+                    class="transition-all duration-300 cursor-pointer"
+                    @mouseenter="hoveredDistrictMonthIdx = idx"
+                    @mouseleave="hoveredDistrictMonthIdx = null"
+                  />
+                </g>
+
+                <!-- 2. 计划用水折线 (金黄折线 #FFC65C) -->
+                <path
+                  :d="districtMonthChartData.planLinePath"
+                  fill="none"
+                  stroke="#FFC65C"
+                  stroke-width="1.6"
+                  stroke-dasharray="3 2"
+                  class="transition-all duration-300"
+                />
+
+                <!-- 3. 数据节点与月份 X 轴标签 -->
+                <g
+                  v-for="(item, idx) in districtMonthChartData.items"
+                  :key="'pt-' + item.record.month"
+                  class="cursor-pointer group"
+                  @mouseenter="hoveredDistrictMonthIdx = idx"
+                  @mouseleave="hoveredDistrictMonthIdx = null"
+                >
+                  <!-- 悬浮触发背景高亮矩形 -->
+                  <rect
+                    :x="item.cx - 12"
+                    y="10"
+                    width="24"
+                    height="94"
+                    fill="rgba(63,208,255,0.08)"
+                    class="opacity-0 group-hover:opacity-100 transition-opacity rounded"
+                  />
+
+                  <!-- 计划节点点位 -->
+                  <circle
+                    :cx="item.cx"
+                    :cy="item.planY"
+                    :r="hoveredDistrictMonthIdx === idx ? 3.8 : 2"
+                    fill="#FFC65C"
+                    stroke="#ffffff"
+                    stroke-width="1"
+                    class="transition-all"
+                  />
+
+                  <!-- 超计划告警角标点 -->
+                  <circle
+                    v-if="item.isExceeded"
+                    :cx="item.cx"
+                    :cy="item.barY - 3"
+                    r="2"
+                    fill="#FF6B7A"
+                    class="animate-pulse"
+                  />
+
+                  <!-- X 轴月份文字 -->
+                  <text
+                    :x="item.cx"
+                    y="108"
+                    text-anchor="middle"
+                    font-size="9.5"
+                    font-weight="bold"
+                    :fill="hoveredDistrictMonthIdx === idx ? '#3FD0FF' : '#8FB6D4'"
+                    class="transition-colors"
+                  >
+                    {{ item.record.month }}
+                  </text>
+                </g>
+              </svg>
+
+              <!-- 悬浮浮窗 Tooltip (跟随月份柱位动态移动，实色紧凑无透明度) -->
+              <div
+                v-if="hoveredDistrictMonthIdx !== null && currentDistrictMonthlyList[hoveredDistrictMonthIdx]"
+                class="spec-tooltip absolute p-2 text-xs shadow-2xl pointer-events-none z-30 w-max max-w-[190px] border border-[#3FD0FF]/70 rounded"
+                :style="districtMonthTooltipStyle"
+              >
+                <i class="tooltip-bar"></i>
+                <div class="font-bold text-[#DCF2FF] mb-1 border-b border-[rgba(70,180,235,0.2)] pb-1 flex items-center justify-between gap-2">
+                  <span>{{ filterParams.district === '西宁市' ? '全市' : filterParams.district }} · {{ currentDistrictMonthlyList[hoveredDistrictMonthIdx].month }}</span>
+                  <span
+                    class="text-[9px] px-1 py-0.2 rounded font-normal"
+                    :class="currentDistrictMonthlyList[hoveredDistrictMonthIdx].rate > 100 ? 'text-rose-300 bg-rose-500/25 border border-rose-500/40' : 'text-emerald-300 bg-emerald-500/25 border border-emerald-500/40'"
+                  >
+                    {{ currentDistrictMonthlyList[hoveredDistrictMonthIdx].rate > 100 ? '超计划预警' : '定额受控' }}
+                  </span>
+                </div>
+                <div class="space-y-0.5 font-spec-num text-[10.5px]">
+                  <div class="text-[#3FD0FF] flex justify-between gap-3 items-center">
+                    <span class="flex items-center gap-1 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#3FD0FF]"></i>实际用水:</span>
+                    <span class="font-bold text-[#E4F6FF]">{{ currentDistrictMonthlyList[hoveredDistrictMonthIdx].actual.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
+                  </div>
+                  <div class="text-[#FFC65C] flex justify-between gap-3 items-center">
+                    <span class="flex items-center gap-1 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#FFC65C]"></i>计划指标:</span>
+                    <span class="font-bold text-[#FFC65C]">{{ currentDistrictMonthlyList[hoveredDistrictMonthIdx].planned.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
+                  </div>
+                  <div class="flex justify-between gap-3 items-center pt-0.5 border-t border-[rgba(70,180,235,0.15)] text-[10px]">
+                    <span class="font-sans text-[#8FB6D4]">偏差水量:</span>
+                    <span
+                      class="font-bold"
+                      :class="currentDistrictMonthlyList[hoveredDistrictMonthIdx].rate > 100 ? 'text-[#FF6B7A]' : 'text-[#3DDC97]'"
+                    >
+                      {{ (currentDistrictMonthlyList[hoveredDistrictMonthIdx].actual - currentDistrictMonthlyList[hoveredDistrictMonthIdx].planned > 0 ? '+' : '') + (currentDistrictMonthlyList[hoveredDistrictMonthIdx].actual - currentDistrictMonthlyList[hoveredDistrictMonthIdx].planned).toLocaleString() }} 万m³
+                    </span>
+                  </div>
+                  <div class="flex justify-between gap-3 items-center text-[10px]">
+                    <span class="font-sans text-[#8FB6D4]">月执行率:</span>
+                    <span
+                      class="font-bold"
+                      :class="currentDistrictMonthlyList[hoveredDistrictMonthIdx].rate > 100 ? 'text-[#FF6B7A]' : 'text-[#3DDC97]'"
+                    >
+                      {{ currentDistrictMonthlyList[hoveredDistrictMonthIdx].rate }}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 第五个区域：用水时间变化趋势 (放在最后一栏) -->
           <div
             id="dev-anno-3"
             class="border-t border-[rgba(70,180,235,0.18)] pt-2 mt-1 flex flex-col flex-1 min-h-[116px] relative rounded transition-all duration-300"
             :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 3 }"
           >
+            <!-- Numbered Point 3 Badge (用水时间变化趋势 - 最后一栏) -->
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
+              class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-[11px] shadow-[0_0_10px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 3 }"
+              @mouseenter="activeAnnotationId = 3"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(3)"
+              title="开发标注 #3: 用水时间变化趋势 (最后一栏)"
+            >
+              3
+            </div>
+
             <div class="flex items-center justify-between pb-1">
               <div class="flex items-center gap-1.5">
                 <span class="w-1 h-3 rounded-sm bg-[#9BEAFF] shadow-[0_0_6px_#9BEAFF]"></span>
@@ -1196,27 +1583,21 @@
               </div>
               <div class="flex items-center gap-2.5 text-[10px]">
                 <div class="flex items-center gap-1.5">
-                  <span
-                    class="w-3.5 h-0.5 rounded-xs"
-                    :class="filterParams.year === '2026' ? 'bg-[#3FD0FF] shadow-[0_0_5px_#3FD0FF]' : 'bg-[#3FD0FF]/40'"
-                  ></span>
-                  <span :class="filterParams.year === '2026' ? 'text-[#3FD0FF] font-semibold' : 'text-[#8FB6D4]'">2026年</span>
+                  <span class="w-3.5 h-0.5 rounded-xs bg-[#3FD0FF] shadow-[0_0_5px_#3FD0FF]"></span>
+                  <span class="text-[#3FD0FF] font-semibold">{{ curYearLabel }}</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <span
-                    class="w-3.5 h-0.5 border-t-2 border-dashed"
-                    :class="filterParams.year === '2025' ? 'border-[#60a5fa]' : 'border-[#60a5fa]/40'"
-                  ></span>
-                  <span :class="filterParams.year === '2025' ? 'text-[#60a5fa] font-semibold' : 'text-[#8FB6D4]'">2025年</span>
+                  <span class="w-3.5 h-0.5 border-t-2 border-dashed border-[#60a5fa]"></span>
+                  <span class="text-[#60a5fa] font-semibold">{{ prevYearLabel }}</span>
                 </div>
               </div>
             </div>
 
             <!-- SVG Smooth Curve & Area Gradient Trend Chart -->
-            <div class="w-full flex-1 min-h-[80px] relative">
+            <div class="w-full h-[96px] relative overflow-visible shrink-0">
             <svg viewBox="0 0 380 120" class="w-full h-full overflow-visible">
               <defs>
-                <!-- Area gradient for 2026年 -->
+                <!-- Area gradient for 当前年份 -->
                 <linearGradient id="actualAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                   <stop offset="0%" stop-color="#3FD0FF" stop-opacity="0.45" />
                   <stop offset="50%" stop-color="#1E7BE8" stop-opacity="0.18" />
@@ -1247,30 +1628,29 @@
                 <text x="32" y="97">0</text>
               </g>
 
-              <!-- 1. 2026年 Gradient Area -->
+              <!-- 1. 当前年份 Gradient Area -->
               <path
-                :d="trendChartData.area2026"
+                :d="trendChartData.areaCur"
                 fill="url(#actualAreaGrad)"
                 class="transition-all duration-300"
               />
 
-              <!-- 2. 2025年 Line (Blue Dashed #60a5fa) -->
+              <!-- 2. 对比上一年度 Line (Blue Dashed #60a5fa) -->
               <path
-                :d="trendChartData.line2025"
+                :d="trendChartData.linePrev"
                 fill="none"
                 stroke="#60a5fa"
-                :stroke-width="filterParams.year === '2025' ? 2.2 : 1.6"
+                stroke-width="1.8"
                 stroke-dasharray="4 3"
-                :opacity="filterParams.year === '2025' ? 0.95 : 0.65"
+                opacity="0.85"
               />
 
-              <!-- 3. 2026年 Line (Glowing Cyan #3FD0FF) -->
+              <!-- 3. 当前年份 Line (Glowing Cyan #3FD0FF) -->
               <path
-                :d="trendChartData.line2026"
+                :d="trendChartData.lineCur"
                 fill="none"
                 stroke="#3FD0FF"
-                :stroke-width="filterParams.year === '2026' ? 2.5 : 1.8"
-                :opacity="filterParams.year === '2026' ? 1 : 0.65"
+                stroke-width="2.5"
                 filter="url(#cyanGlow)"
               />
 
@@ -1294,10 +1674,10 @@
                   {{ item.month }}
                 </text>
 
-                <!-- Data point dot on 2025 line -->
+                <!-- Data point dot on 前一年份 line -->
                 <circle
                   :cx="36 + idx * (332 / 11)"
-                  :cy="94 - (item.y2025 / 18000) * 78"
+                  :cy="94 - (item.yPrev / 18000) * 78"
                   :r="hoveredTrendIdx === idx ? 3.6 : 2"
                   fill="#0b2447"
                   stroke="#60a5fa"
@@ -1305,10 +1685,10 @@
                   class="transition-all"
                 />
 
-                <!-- Data point dot on 2026 line -->
+                <!-- Data point dot on 当前年份 line -->
                 <circle
                   :cx="36 + idx * (332 / 11)"
-                  :cy="94 - (item.y2026 / 18000) * 78"
+                  :cy="94 - (item.yCur / 18000) * 78"
                   :r="hoveredTrendIdx === idx ? 4.5 : 2.5"
                   fill="#ffffff"
                   stroke="#3FD0FF"
@@ -1318,165 +1698,49 @@
               </g>
             </svg>
 
-            <!-- Hover Month Tooltip (Spec 07 Tooltip) -->
+            <!-- Hover Month Tooltip (跟随时间月份节点动态移动，实色紧凑无透明度) -->
             <div
-              v-if="hoveredTrendIdx !== null"
-              class="spec-tooltip absolute top-1 right-2 p-2.5 text-xs shadow-2xl pointer-events-none z-30 min-w-[170px]"
+              v-if="hoveredTrendIdx !== null && monthlyTrendData[hoveredTrendIdx]"
+              class="spec-tooltip absolute p-2 text-xs shadow-2xl pointer-events-none z-30 w-max max-w-[190px] border border-[#3FD0FF]/70 rounded"
+              :style="trendTooltipStyle"
             >
               <i class="tooltip-bar"></i>
-              <div class="font-bold text-[#DCF2FF] mb-1.5 border-b border-[rgba(70,180,235,0.18)] pb-1 flex items-center justify-between">
-                <span>{{ monthlyTrendData[hoveredTrendIdx].month }} 用水情况</span>
-                <span class="text-[10px] text-[#5D8AAA] font-normal">年度对比</span>
+              <div class="font-bold text-[#DCF2FF] mb-1 border-b border-[rgba(70,180,235,0.2)] pb-1 flex items-center justify-between gap-2">
+                <span>{{ monthlyTrendData[hoveredTrendIdx].month }} 用水参数</span>
+                <span
+                  class="text-[9px] px-1 py-0.2 rounded font-normal"
+                  :class="monthlyTrendData[hoveredTrendIdx].yCur >= monthlyTrendData[hoveredTrendIdx].yPrev ? 'text-amber-300 bg-amber-500/25 border border-amber-500/40' : 'text-cyan-300 bg-cyan-500/25 border border-cyan-500/40'"
+                >
+                  {{ monthlyTrendData[hoveredTrendIdx].yCur >= monthlyTrendData[hoveredTrendIdx].yPrev ? '同比上升' : '同比下降' }}
+                </span>
               </div>
-              <div class="space-y-1 font-spec-num text-[11px]">
+              <div class="space-y-0.5 font-spec-num text-[10.5px]">
                 <div class="text-[#3FD0FF] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#3FD0FF]"></i>2026年:</span>
-                  <span class="font-bold text-[#E4F6FF]">{{ monthlyTrendData[hoveredTrendIdx].y2026 }} <small class="text-[#5D8AAA] text-[10px] font-normal">万m³</small></span>
+                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#3FD0FF]"></i>{{ curYearLabel }}:</span>
+                  <span class="font-bold text-[#E4F6FF]">{{ monthlyTrendData[hoveredTrendIdx].yCur.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
                 </div>
                 <div class="text-[#60a5fa] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#60a5fa]"></i>2025年:</span>
-                  <span class="text-[#DCF2FF]">{{ monthlyTrendData[hoveredTrendIdx].y2025 }} <small class="text-[#5D8AAA] text-[10px] font-normal">万m³</small></span>
+                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#60a5fa]"></i>{{ prevYearLabel }}:</span>
+                  <span class="text-[#DCF2FF]">{{ monthlyTrendData[hoveredTrendIdx].yPrev.toLocaleString() }} <small class="text-[#5D8AAA] text-[9px] font-normal">万m³</small></span>
                 </div>
-                <div class="text-[#FFC65C] flex justify-between gap-3 items-center">
-                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#FFC65C]"></i>同比:</span>
+                <div class="flex justify-between gap-3 items-center pt-0.5 border-t border-[rgba(70,180,235,0.15)] text-[10px]">
+                  <span class="font-sans text-[#8FB6D4]">同期差值:</span>
+                  <span
+                    class="font-bold font-spec-num"
+                    :class="monthlyTrendData[hoveredTrendIdx].yCur >= monthlyTrendData[hoveredTrendIdx].yPrev ? 'text-[#FFC65C]' : 'text-[#3DDC97]'"
+                  >
+                    {{ (monthlyTrendData[hoveredTrendIdx].yCur - monthlyTrendData[hoveredTrendIdx].yPrev > 0 ? '+' : '') + (monthlyTrendData[hoveredTrendIdx].yCur - monthlyTrendData[hoveredTrendIdx].yPrev).toLocaleString() }} 万m³
+                  </span>
+                </div>
+                <div class="text-[#FFC65C] flex justify-between gap-3 items-center text-[10px]">
+                  <span class="flex items-center gap-1.5 font-sans text-[#8FB6D4]"><i class="w-1.5 h-1.5 rounded-xs bg-[#FFC65C]"></i>变化率:</span>
                   <span class="font-semibold text-[#FFC65C]">{{ trendYoY(monthlyTrendData[hoveredTrendIdx]) }}</span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        </div>
-        </div>
-
-        <!-- ================= Card 3: 行业用水结构占比 (独立卡片 3) ================= -->
-        <div
-          id="dev-anno-4"
-          class="spec-card rounded-lg p-3 min-h-0 flex flex-col justify-between relative transition-all duration-300"
-          :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 4 }"
-        >
-          <!-- Numbered Point 4 Badge (行业用水结构占比 - 左3) -->
-          <div
-            v-if="showAnnotationBadges && scenarioMode === 'comprehensive'"
-            class="absolute -top-2 -left-2 z-40 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-xs shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
-            :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 4 }"
-            @mouseenter="activeAnnotationId = 4"
-            @mouseleave="activeAnnotationId = null"
-            @click="scrollToAnnotation(4)"
-            title="开发标注 #4: 行业用水结构占比 (左3)"
-          >
-            4
-          </div>
-          <!-- 内容区：1/3 高度不足时卡片内部滚动 -->
-          <div class="flex-1 min-h-0 flex flex-col overflow-y-auto custom-dark-scrollbar pr-0.5">
-          <div class="flex items-center justify-between pb-1.5">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2" stroke-width="1.8" />
-                <polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5 12 6" stroke-width="1.2" stroke-opacity="0.6" />
-              </svg>
-              <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">行业用水结构占比</h2>
-            </div>
-            <div class="text-xs text-[#9BEAFF] font-spec-num font-bold">
-              全域总额: 61,327 万m³
             </div>
           </div>
-          <div class="spec-header-divider mb-2"></div>
-
-          <!-- Donut Chart & Detailed Industry Breakdown (统一水蓝渐变色系，减少杂色) -->
-          <div class="flex items-center gap-4 my-auto py-1">
-            <!-- Left: Donut Chart with center total -->
-            <div class="w-32 h-32 relative shrink-0 flex items-center justify-center">
-              <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
-                <!-- 农业 38.60% (circumference ~ 226) #3FD0FF -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#3FD0FF" stroke-width="15" stroke-dasharray="87.2 138.8" stroke-dashoffset="0" />
-                <!-- 工业 31.78% #1E7BE8 -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#1E7BE8" stroke-width="15" stroke-dasharray="71.8 154.2" stroke-dashoffset="-87.2" />
-                <!-- 城镇公共 12.35% #9BEAFF -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#9BEAFF" stroke-width="15" stroke-dasharray="27.9 198.1" stroke-dashoffset="-159.0" />
-                <!-- 居民生活 7.02% #60a5fa -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#60a5fa" stroke-width="15" stroke-dasharray="15.9 210.1" stroke-dashoffset="-186.9" />
-                <!-- 生态环境 6.85% #9B8CFF (Spec 第四类目) -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#9B8CFF" stroke-width="15" stroke-dasharray="15.5 210.5" stroke-dashoffset="-202.8" />
-                <!-- 其他 3.40% #5D8AAA -->
-                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#5D8AAA" stroke-width="15" stroke-dasharray="7.7 218.3" stroke-dashoffset="-218.3" />
-              </svg>
-              <!-- Center Text Inside Donut -->
-              <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span class="text-[11px] text-[#8FB6D4] font-medium">全行业</span>
-                <span class="text-sm font-bold font-spec-num text-[#9BEAFF]">100%</span>
-              </div>
-            </div>
-
-            <!-- Right: 6 Industry Items List with Volumes & Percentages -->
-            <div class="flex-1 space-y-1.5 text-xs">
-              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#3FD0FF]"></span>
-                  <span class="text-[#DCF2FF] font-medium">农业用水</span>
-                </div>
-                <div class="flex items-center gap-2 font-spec-num">
-                  <span class="text-[#8FB6D4]">23,672万m³</span>
-                  <span class="font-bold text-[#3FD0FF]">38.60%</span>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#1E7BE8]"></span>
-                  <span class="text-[#DCF2FF] font-medium">工业用水</span>
-                </div>
-                <div class="flex items-center gap-2 font-spec-num">
-                  <span class="text-[#8FB6D4]">19,490万m³</span>
-                  <span class="font-bold text-[#9BEAFF]">31.78%</span>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#9BEAFF]"></span>
-                  <span class="text-[#DCF2FF] font-medium">城镇公共</span>
-                </div>
-                <div class="flex items-center gap-2 font-spec-num">
-                  <span class="text-[#8FB6D4]">7,574万m³</span>
-                  <span class="font-bold text-[#DCF2FF]">12.35%</span>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#60a5fa]"></span>
-                  <span class="text-[#DCF2FF] font-medium">居民生活</span>
-                </div>
-                <div class="flex items-center gap-2 font-spec-num">
-                  <span class="text-[#8FB6D4]">4,305万m³</span>
-                  <span class="font-bold text-[#60a5fa]">7.02%</span>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between pb-1 border-b border-[rgba(70,180,235,0.12)] border-dashed">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#9B8CFF]"></span>
-                  <span class="text-[#DCF2FF] font-medium">生态环境</span>
-                </div>
-                <div class="flex items-center gap-2 font-spec-num">
-                  <span class="text-[#8FB6D4]">4,201万m³</span>
-                  <span class="font-bold text-[#9B8CFF]">6.85%</span>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-xs bg-[#5D8AAA]"></span>
-                  <span class="text-[#DCF2FF] font-medium">其他用水</span>
-                </div>
-                <div class="flex items-center gap-2 font-spec-num">
-                  <span class="text-[#8FB6D4]">2,085万m³</span>
-                  <span class="font-bold text-[#8FB6D4]">3.40%</span>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
         </div>
         </template>
 
@@ -1984,10 +2248,10 @@
           </div>
         </div>
 
-        <!-- ================= 行政区划全局统一搜索 (地图左上角，顶部对齐地图图层，整体下移至 top-28，支持收起/展开) ================= -->
+        <!-- ================= 地图主控：行政区划 与 年份筛选 (同一排独立排布) ================= -->
         <div
           id="dev-anno-5"
-          class="absolute top-28 left-6 pointer-events-auto z-30 transition-all duration-300"
+          class="absolute top-28 left-6 pointer-events-auto z-30 transition-all duration-300 flex items-start gap-2.5"
           :class="{ 'ring-2 ring-[#FFB800] rounded-xl shadow-[0_0_28px_rgba(255,184,0,0.7)]': activeAnnotationId === 5 }"
         >
           <!-- Numbered Point 5 Badge (西宁全域 GIS 数字孪生底图 - 核心) -->
@@ -2002,13 +2266,16 @@
           >
             5
           </div>
-          <!-- 1. 收起状态：紧凑胶囊入口 -->
-          <div
-            v-if="isDistrictPanelCollapsed"
-            class="spec-card rounded px-3 py-1.5 shadow-2xl flex items-center gap-2 cursor-pointer hover:border-[#3FD0FF] transition group"
-            @click="isDistrictPanelCollapsed = false"
-            title="点击展开行政区划与全局搜索"
-          >
+
+          <!-- 1. 行政区划主控 (收起状态 / 展开状态) -->
+          <div class="shrink-0">
+            <!-- 1.1 收起状态：紧凑胶囊入口 -->
+            <div
+              v-if="isDistrictPanelCollapsed"
+              class="spec-card rounded px-3 py-1.5 shadow-2xl flex items-center gap-2 cursor-pointer hover:border-[#3FD0FF] transition group h-[34px]"
+              @click="isDistrictPanelCollapsed = false"
+              title="点击展开行政区划与全局搜索"
+            >
             <span class="w-2 h-2 rounded-full bg-[#3FD0FF] shadow-[0_0_6px_#3FD0FF]"></span>
             <span class="text-xs font-semibold text-[#DCF2FF] tracking-wide">行政区划</span>
             <span
@@ -2237,6 +2504,28 @@
             <div v-if="filterParams.district !== '西宁市'" class="mt-2 pt-1.5 border-t border-[#1b4372]/40 flex items-center justify-between text-[10px] text-slate-300">
               <span>{{ filterParams.district }} 监控状态:</span>
               <span class="font-mono text-cyan-300 font-bold">{{ filteredMeterPoints.length }} 测站 · {{ currentDistrictUsersCount }} 重点户</span>
+            </div>
+          </div>
+          </div>
+
+          <!-- 2. 年份筛选单独一栏下拉展示 (与行政区划排在同一排) -->
+          <div class="spec-card rounded px-3 py-1.5 shadow-2xl flex items-center gap-2 border border-[#1E7BE8]/45 backdrop-blur-md select-none shrink-0 h-[34px]">
+            <span class="w-2 h-2 rounded-full bg-[#3FD0FF] shadow-[0_0_6px_#3FD0FF]"></span>
+            <span class="text-xs font-semibold text-[#DCF2FF] tracking-wide font-spec-cn">年份</span>
+            <div class="relative">
+              <select
+                v-model="filterParams.year"
+                class="bg-[#0b2447] border border-[#1b4372] rounded pl-2.5 pr-6 py-0.5 text-[#DCF2FF] text-xs focus:outline-none focus:border-[#3FD0FF] cursor-pointer hover:border-[#3FD0FF]/60 transition font-spec-cn font-medium appearance-none"
+              >
+                <option value="2026">2026年</option>
+                <option value="2025">2025年</option>
+                <option value="2024">2024年</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-1.5 flex items-center text-[#3FD0FF]">
+                <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -3087,7 +3376,7 @@
           <!-- 3 Meter Category Stats -->
           <div class="grid grid-cols-3 gap-1.5 text-center text-xs my-1.5">
             <div class="min-w-0 bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-1.5">
-              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">规模以上农业计量点</div>
+              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">规模以上农业</div>
               <div class="flex justify-around items-center font-spec-num">
                 <div>
                   <span class="text-[10px] text-[#5D8AAA] block font-spec-cn">接入率</span>
@@ -3102,7 +3391,7 @@
             </div>
 
             <div class="min-w-0 bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-1.5">
-              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">规模以上非农计量点</div>
+              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">规模以上非农</div>
               <div class="flex justify-around items-center font-spec-num">
                 <div>
                   <span class="text-[10px] text-[#5D8AAA] block font-spec-cn">接入率</span>
@@ -3117,7 +3406,7 @@
             </div>
 
             <div class="min-w-0 bg-[rgba(10,36,58,0.55)] border border-[rgba(70,180,235,0.2)] rounded-lg p-1.5">
-              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">其他在线计量点</div>
+              <div class="text-xs text-slate-300 font-medium mb-1 font-spec-cn">中央发展资金</div>
               <div class="flex justify-around items-center font-spec-num">
                 <div>
                   <span class="text-[10px] text-[#5D8AAA] block font-spec-cn">接入率</span>
@@ -4585,35 +4874,36 @@ const annotationList = ref<AnnotationItem[]>([
   },
   {
     id: 2,
-    title: '区域用水态势分析 (左1)',
-    source: '全域及7区县取用水数据库，包含计量水量、直报水量、税务水量、许可水量与计划水量五维融合数据，以及2025/2026年度月度用水时序数据。',
-    interaction: '行业类型、水源类型、年份筛选联动；鼠标悬浮柱体或数据节点弹出5维指标对比浮窗；点击区划联动全域地图定位。',
+    title: '区域用水态势分析 (左侧总览)',
+    source: '全域及7区县取用水数据库，包含计量水量、直报水量、税务水量、许可水量与计划水量五维融合数据，以及双年度月度用水时序数据与行业/水源结构数据。',
+    interaction: '与地图左上角行政区划、年份下拉独立筛选栏实时联动；鼠标悬浮柱体或数据节点弹出5维指标对比浮窗；点击区划联动全域地图定位。',
     keyPoints: [
-      '大卡片自上而下依次为筛选条件、五维统计数量、行政区域用水对比图与年度时间趋势。',
+      '左侧单一大卡片自上而下集成：五维统计数量、行政区域用水对比、结构占比分析（行业4类+水源2类）、行政区划用水统计趋势（月度实际vs计划联动）与最后一栏用水时间变化趋势。',
       '三维同色水蓝柱族（计量/直报/税务）与双轨管控折线（许可金黄/计划虚白）在同一SVG坐标系下归一化渲染。',
-      '用水时间趋势仅保留2026年与2025年两条年度序列，年份筛选控制对应曲线高亮。如果选择25年，则显示25年和24年的趋势，依次类推',
+      '新增【行政区划用水统计趋势】：以月维度统计实际用水（柱）与计划用水（折线），与中间行政区划（如城东区、城北区、全市视角等）实时联动重算与超计划红柱告警。',
+      '整体布局紧凑高集成，消除卡片碎片化，提升大屏空间利用率。',
     ],
   },
   {
     id: 3,
-    title: '用水时间变化趋势 (区域内子项)',
-    source: '2025年与2026年逐月用水量时序数据。',
-    interaction: '鼠标悬停任意月份节点展示当月2026年/2025年用水量与同比变化浮窗；年份筛选控制对应曲线高亮。',
+    title: '用水时间变化趋势 (最后一栏)',
+    source: '2025年与2026年逐月用水量时序数据库。',
+    interaction: '鼠标悬停任意月份节点展示当月双年度用水量与同比变化浮窗；与地图左上角年份筛选联动。',
     keyPoints: [
-      '2026年采用平滑贝塞尔曲线叠加天蓝色纵向渐变光晕面积（LinearGradient）。',
-      '2025年采用蓝色虚线对照，便于直观研判年度变化趋势。',
-      '月份坐标轴自适应12个月跨度，提供同比变化率实时计算。',
+      '置于区域用水态势分析卡片的最底部最后一栏。',
+      '采用平滑贝塞尔曲线叠加天蓝色纵向渐变光晕面积（LinearGradient）与虚线对比轴。',
+      '动态呈现所选年份（如2026）与上一年度（如2025）的逐月趋势对比。',
     ],
   },
   {
     id: 4,
-    title: '行业用水结构占比 (左3)',
-    source: '重点取水户行业分类数据库，涵盖规上工业、农业灌区、城镇供水、生态环境及特种行业。',
-    interaction: '环形图扇区悬浮高亮放大；点击行业卡片筛选对应行业用水明细与占比趋势。',
+    title: '行业与水源结构占比 (区域内子项)',
+    source: '重点取水户行业分类数据库及水源地工程供水台账。',
+    interaction: '鼠标悬浮环形图查看对应行业/水源的比例及水量详情。',
     keyPoints: [
-      '采用SVG Ring仪表盘展示规上工业与农业灌区双核心比重。',
-      '提供行业用水量与占比双重指标标注，保证极端小数值依然具备视觉辨识度。',
-      '内嵌结构健康度评估微标签，辅助研判产业节水成效。',
+      '并排左右双栏架构：左侧为行业用水结构占比（仅保留工业、农业、生活、环境 4类），右侧为水源类型占比（地表水与地下水 2类）。',
+      '双 Donut 环形图配合右侧清晰的数据列表与百分比标签，结构一目了然。',
+      '与全域总取水指标相呼应，直观呈现西宁市水资源配置结构。',
     ],
   },
   {
@@ -5952,6 +6242,34 @@ const districtBarData = ref<DistrictWaterItem[]>([
 ]);
 
 const hoveredBarDistrict = ref<DistrictWaterItem | null>(null);
+const hoveredBarDistrictIdx = ref<number | null>(null);
+
+// 行政区域用水对比：悬浮弹窗紧凑跟随柱位动态定位 (无透明度纯实色，控制尺寸不远离)
+const districtBarTooltipStyle = computed(() => {
+  if (hoveredBarDistrictIdx.value === null) return {};
+  const idx = hoveredBarDistrictIdx.value;
+  // SVG viewBox 0 0 380 120，每个柱中心为 54.5 + idx * 46
+  const pctX = ((54.5 + idx * 46) / 380) * 100;
+  if (idx < 4) {
+    return {
+      position: 'absolute' as const,
+      left: `calc(${pctX.toFixed(1)}% + 14px)`,
+      right: 'auto',
+      top: '0px',
+      zIndex: 50,
+      pointerEvents: 'none' as const,
+    };
+  } else {
+    return {
+      position: 'absolute' as const,
+      right: `calc(${(100 - pctX).toFixed(1)}% + 14px)`,
+      left: 'auto',
+      top: '0px',
+      zIndex: 50,
+      pointerEvents: 'none' as const,
+    };
+  }
+});
 
 // 5项指标汇总动态计算 (支持当前区划选中联动或全域总和)
 const districtTotals = computed(() => {
@@ -6057,29 +6375,252 @@ function selectSearchWarning(warn: WarningEventPoint) {
   globalSearchText.value = '';
 }
 
-// 2. 用水时间变化趋势 2项序列: 2026年 (带面积渐变) / 2025年
-interface MonthlyTrendItem {
+// ================= 行政区划用水统计趋势 (以月维度统计实际用水执行与计划用水，与中间行政区划切换联动) =================
+interface DistrictMonthlyWaterRecord {
   month: string;
-  y2026: number;       // 2026年用水量 (万m³)
-  y2025: number;       // 2025年用水量 (万m³)
+  actual: number;   // 实际用水量 (万m³)
+  planned: number;  // 计划指标量 (万m³)
+  rate: number;     // 执行率 (%)
 }
 
-const monthlyTrendData = ref<MonthlyTrendItem[]>([
-  { month: '1月', y2026: 4850, y2025: 4520 },
-  { month: '2月', y2026: 4320, y2025: 4020 },
-  { month: '3月', y2026: 6980, y2025: 6480 },
-  { month: '4月', y2026: 9450, y2025: 8760 },
-  { month: '5月', y2026: 12850, y2025: 11840 },
-  { month: '6月', y2026: 14120, y2025: 13020 },
-  { month: '7月', y2026: 14680, y2025: 13560 },
-  { month: '8月', y2026: 13950, y2025: 12880 },
-  { month: '9月', y2026: 10840, y2025: 10020 },
-  { month: '10月', y2026: 8250, y2025: 7620 },
-  { month: '11月', y2026: 5920, y2025: 5460 },
-  { month: '12月', y2026: 5120, y2025: 4720 },
-]);
+// 7个行政区划基础逐月数据 (实际用水 vs 计划用水)
+// 夏季 (5-8月) 为西宁市及各区用水高峰期，部分重负荷区县在高峰期实际用水略超计划
+const districtMonthlyRawData: Record<string, { actual: number[]; planned: number[] }> = {
+  '城东区': {
+    actual:  [980, 850, 1120, 1340, 1680, 1720, 1850, 1620, 1310, 1080, 950, 890],
+    planned: [1100, 950, 1180, 1300, 1550, 1600, 1700, 1550, 1300, 1150, 1020, 950],
+  },
+  '城中区': {
+    actual:  [620, 540, 710, 790, 880, 920, 960, 890, 780, 690, 610, 580],
+    planned: [750, 650, 780, 850, 950, 980, 1020, 950, 850, 780, 700, 650],
+  },
+  '城西区': {
+    actual:  [720, 640, 810, 910, 1050, 1120, 1180, 1090, 920, 810, 710, 670],
+    planned: [850, 750, 880, 960, 1100, 1150, 1200, 1120, 980, 890, 800, 740],
+  },
+  '城北区': {
+    actual:  [1210, 1080, 1420, 1680, 2150, 2280, 2360, 2110, 1720, 1380, 1190, 1100],
+    planned: [1350, 1200, 1480, 1650, 2000, 2100, 2200, 2050, 1700, 1450, 1300, 1220],
+  },
+  '湟中区': {
+    actual:  [1650, 1420, 2350, 3120, 4280, 4650, 4820, 4390, 3210, 2260, 1750, 1580],
+    planned: [1900, 1650, 2450, 3050, 4000, 4300, 4500, 4100, 3150, 2400, 1950, 1750],
+  },
+  '湟源县': {
+    actual:  [850, 760, 1180, 1420, 1820, 1950, 2020, 1880, 1490, 1180, 920, 810],
+    planned: [1000, 880, 1220, 1450, 1850, 1980, 2050, 1900, 1550, 1280, 1050, 940],
+  },
+  '大通县': {
+    actual:  [1420, 1250, 1850, 2290, 2980, 3190, 3320, 3080, 2460, 1850, 1480, 1330],
+    planned: [1600, 1400, 1920, 2350, 3050, 3250, 3380, 3150, 2550, 2000, 1650, 1480],
+  },
+};
+
+const hoveredDistrictMonthIdx = ref<number | null>(null);
+
+// 当前联动区划的12个月用水统计列表 (选'西宁市'时自动全域7区县矢量加和)
+const currentDistrictMonthlyList = computed<DistrictMonthlyWaterRecord[]>(() => {
+  const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+  const dist = filterParams.value.district;
+
+  if (dist !== '西宁市' && districtMonthlyRawData[dist]) {
+    const raw = districtMonthlyRawData[dist];
+    return months.map((m, idx) => {
+      const actual = raw.actual[idx] ?? 0;
+      const planned = raw.planned[idx] ?? 0;
+      const rate = planned > 0 ? Math.round((actual / planned) * 1000) / 10 : 0;
+      return { month: m, actual, planned, rate };
+    });
+  }
+
+  // 全市聚合 (7区县逐月求和)
+  const keys = Object.keys(districtMonthlyRawData);
+  return months.map((m, idx) => {
+    let actualSum = 0;
+    let plannedSum = 0;
+    for (const k of keys) {
+      actualSum += districtMonthlyRawData[k].actual[idx] ?? 0;
+      plannedSum += districtMonthlyRawData[k].planned[idx] ?? 0;
+    }
+    const rate = plannedSum > 0 ? Math.round((actualSum / plannedSum) * 1000) / 10 : 0;
+    return { month: m, actual: actualSum, planned: plannedSum, rate };
+  });
+});
+
+// 当前区划月度汇总统计卡片指标 (年实际用水、年计划指标、综合执行率)
+const currentDistrictMonthTotals = computed(() => {
+  const list = currentDistrictMonthlyList.value;
+  const totalActual = list.reduce((s, i) => s + i.actual, 0);
+  const totalPlanned = list.reduce((s, i) => s + i.planned, 0);
+  const executionRate = totalPlanned > 0 ? Math.round((totalActual / totalPlanned) * 1000) / 10 : 0;
+  return { totalActual, totalPlanned, executionRate };
+});
+
+// SVG图表坐标与路径计算: viewBox="0 0 380 120"
+const districtMonthChartData = computed(() => {
+  const list = currentDistrictMonthlyList.value;
+  const xStart = 36;
+  const xEnd = 368;
+  const yBaseline = 94;
+  const yTop = 16;
+  const chartHeight = yBaseline - yTop; // 78px
+  const count = list.length;
+  const stepX = (xEnd - xStart) / count;
+  const barWidth = 14;
+
+  const rawMax = Math.max(...list.map(i => Math.max(i.actual, i.planned)), 100);
+  let yMax = 1000;
+  if (rawMax > 12000) yMax = Math.ceil(rawMax / 3000) * 3000;
+  else if (rawMax > 4000) yMax = Math.ceil(rawMax / 1000) * 1000;
+  else if (rawMax > 1500) yMax = Math.ceil(rawMax / 500) * 500;
+  else yMax = Math.ceil(rawMax / 200) * 200;
+
+  // 4刻度点: yTop (yMax), yTop + 26 (yMax * 2/3), yTop + 52 (yMax * 1/3), yBaseline (0)
+  const formatTick = (val: number) => {
+    if (val >= 10000) return `${(val / 10000).toFixed(1)}w`;
+    return String(Math.round(val));
+  };
+  const yTicks = [
+    { label: formatTick(yMax), y: 19 },
+    { label: formatTick((yMax * 2) / 3), y: 45 },
+    { label: formatTick(yMax / 3), y: 71 },
+    { label: '0', y: 97 },
+  ];
+
+  const items = list.map((record, idx) => {
+    const cx = xStart + (idx + 0.5) * stepX;
+    const barX = cx - barWidth / 2;
+    const barHeight = Math.max(2, Math.min(chartHeight, (record.actual / yMax) * chartHeight));
+    const barY = yBaseline - barHeight;
+    const planY = Math.max(yTop, Math.min(yBaseline, yBaseline - (record.planned / yMax) * chartHeight));
+    const isExceeded = record.actual > record.planned;
+
+    return {
+      record,
+      cx,
+      barX,
+      barY,
+      barWidth,
+      barHeight,
+      planY,
+      isExceeded,
+    };
+  });
+
+  const planLinePath = items.map((it, idx) => {
+    return `${idx === 0 ? 'M' : 'L'} ${it.cx.toFixed(1)} ${it.planY.toFixed(1)}`;
+  }).join(' ');
+
+  return {
+    yTicks,
+    items,
+    planLinePath,
+  };
+});
+
+// 行政区划用水统计趋势：悬浮弹窗紧凑跟随月份柱位动态定位 (无透明度纯实色，控制尺寸不远离)
+const districtMonthTooltipStyle = computed(() => {
+  if (hoveredDistrictMonthIdx.value === null) return {};
+  const idx = hoveredDistrictMonthIdx.value;
+  const count = currentDistrictMonthlyList.value.length || 12;
+  const stepX = 332 / count;
+  const cx = 36 + (idx + 0.5) * stepX;
+  const pctX = (cx / 380) * 100;
+  if (idx < 6) {
+    return {
+      position: 'absolute' as const,
+      left: `calc(${pctX.toFixed(1)}% + 12px)`,
+      right: 'auto',
+      top: '0px',
+      zIndex: 50,
+      pointerEvents: 'none' as const,
+    };
+  } else {
+    return {
+      position: 'absolute' as const,
+      right: `calc(${(100 - pctX).toFixed(1)}% + 12px)`,
+      left: 'auto',
+      top: '0px',
+      zIndex: 50,
+      pointerEvents: 'none' as const,
+    };
+  }
+});
+
+// 2. 用水时间变化趋势：双年份对比 (根据地图主控年份下拉动态切换当年与上一年，如 2026 vs 2025、2025 vs 2024 等)
+interface MonthlyTrendItem {
+  month: string;
+  yCur: number;        // 当前选中年份用水量 (万m³)
+  yPrev: number;       // 上一年份同期用水量 (万m³)
+}
+
+const yearlyTrendRaw: Record<string, number[]> = {
+  '2026': [4850, 4320, 6980, 9450, 12850, 14120, 14680, 13950, 10840, 8250, 5920, 5120],
+  '2025': [4520, 4020, 6480, 8760, 11840, 13020, 13560, 12880, 10020, 7620, 5460, 4720],
+  '2024': [4200, 3750, 6050, 8150, 11020, 12100, 12600, 11950,  9300, 7080, 5080, 4380],
+  '2023': [3920, 3500, 5650, 7600, 10250, 11280, 11750, 11150,  8680, 6610, 4740, 4080],
+};
+
+const selectedYearNum = computed(() => parseInt(filterParams.value.year, 10) || 2026);
+const curYearLabel = computed(() => `${selectedYearNum.value}年`);
+const prevYearLabel = computed(() => `${selectedYearNum.value - 1}年`);
+
+const monthlyTrendData = computed<MonthlyTrendItem[]>(() => {
+  const curYStr = String(selectedYearNum.value);
+  const prevYStr = String(selectedYearNum.value - 1);
+  const curArr = yearlyTrendRaw[curYStr] || yearlyTrendRaw['2026'];
+  const prevArr = yearlyTrendRaw[prevYStr] || yearlyTrendRaw['2025'];
+  const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+  return months.map((m, idx) => ({
+    month: m,
+    yCur: curArr[idx],
+    yPrev: prevArr[idx],
+  }));
+});
 
 const hoveredTrendIdx = ref<number | null>(null);
+
+// 用水时间变化趋势：悬浮弹窗紧凑跟随月份节点动态定位 (无透明度纯实色，控制尺寸不远离)
+const trendTooltipStyle = computed(() => {
+  if (hoveredTrendIdx.value === null) return {};
+  const idx = hoveredTrendIdx.value;
+  const count = monthlyTrendData.value.length || 12;
+  const stepX = (368 - 36) / (count - 1);
+  const cx = 36 + idx * stepX;
+  const pctX = (cx / 380) * 100;
+  if (idx < 6) {
+    return {
+      position: 'absolute' as const,
+      left: `calc(${pctX.toFixed(1)}% + 12px)`,
+      right: 'auto',
+      top: '0px',
+      zIndex: 50,
+      pointerEvents: 'none' as const,
+    };
+  } else {
+    return {
+      position: 'absolute' as const,
+      right: `calc(${(100 - pctX).toFixed(1)}% + 12px)`,
+      left: 'auto',
+      top: '0px',
+      zIndex: 50,
+      pointerEvents: 'none' as const,
+    };
+  }
+});
+
+// 行业用水与水源类型结构悬浮明细
+interface StructureDetailItem {
+  type: 'industry' | 'source';
+  name: string;
+  rate: string;
+  volume: string;
+  focus: string;
+  color: string;
+}
+
+const hoveredStructureDetail = ref<StructureDetailItem | null>(null);
+const hoveredStructureSide = ref<'left' | 'right'>('left');
 
 // 平滑曲线路径生成函数
 function getSmoothLinePath(pts: { x: number; y: number }[]): string {
@@ -6109,38 +6650,38 @@ const trendChartData = computed(() => {
   const count = monthlyTrendData.value.length;
   const stepX = (xEnd - xStart) / (count - 1);
 
-  const pts2026 = monthlyTrendData.value.map((d, i) => ({
+  const ptsCur = monthlyTrendData.value.map((d, i) => ({
     x: xStart + i * stepX,
-    y: yBaseline - (d.y2026 / maxY) * (yBaseline - yTop),
-    val: d.y2026,
+    y: yBaseline - (d.yCur / maxY) * (yBaseline - yTop),
+    val: d.yCur,
     item: d
   }));
 
-  const pts2025 = monthlyTrendData.value.map((d, i) => ({
+  const ptsPrev = monthlyTrendData.value.map((d, i) => ({
     x: xStart + i * stepX,
-    y: yBaseline - (d.y2025 / maxY) * (yBaseline - yTop),
-    val: d.y2025,
+    y: yBaseline - (d.yPrev / maxY) * (yBaseline - yTop),
+    val: d.yPrev,
     item: d
   }));
 
-  const line2026 = getSmoothLinePath(pts2026);
-  const area2026 = `${line2026} L ${pts2026[count - 1].x.toFixed(1)},${yBaseline} L ${pts2026[0].x.toFixed(1)},${yBaseline} Z`;
-  const line2025 = getSmoothLinePath(pts2025);
+  const lineCur = getSmoothLinePath(ptsCur);
+  const areaCur = `${lineCur} L ${ptsCur[count - 1].x.toFixed(1)},${yBaseline} L ${ptsCur[0].x.toFixed(1)},${yBaseline} Z`;
+  const linePrev = getSmoothLinePath(ptsPrev);
 
   return {
-    pts2026,
-    pts2025,
-    line2026,
-    area2026,
-    line2025,
+    ptsCur,
+    ptsPrev,
+    lineCur,
+    areaCur,
+    linePrev,
     yBaseline,
   };
 });
 
-// 2026 年较 2025 年同比变化率
+// 当年较前一年同比变化率
 function trendYoY(item: MonthlyTrendItem): string {
-  if (!item.y2025) return '—';
-  const rate = ((item.y2026 - item.y2025) / item.y2025) * 100;
+  if (!item.yPrev) return '—';
+  const rate = ((item.yCur - item.yPrev) / item.yPrev) * 100;
   return `${rate >= 0 ? '+' : ''}${rate.toFixed(1)}%`;
 }
 
@@ -6896,5 +7437,12 @@ function dispatchReviewTask(item: StandardCompareItem) {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Tooltip floating overlay - 绝对定位悬浮展示，不撑开父级或下方图表 */
+.spec-tooltip {
+  position: absolute !important;
+  pointer-events: none !important;
+  z-index: 50 !important;
 }
 </style>

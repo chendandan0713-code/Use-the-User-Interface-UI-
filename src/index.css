@@ -231,14 +231,17 @@ select option:checked {
   color: transparent;
 }
 
-/* Spec Tooltip Container (Section 07) */
+/* Spec Tooltip Container (Section 07) - 完全不透明实色无透光，绝对定位悬浮不撑开容器 */
 .spec-tooltip {
-  position: relative;
-  background: rgba(6, 26, 46, 0.96);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(63, 208, 255, 0.45);
-  box-shadow: 0 12px 30px rgba(0, 10, 20, 0.70), inset 0 0 24px rgba(30, 120, 200, 0.10);
+  position: absolute !important;
+  pointer-events: none !important;
+  z-index: 50 !important;
+  background: #06182c !important;
+  opacity: 1 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(63, 208, 255, 0.65) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95), 0 0 12px rgba(10, 40, 80, 0.7);
 }
 
 .spec-tooltip::before,

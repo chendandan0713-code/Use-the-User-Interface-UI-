@@ -359,7 +359,7 @@
               西宁市
             </text>
 
-            <!-- 4. District Name & Overall Arrival Rate (区名直接落在区域内，下方展示整体到报率) -->
+            <!-- 4. District Name & Current Monitoring Layer Summary -->
             <g
               v-for="district in xiningDistrictsGeo"
               :key="'label-' + district.adcode"
@@ -384,21 +384,7 @@
                   {{ normalizeDistrictName(district.name) }}
                 </text>
                 <text
-                  v-if="scenarioMode !== 'comprehensive' && activeLayers.arrivalRate"
-                  x="0"
-                  y="11"
-                  fill="#9BEAFF"
-                  font-size="9.5"
-                  font-weight="bold"
-                  text-anchor="middle"
-                  font-family="monospace"
-                  filter="drop-shadow(0 1px 3px rgba(0,0,0,0.95))"
-                  pointer-events="none"
-                >
-                  到报率 {{ getDistrictArrivalRate(district.name).overallReportRate }}%
-                </text>
-                <text
-                  v-else-if="scenarioMode === 'comprehensive' && isMapLegendTypeActive('approval')"
+                  v-if="scenarioMode === 'comprehensive' && isMapLegendTypeActive('approval')"
                   x="0"
                   y="11"
                   :fill="getApprovalControlLevel(district.name).strokeColor"
@@ -711,7 +697,7 @@
 
             <!-- 5.1 专项应用场景：区县悬浮详细水量卡片 -->
             <g
-              v-if="hoveredDistrictName && scenarioMode !== 'comprehensive' && !activeLayers.arrivalRate"
+              v-if="hoveredDistrictName && scenarioMode !== 'comprehensive' && !activeLayers.meterMonitoring"
               :transform="(() => {
                 const geo = xiningDistrictsGeo.find(d => d.name === hoveredDistrictName || normalizeDistrictName(d.name) === normalizeDistrictName(hoveredDistrictName));
                 const cx = geo ? geo.center[0] : 500;
@@ -786,58 +772,6 @@
               </text>
             </g>
 
-            <!-- 5.2 专项应用场景：到报率图层悬浮弹窗 (证照 / 在线计量 / 非在线计量) -->
-            <g
-              v-if="hoveredDistrictName && scenarioMode !== 'comprehensive' && activeLayers.arrivalRate"
-              :transform="getArrivalPopupTransform(hoveredDistrictName)"
-              pointer-events="none"
-              class="transition-opacity duration-150 select-none"
-            >
-              <rect
-                x="-154"
-                y="0"
-                width="308"
-                height="172"
-                rx="7"
-                fill="#051326"
-                fill-opacity="0.97"
-                stroke="#2BA8E8"
-                stroke-width="1.2"
-                filter="drop-shadow(0 8px 18px rgba(0,0,0,0.85))"
-              />
-              <circle cx="-138" cy="18" r="3.5" fill="#34d399" />
-              <text x="-128" y="21" fill="#ffffff" font-size="11" font-weight="bold">
-                {{ normalizeDistrictName(hoveredDistrictName) }}
-              </text>
-              <text x="140" y="21" fill="#9BEAFF" font-size="11" font-weight="bold" text-anchor="end" font-family="monospace">
-                整体到报率 {{ getDistrictArrivalRate(hoveredDistrictName).overallReportRate }}%
-              </text>
-              <line x1="-140" y1="29" x2="140" y2="29" stroke="rgba(70,180,235,0.25)" stroke-width="1" />
-
-              <!-- 证照维度 -->
-              <text x="-140" y="45" fill="#ffffff" font-size="9" font-weight="bold">证照维度</text>
-              <text x="-140" y="61" fill="#7f9bb8" font-size="8.5">应接证照数量</text>
-              <text x="-48" y="61" fill="#e2e8f0" font-size="8.5" text-anchor="end" font-family="monospace">{{ getDistrictArrivalRate(hoveredDistrictName).certDue }}</text>
-              <text x="-140" y="77" fill="#7f9bb8" font-size="8.5">已接证照数</text>
-              <text x="-48" y="77" fill="#e2e8f0" font-size="8.5" text-anchor="end" font-family="monospace">{{ getDistrictArrivalRate(hoveredDistrictName).certConnected }}</text>
-              <text x="-140" y="93" fill="#7f9bb8" font-size="8.5">证照接入率</text>
-              <text x="-48" y="93" fill="#9BEAFF" font-size="8.5" text-anchor="end" font-family="monospace">{{ getDistrictArrivalRate(hoveredDistrictName).certAccessRate }}%</text>
-
-              <!-- 在线计量接入情况 -->
-              <text x="-34" y="45" fill="#ffffff" font-size="9" font-weight="bold">在线计量接入情况</text>
-              <text x="-34" y="61" fill="#7f9bb8" font-size="8.5">计量接入率</text>
-              <text x="52" y="61" fill="#e2e8f0" font-size="8.5" text-anchor="end" font-family="monospace">{{ getDistrictArrivalRate(hoveredDistrictName).onlineAccessRate }}%</text>
-              <text x="-34" y="77" fill="#7f9bb8" font-size="8.5">计量到报率</text>
-              <text x="52" y="77" fill="#9BEAFF" font-size="8.5" text-anchor="end" font-family="monospace">{{ getDistrictArrivalRate(hoveredDistrictName).onlineReportRate }}%</text>
-
-              <!-- 非在线计量接入情况 -->
-              <text x="68" y="45" fill="#ffffff" font-size="9" font-weight="bold">非在线计量接入情况</text>
-              <text x="68" y="61" fill="#7f9bb8" font-size="8.5">计量接入率</text>
-              <text x="140" y="61" fill="#e2e8f0" font-size="8.5" text-anchor="end" font-family="monospace">{{ getDistrictArrivalRate(hoveredDistrictName).offlineAccessRate }}%</text>
-              <text x="68" y="77" fill="#7f9bb8" font-size="8.5">计量到报率</text>
-              <text x="140" y="77" fill="#9BEAFF" font-size="8.5" text-anchor="end" font-family="monospace">{{ getDistrictArrivalRate(hoveredDistrictName).offlineReportRate }}%</text>
-            </g>
-
             <!-- 6. Dynamic Interactive Map Layers (点位图层：仅在专项业务应用场景展示，综合应用场景不展示点位) -->
             
             <!-- Layer B: 用水户图层 (规上工业、现代化灌区、自来水厂 - 标点小巧精致) -->
@@ -906,8 +840,10 @@
                 v-for="w in warningEventsList"
                 :key="'warn-' + w.id"
                 :transform="`translate(${w.x}, ${w.y})`"
-                class="cursor-pointer transition-transform duration-150 hover:scale-125"
-                @click="handleEventClick(w.title)"
+                :data-warning-level="w.level"
+                :data-warning-type="w.alarmType"
+                class="cursor-pointer"
+                @click="openWarningEventDetail(w)"
               >
                 <circle
                   cx="0"
@@ -929,15 +865,32 @@
                 <!-- 告警感叹标 (微型精致) -->
                 <line x1="0" y1="-1.6" x2="0" y2="0.5" stroke="#ffffff" stroke-width="0.9" stroke-linecap="round" />
                 <circle cx="0" cy="1.6" r="0.45" fill="#ffffff" />
+                <!-- 告警类型常显标签：仅表达类型，悬浮不展开内容 -->
+                <text
+                  x="0"
+                  y="14"
+                  text-anchor="middle"
+                  font-size="7.8"
+                  font-weight="700"
+                  fill="#FFF4F5"
+                  stroke="#071A2E"
+                  stroke-width="2.6"
+                  paint-order="stroke"
+                  stroke-linejoin="round"
+                  class="pointer-events-none"
+                >
+                  {{ w.alarmType }}
+                </text>
               </g>
             </g>
 
-            <!-- Layer A: 计量点图层 (用颜色严格区分: 正常(绿)、故障(红)、待检定(黄) - 标点小巧紧凑) -->
-            <g v-if="scenarioMode !== 'comprehensive' && activeLayers.meters">
+            <!-- Layer A: 计量点 / 计量监控 / 国控计量点图层 -->
+            <g v-if="scenarioMode !== 'comprehensive' && (activeLayers.meters || activeLayers.meterMonitoring || activeLayers.nationalControl)">
               <g
-                v-for="meter in filteredMeterPoints"
+                v-for="meter in visibleMeterPoints"
                 :key="'meter-' + meter.id"
                 :transform="`translate(${meter.x}, ${meter.y})`"
+                :data-meter-status="meter.meterStatus"
                 class="cursor-pointer"
                 @click="openMeterDetail(meter)"
                 @mouseenter="hoveredMeterPoint = meter"
@@ -945,6 +898,28 @@
               >
                 <!-- 透明碰撞层 (Hit Area): 适中鼠标捕获半径，防止悬浮抖动 -->
                 <circle cx="0" cy="0" r="14" fill="transparent" />
+
+                <!-- 国控计量点：金色双环与菱形外框，状态色仍由中心点位表达 -->
+                <template v-if="activeLayers.nationalControl">
+                  <polygon
+                    points="0,-8.5 8.5,0 0,8.5 -8.5,0"
+                    fill="none"
+                    stroke="#FFD043"
+                    stroke-width="1.2"
+                    filter="drop-shadow(0 0 5px rgba(255,208,67,0.75))"
+                    pointer-events="none"
+                  />
+                  <circle
+                    cx="0"
+                    cy="0"
+                    r="6.1"
+                    fill="none"
+                    stroke="#FFE89B"
+                    stroke-width="0.65"
+                    stroke-dasharray="1.5 1"
+                    pointer-events="none"
+                  />
+                </template>
 
                 <!-- 悬浮高亮外光晕 (小巧平滑渐变) -->
                 <circle
@@ -1071,7 +1046,7 @@
                   cx="-95"
                   cy="-45"
                   r="3.5"
-                  :fill="hoveredMeterPoint.meterStatus === 'normal' ? '#10b981' : hoveredMeterPoint.meterStatus === 'fault' ? '#ef4444' : '#f59e0b'"
+                  :fill="getMeterStatusColor(hoveredMeterPoint.meterStatus)"
                   pointer-events="none"
                 />
                 <text x="-85" y="-42" fill="#00e5ff" font-size="10" font-family="monospace" font-weight="bold" pointer-events="none">
@@ -1081,12 +1056,12 @@
                   x="96"
                   y="-42"
                   text-anchor="end"
-                  :fill="hoveredMeterPoint.meterStatus === 'normal' ? '#34d399' : hoveredMeterPoint.meterStatus === 'fault' ? '#f87171' : '#fbbf24'"
+                  :fill="getMeterStatusColor(hoveredMeterPoint.meterStatus)"
                   font-size="10"
                   font-weight="bold"
                   pointer-events="none"
                 >
-                  {{ hoveredMeterPoint.meterStatus === 'normal' ? '● 正常' : hoveredMeterPoint.meterStatus === 'fault' ? '▲ 故障' : '◆ 待检定' }}
+                  {{ getMeterStatusLabel(hoveredMeterPoint.meterStatus) }}
                 </text>
 
                 <!-- 测站名称 -->
@@ -2203,7 +2178,7 @@
               <div class="flex items-center justify-between text-xs font-semibold text-[#DCF2FF] shrink-0">
                 <div class="flex items-center gap-1.5">
                   <span class="text-[#3FD0FF] font-bold">|</span>
-                  <span>下级管理单位设施状态</span>
+                  <span>中央发展资金年度统计</span>
                   <span class="text-[10px] text-[#8FB6D4] font-normal">(与上方总量联动)</span>
                 </div>
                 <span class="text-[9px] text-[#FFC65C] font-spec-cn">
@@ -2368,7 +2343,7 @@
                 <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">计量设施状态监控</h2>
               </div>
               <span class="text-[9px] text-[#8FB6D4] font-spec-cn">
-                近24小时 · 合计
+                当天事件 · 合计
                 <b class="ml-1 text-[#FFC65C] font-spec-num">{{ meterAbnormalStats.reduce((sum, item) => sum + item.count, 0) }}</b>
                 条
               </span>
@@ -2639,7 +2614,7 @@
                        <div class="flex items-center justify-between pb-1.5 mb-1.5">
               <div class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-[#3FD0FF] shadow-[0_0_6px_#3FD0FF]"></span>
-                <span class="text-xs font-semibold text-[#E4F6FF] tracking-wide">行政区划 · 全省市州搜索</span>
+                <span class="text-xs font-semibold text-[#E4F6FF] tracking-wide">行政区划</span>
               </div>
               <div class="flex items-center gap-1.5">
                 <button
@@ -2666,8 +2641,8 @@
             </div>
             <div class="spec-header-divider mb-2"></div>
 
-            <!-- Global Unified Search Input -->
-            <div class="relative">
+            <!-- Global Unified Search Input (由三级下拉替代，保留检索能力供后续扩展) -->
+            <div v-if="false" class="relative">
               <div class="flex items-center bg-[#07172f] border border-[#1b4372] focus-within:border-cyan-400 rounded-lg px-2.5 py-1.5 transition">
                 <svg class="w-3.5 h-3.5 text-cyan-400 shrink-0 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -2737,9 +2712,9 @@
                       </div>
                       <span
                         class="text-[10px] px-1.5 py-0.2 rounded shrink-0 font-medium"
-                        :class="m.meterStatus === 'normal' ? 'bg-slate-800 text-slate-300 border border-slate-700' : m.meterStatus === 'fault' ? 'bg-rose-950/60 text-rose-300 border border-rose-500/30' : 'bg-amber-950/60 text-amber-300 border border-amber-500/30'"
+                        :class="getMeterStatusBadgeClass(m.meterStatus)"
                       >
-                        {{ m.meterStatus === 'normal' ? '正常' : m.meterStatus === 'fault' ? '故障' : '待检' }}
+                        {{ getMeterStatusLabel(m.meterStatus) }}
                       </span>
                     </div>
                   </div>
@@ -2770,6 +2745,8 @@
                     </div>
                   </div>
                 </div>
+
+
 
                 <!-- 4. 预警事件匹配结果 -->
                 <div v-if="matchedWarnings.length > 0" class="pt-1.5">
@@ -2806,56 +2783,49 @@
               </div>
             </div>
 
-            <!-- Province → City → County hierarchy -->
-            <div class="mt-2 pt-2 border-t border-[#1b4372]/60">
-              <div class="text-[10px] font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>行政层级切换</span>
-                <span class="text-[9px] text-[#5D8AAA] font-spec-cn">省 / 市州</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <button
-                  type="button"
-                  class="h-7 px-2 rounded border text-[10px] font-medium transition cursor-pointer shrink-0"
-                  :class="selectedAdministrativeRegion === '青海省'
-                    ? 'bg-[#0b3155] border-[#3FD0FF] text-[#DCF2FF] shadow-[0_0_8px_rgba(63,208,255,0.28)]'
-                    : 'bg-[#07172f] border-[#1b4372] text-[#8FB6D4] hover:border-[#3FD0FF]/60 hover:text-white'"
-                  @click="selectAdministrativeRegion('青海省')"
+            <!-- Province → City → County hierarchy: one horizontal control row -->
+            <div class="mt-2 pt-2 border-t border-[#1b4372]/60 grid grid-cols-3 gap-1.5">
+              <div class="relative min-w-0">
+                <select
+                  id="admin-province-select"
+                  v-model="selectedAdministrativeProvince"
+                  class="dashboard-dark-select w-full h-7 border border-[#3FD0FF]/35 rounded pl-2 pr-5 text-[9.5px] text-[#DCF2FF] focus:outline-none focus:border-[#3FD0FF] cursor-pointer appearance-none transition"
+                  aria-label="选择省级行政区"
                 >
-                  青海省
-                </button>
-                <svg class="w-3 h-3 text-[#4C7FA5] shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
-                  <path d="M6 3l4 5-4 5" />
+                  <option value="青海省">青海省</option>
+                </select>
+                <svg class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 text-[#3FD0FF]" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
-                <div class="relative min-w-0 flex-1">
-                  <select
-                    v-model="selectedAdministrativeCity"
-                    class="dashboard-dark-select w-full h-7 bg-[#07172f] border border-[#1b4372] rounded pl-2 pr-6 text-[10px] text-[#DCF2FF] focus:outline-none focus:border-[#3FD0FF] cursor-pointer appearance-none transition"
-                    aria-label="选择市州"
-                  >
-                    <option v-for="city in qinghaiCityOptions" :key="city" :value="city">{{ city }}</option>
-                  </select>
-                  <svg class="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#3FD0FF]" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </div>
               </div>
-            </div>
 
-            <!-- Quick District Switcher Pills (行政区划快捷检索切换) -->
-            <div v-if="selectedAdministrativeCity === '西宁市'" class="mt-2 pt-2 border-t border-[#1b4372]/60">
-              <div class="grid grid-cols-4 gap-1 text-[11px]">
-                <button
-                  v-for="dist in quickDistrictList"
-                  :key="dist"
-                  type="button"
-                  class="py-1 px-1 rounded text-center transition cursor-pointer border truncate text-[11px]"
-                  :class="selectedAdministrativeRegion === dist
-                    ? 'bg-cyan-500/30 text-cyan-200 border-cyan-400/80 font-bold shadow-[0_0_6px_rgba(6,182,212,0.3)]'
-                    : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white'"
-                  @click="selectSearchDistrict(dist)"
+              <div class="relative min-w-0">
+                <select
+                  id="admin-city-select"
+                  v-model="selectedAdministrativeCity"
+                  class="dashboard-dark-select w-full h-7 border border-[#3FD0FF]/35 rounded pl-2 pr-5 text-[9.5px] text-[#DCF2FF] focus:outline-none focus:border-[#3FD0FF] cursor-pointer appearance-none transition"
+                  aria-label="选择市州"
                 >
-                  {{ dist === '西宁市' ? '全域' : dist.replace(/区|县/, '') }}
-                </button>
+                  <option v-for="city in qinghaiCityOptions" :key="city" :value="city">{{ city }}</option>
+                </select>
+                <svg class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 text-[#3FD0FF]" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
+
+              <div class="relative min-w-0">
+                <select
+                  id="admin-county-select"
+                  v-model="selectedAdministrativeCounty"
+                  class="dashboard-dark-select w-full h-7 border border-[#3FD0FF]/35 rounded pl-2 pr-5 text-[9.5px] text-[#DCF2FF] focus:outline-none focus:border-[#3FD0FF] cursor-pointer appearance-none transition"
+                  aria-label="选择区县"
+                >
+                  <option value="">全部区县</option>
+                  <option v-for="county in administrativeCountyOptions" :key="county" :value="county">{{ county }}</option>
+                </select>
+                <svg class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 text-[#3FD0FF]" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
               </div>
             </div>
 
@@ -2920,7 +2890,7 @@
 
         <!-- ================= Floating Map Controls (Top Right of Center Area - 顶部对齐行政区划，统一 top-28) ================= -->
         <div class="absolute top-40 right-4 pointer-events-auto z-30 flex flex-col items-end gap-2">
-          <!-- Layer Toolbox (综合场景: 用水户叠加; 专项场景: 计量点 / 到报率 / 预警事件) -->
+          <!-- Layer Toolbox (综合场景: 用水户叠加; 专项场景: 计量点 / 计量监控 / 预警事件) -->
           <div class="spec-card flex flex-col rounded-xl p-2.5 shadow-2xl text-xs w-[120px] 2xl:w-[128px]">
             <!-- Header -->
             <div class="px-1 py-0.5 flex items-center justify-between border-b border-[rgba(70,180,235,0.2)] mb-1.5">
@@ -3029,7 +2999,7 @@
                     : 'text-[#8FB6D4] hover:text-white'"
                   :aria-pressed="activeLayers.meters"
                   @click="toggleMeterLayer"
-                  title="展示西宁全域计量点分布与运行状态"
+                  title="展示西宁全域计量点分布；开启后将关闭其他专项地图图层"
                 >
                   <span class="map-layer-hex-shell">
                     <span class="map-layer-hex">
@@ -3044,31 +3014,54 @@
                   <span class="text-[10px] leading-none whitespace-nowrap font-medium">计量点</span>
                 </button>
 
-                <!-- 2. 到报率图层 -->
+                <!-- 2. 计量设施运行状态监控图层 -->
                 <button
                   type="button"
                   class="map-layer-tile group relative min-h-[64px] px-1 py-1.5 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200"
-                  :class="activeLayers.arrivalRate
-                    ? 'is-active text-emerald-100'
+                  :class="activeLayers.meterMonitoring
+                    ? 'is-active text-cyan-100'
                     : 'text-[#8FB6D4] hover:text-white'"
-                  :aria-pressed="activeLayers.arrivalRate"
-                  @click="activeLayers.arrivalRate = !activeLayers.arrivalRate"
-                  title="在行政区划内展示整体到报率，悬浮可查看证照、在线计量与非在线计量接入情况"
+                  :aria-pressed="activeLayers.meterMonitoring"
+                  @click="toggleMeterMonitoringLayer"
+                  title="展示五类计量设施状态；可点击图例筛选单一状态"
                 >
                   <span class="map-layer-hex-shell">
                     <span class="map-layer-hex">
                       <svg class="w-[18px] h-[18px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="8.5" />
-                        <path d="M8.5 15.5a5 5 0 0 1 7 0" />
-                        <path d="M6.5 13a8 8 0 0 1 11 0" />
+                        <path d="M12 12l4-3" />
+                        <path d="M7.8 16.4h8.4" />
                         <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" />
                       </svg>
                     </span>
                   </span>
-                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">到报率</span>
+                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">计量监控</span>
                 </button>
 
-                <!-- 3. 预警事件图层 -->
+                <!-- 3. 国控计量点图层 -->
+                <button
+                  type="button"
+                  class="map-layer-tile group relative min-h-[64px] px-1 py-1.5 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200"
+                  :class="activeLayers.nationalControl
+                    ? 'is-active text-amber-100'
+                    : 'text-[#8FB6D4] hover:text-white'"
+                  :aria-pressed="activeLayers.nationalControl"
+                  @click="toggleNationalControlLayer"
+                  title="展示国控计量点；开启后将关闭其他专项地图图层"
+                >
+                  <span class="map-layer-hex-shell">
+                    <span class="map-layer-hex">
+                      <svg class="w-[18px] h-[18px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3 21 8l-9 5-9-5z" />
+                        <path d="M5 10.5V16l7 4 7-4v-5.5" />
+                        <circle cx="12" cy="8" r="1.3" fill="currentColor" stroke="none" />
+                      </svg>
+                    </span>
+                  </span>
+                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">国控计量点</span>
+                </button>
+
+                <!-- 4. 预警事件图层 -->
                 <button
                   type="button"
                   class="map-layer-tile group relative min-h-[64px] px-1 py-1.5 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200"
@@ -3076,8 +3069,8 @@
                     ? 'is-active text-rose-100'
                     : 'text-[#8FB6D4] hover:text-white'"
                   :aria-pressed="activeLayers.warnings"
-                  @click="activeLayers.warnings = !activeLayers.warnings"
-                  title="展示超许可预警 / 设备离线等告警点位"
+                  @click="toggleWarningLayer"
+                  title="展示预警事件点位；开启后将关闭其他专项地图图层"
                 >
                   <span class="map-layer-hex-shell">
                     <span class="map-layer-hex">
@@ -3095,7 +3088,11 @@
         </div>
 
         <!-- ================= Fully Visible Map Legend (Bottom-Left of Center Area) ================= -->
-        <div class="map-legend-filter absolute bottom-16 left-6 pointer-events-auto z-30">
+        <div
+          v-if="scenarioMode !== 'special' || hasActiveSpecialMapLayer"
+          data-map-legend
+          class="map-legend-filter absolute bottom-16 left-6 pointer-events-auto z-30"
+        >
           <div
             class="spec-card rounded-xl p-2.5 shadow-2xl transition-all duration-200"
             :class="scenarioMode === 'comprehensive'
@@ -3109,8 +3106,8 @@
                   <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#3FD0FF" stroke-width="1.2" fill="none" />
                   <circle cx="8" cy="8" r="2" fill="#3FD0FF" />
                 </svg>
-                <span class="text-xs font-bold text-white tracking-wide font-spec-cn">
-                  {{ scenarioMode === 'comprehensive' ? '专题图层图例' : '西宁全域监控图例' }}
+                <span data-legend-title class="text-xs font-bold text-white tracking-wide font-spec-cn">
+                  {{ mapLegendTitle }}
                 </span>
               </div>
               <div class="flex items-center gap-2">
@@ -3214,108 +3211,122 @@
                 </div>
               </template>
 
-              <!-- B. 专项业务应用场景图例：极简风格 (计量点3色状态、用水户纵向展示、预警事件保留) -->
+              <!-- B. 专项业务应用场景：当前图层对应图例，统一纵向展示 -->
               <template v-else>
-                <!-- 1. 计量点运行状态 (仅展示正常、故障、待检定三个颜色) -->
-                <div>
+                <!-- 1. 计量点图层 -->
+                <template v-if="activeLayers.meters">
                   <div class="text-[11px] font-semibold text-slate-300 mb-1.5 font-spec-cn flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                       <span class="w-1.5 h-1.5 rounded-full bg-[#00E5FF]"></span>
                       <span>计量点运行状态</span>
                     </div>
-                    <span class="text-[10px] text-[#5D8AAA] font-spec-num">{{ meterStats.total }}处</span>
+                    <span class="text-[10px] text-[#5D8AAA] font-spec-num">{{ districtMeterPoints.length }}处</span>
                   </div>
-                  <div class="flex items-center justify-between px-2 py-1.5 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.18)] text-[11px] font-spec-cn">
-                    <!-- 正常 (绿色) -->
-                    <div
-                      class="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition"
-                      :class="meterStatusFilter === 'normal' ? 'text-emerald-300 font-bold' : 'text-slate-200'"
-                      @click="meterStatusFilter = meterStatusFilter === 'normal' ? 'all' : 'normal'"
-                      title="点击筛选正常站点"
+                  <div class="space-y-1">
+                    <button
+                      v-for="item in meterPointLegendItems"
+                      :key="item.key"
+                      type="button"
+                      class="w-full min-h-7 px-2 flex items-center gap-2 rounded border text-left transition cursor-pointer"
+                      :class="meterStatusFilter === item.status
+                        ? 'border-[rgba(63,208,255,0.52)] bg-[rgba(30,123,232,0.22)]'
+                        : 'border-transparent bg-[rgba(10,36,58,0.42)] hover:bg-[rgba(30,123,232,0.12)]'"
+                      @click="meterStatusFilter = meterStatusFilter === item.status ? 'all' : item.status"
                     >
-                      <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] shadow-[0_0_6px_#10b981] border border-white/60"></span>
-                      <span>正常</span>
-                    </div>
-
-                    <!-- 故障 (红色) -->
-                    <div
-                      class="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition"
-                      :class="meterStatusFilter === 'fault' ? 'text-rose-300 font-bold' : 'text-slate-200'"
-                      @click="meterStatusFilter = meterStatusFilter === 'fault' ? 'all' : 'fault'"
-                      title="点击筛选故障站点"
-                    >
-                      <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444] shadow-[0_0_6px_#ef4444] border border-white/60"></span>
-                      <span>故障</span>
-                    </div>
-
-                    <!-- 待检定 (橙黄色) -->
-                    <div
-                      class="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition"
-                      :class="meterStatusFilter === 'pending' ? 'text-amber-300 font-bold' : 'text-slate-200'"
-                      @click="meterStatusFilter = meterStatusFilter === 'pending' ? 'all' : 'pending'"
-                      title="点击筛选待检定站点"
-                    >
-                      <span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_6px_#f59e0b] border border-white/60"></span>
-                      <span>待检定</span>
-                    </div>
+                      <span
+                        class="shrink-0 shadow-[0_0_6px_rgba(255,255,255,0.2)]"
+                        :class="item.iconClass"
+                        :style="{ backgroundColor: item.color, borderColor: item.borderColor }"
+                      ></span>
+                      <span class="text-[11px] text-[#DCF2FF]">{{ item.label }}</span>
+                      <span class="ml-auto text-[12px] font-bold font-spec-num" :style="{ color: item.color }">{{ item.value }}</span>
+                    </button>
                   </div>
-                </div>
+                </template>
 
-                <!-- 2. 用水户类型 (保留纵向展示) -->
-                <div class="pt-1.5 border-t border-[rgba(70,180,235,0.18)]">
+                <!-- 2. 计量监控图层 -->
+                <template v-else-if="activeLayers.meterMonitoring">
                   <div class="text-[11px] font-semibold text-slate-300 mb-1.5 font-spec-cn flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                      <span class="w-1.5 h-1.5 rounded-full bg-[#38BDF8]"></span>
-                      <span>用水户类型</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#3FD0FF]"></span>
+                      <span>计量设施状态</span>
                     </div>
-                    <span class="text-[10px] text-[#5D8AAA] font-spec-num">{{ waterUsersList.length }}户</span>
+                    <span class="text-[10px] text-[#5D8AAA] font-spec-cn">当前区划</span>
                   </div>
-                  <!-- 纵向展示 -->
-                  <div class="space-y-1.5 px-2 py-1.5 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.18)] text-[11px] font-spec-cn text-slate-200">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 bg-[#38bdf8] rotate-45 border border-white/80 shrink-0"></span>
-                        <span class="text-[#DCF2FF]">规上工业</span>
-                      </div>
-                      <span class="text-[10px] text-[#5D8AAA] font-spec-num">5户</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-xs bg-[#00e5ff] border border-white/80 shrink-0"></span>
-                        <span class="text-[#DCF2FF]">规上农业</span>
-                      </div>
-                      <span class="text-[10px] text-[#5D8AAA] font-spec-num">3处</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-[#818cf8] border border-white/80 shrink-0"></span>
-                        <span class="text-[#DCF2FF]">公共供水</span>
-                      </div>
-                      <span class="text-[10px] text-[#5D8AAA] font-spec-num">2座</span>
-                    </div>
+                  <div class="space-y-1">
+                    <button
+                      v-for="item in meterMonitoringLegendItems"
+                      :key="item.key"
+                      type="button"
+                      class="w-full flex items-center gap-2 min-h-7 px-2 rounded border text-left transition cursor-pointer"
+                      :class="monitoringStatusFilter === item.filter
+                        ? 'border-[rgba(63,208,255,0.65)] bg-[rgba(30,123,232,0.24)] shadow-[0_0_8px_rgba(63,208,255,0.12)]'
+                        : 'border-transparent bg-[rgba(10,36,58,0.42)] hover:border-[rgba(63,208,255,0.3)] hover:bg-[rgba(30,123,232,0.14)]'"
+                      :aria-pressed="monitoringStatusFilter === item.filter"
+                      :title="item.filter === 'all' ? '展示全部计量点' : `仅展示${item.label}`"
+                      @click="selectMeterMonitoringStatus(item.filter)"
+                    >
+                      <span
+                        class="shrink-0"
+                        :class="item.iconClass"
+                        :style="{ backgroundColor: item.color, borderColor: item.borderColor }"
+                      ></span>
+                      <span class="text-[11px] font-medium text-[#DCF2FF]">{{ item.label }}</span>
+                      <span class="ml-auto text-[12px] font-bold font-spec-num" :style="{ color: item.color }">
+                        {{ item.value }}
+                        <span class="text-[8px] font-normal text-[#5D8AAA]">处</span>
+                      </span>
+                    </button>
                   </div>
-                </div>
+                </template>
 
-                <!-- 3. 预警事件展示保留 -->
-                <div class="pt-1.5 border-t border-[rgba(70,180,235,0.18)]">
+                <!-- 3. 国控计量点图层 -->
+                <template v-else-if="activeLayers.nationalControl">
+                  <div class="text-[11px] font-semibold text-slate-300 mb-1.5 font-spec-cn flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2 h-2 rotate-45 border border-[#FFD043] bg-[#FFD043]/20 shadow-[0_0_6px_rgba(255,208,67,0.55)]"></span>
+                      <span>国控计量点</span>
+                    </div>
+                    <span class="text-[10px] text-[#FFD88C] font-spec-num">{{ nationalControlMeterPoints.length }}处</span>
+                  </div>
+                  <div class="space-y-1">
+                    <div
+                      v-for="item in nationalControlLegendItems"
+                      :key="item.key"
+                      class="min-h-7 px-2 flex items-center gap-2 rounded bg-[rgba(10,36,58,0.42)] border border-transparent"
+                    >
+                      <span
+                        class="shrink-0"
+                        :class="item.iconClass"
+                        :style="{ backgroundColor: item.color, borderColor: item.borderColor }"
+                      ></span>
+                      <span class="text-[11px] text-[#DCF2FF]">{{ item.label }}</span>
+                      <span class="ml-auto text-[12px] font-bold font-spec-num" :style="{ color: item.color }">{{ item.value }}</span>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- 4. 预警事件图层 -->
+                <template v-else-if="activeLayers.warnings">
                   <div class="text-[11px] font-semibold text-slate-300 mb-1.5 font-spec-cn flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                       <span class="w-1.5 h-1.5 rounded-full bg-[#ef4444]"></span>
-                      <span>预警事件展示</span>
+                      <span>预警事件</span>
                     </div>
                     <span class="text-[10px] text-[#5D8AAA] font-spec-num">{{ warningEventsList.length }}起</span>
                   </div>
-                  <div class="flex items-center justify-between px-2 py-1.5 rounded bg-[rgba(10,36,58,0.5)] border border-[rgba(70,180,235,0.18)] text-[11px] font-spec-cn text-slate-200">
-                    <div class="flex items-center gap-1.5">
-                      <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shrink-0"></span>
-                      <span>高风险预警</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
-                      <span>中/低风险预警</span>
+                  <div class="space-y-1">
+                    <div
+                      v-for="item in warningLegendItems"
+                      :key="item.key"
+                      class="min-h-7 px-2 flex items-center gap-2 rounded bg-[rgba(10,36,58,0.42)] border border-transparent"
+                    >
+                      <span class="w-2.5 h-2.5 rounded-full border border-white/65 shrink-0" :style="{ backgroundColor: item.color, boxShadow: `0 0 6px ${item.color}` }"></span>
+                      <span class="text-[11px] text-[#DCF2FF]">{{ item.label }}</span>
+                      <span class="ml-auto text-[12px] font-bold font-spec-num" :style="{ color: item.color }">{{ item.value }}</span>
                     </div>
                   </div>
-                </div>
+                </template>
               </template>
             </div>
           </div>
@@ -4088,12 +4099,10 @@
             <div class="mt-1.5 pt-1.5 border-t border-[rgba(70,180,235,0.22)]">
               <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5 font-spec-cn">
                 <div class="flex items-center gap-1.5">
-                  <span class="text-[#00E5FF] font-bold">|</span>
                   <span class="text-white">运维单位能效排名</span>
                   <span class="text-[9.5px] text-[#5D8AAA] font-normal font-spec-cn">区域滚动展示</span>
                 </div>
                 <div class="text-[10px] text-[#5D8AAA] font-spec-num">
-                  平均响应: <span class="text-[#00E5FF] font-bold">{{ operationEfficiencyMetrics.avgResolutionTime }}h</span>
                   <span class="mx-1 text-slate-600">|</span>
                   成功率: <span class="text-[#3DDC97] font-bold">{{ operationEfficiencyMetrics.successRate }}%</span>
                 </div>
@@ -4137,18 +4146,12 @@
                         <span class="text-slate-500">/</span>
                         <span class="font-spec-num">{{ team.totalOrders }}</span>
                       </div>
-
-                      <!-- 平均时效 -->
-                      <div class="text-[11px] px-1.5 py-0.2 rounded bg-[#071d37] border border-[rgba(70,180,235,0.2)] text-[#00E5FF]">
-                        {{ team.avgHours }}h
-                      </div>
-
                       <!-- 能效得分 -->
                       <div class="flex items-center gap-1 min-w-[58px] justify-end">
                         <span class="font-bold text-sm" :class="team.rank <= 2 ? 'text-[#00E5FF]' : team.rank === 3 ? 'text-[#FFC65C]' : 'text-[#38BDF8]'">
                           {{ team.score }}
                         </span>
-                        <span class="text-[10px] text-[#5D8AAA] font-spec-cn">分</span>
+                        <span class="text-[10px] text-[#5D8AAA] font-spec-cn">%</span>
                       </div>
                     </div>
                   </div>
@@ -4225,7 +4228,7 @@
                 <div class="flex items-center gap-2 text-[10px] font-spec-cn">
                   <div class="flex items-center gap-1">
                     <span class="w-2 h-2 rounded-xs bg-[#00E5FF]"></span>
-                    <span class="text-slate-300">当前取水</span>
+                    <span class="text-slate-300">计量水量</span>
                   </div>
                   <div class="flex items-center gap-1">
                     <span class="w-2 h-2 rounded-xs bg-[#38BDF8]"></span>
@@ -4237,7 +4240,7 @@
                   </div>
                   <div class="flex items-center gap-1">
                     <span class="w-2 h-2 rounded-xs bg-[#8AAEC8]"></span>
-                    <span class="text-slate-300">许可剩余</span>
+                    <span class="text-slate-300">许可水量</span>
                   </div>
                 </div>
               </div>
@@ -4329,7 +4332,7 @@
                   <span class="text-[#00E5FF] font-bold">|</span>
                   <span>取水数据差值比对</span>
                 </span>
-                <span class="text-[10px] text-[#5D8AAA]">框内滚动 / 支持下发指令</span>
+                <span class="text-[10px] text-[#5D8AAA]">框内滚动</span>
               </div>
 
               <!-- Difference Table (Scrollable within container) -->
@@ -4338,11 +4341,10 @@
                   <thead class="sticky top-0 z-10 bg-[#071F38] shadow-xs">
                     <tr class="text-[#5D8AAA] border-b border-[rgba(70,180,235,0.25)] text-[10px]">
                       <th class="py-1 px-1.5 font-medium font-spec-cn bg-[#071F38]">分析对象</th>
-                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">当前(万m³)</th>
+                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">当前计量(万m³)</th>
                       <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">同期均值/偏差</th>
                       <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">当月计划</th>
-                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">许可剩余</th>
-                      <th class="py-1 px-1.5 text-center font-medium font-spec-cn bg-[#071F38]">复核操作</th>
+                      <th class="py-1 px-1 text-right font-medium font-spec-cn bg-[#071F38]">许可水量</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-[rgba(70,180,235,0.12)] divide-dashed text-slate-300 text-[11px] font-spec-num">
@@ -4387,22 +4389,6 @@
                       <td class="py-1.5 px-1 text-right text-slate-200 font-bold">
                         {{ item.licensedRemaining }}
                       </td>
-
-                      <!-- Action: Dispatch Review Task Button -->
-                      <td class="py-1.5 px-1.5 text-center font-spec-cn">
-                        <button
-                          v-if="item.isAbnormal"
-                          type="button"
-                          @click="dispatchReviewTask(item)"
-                          class="px-2 py-0.5 rounded bg-[#00E5FF]/20 hover:bg-[#00E5FF]/30 text-[#00E5FF] border border-[#00E5FF]/50 font-bold text-[10px] shadow-sm cursor-pointer transition active:scale-95 whitespace-nowrap"
-                          title="下发复核指令"
-                        >
-                          下发复核
-                        </button>
-                        <span v-else class="text-[10px] text-[#3DDC97] bg-[#3DDC97]/10 px-1.5 py-0.5 rounded border border-[#3DDC97]/30">
-                          正常受控
-                        </span>
-                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -4414,7 +4400,7 @@
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse"></span>
                 <span class="text-slate-300 text-[11px] font-spec-cn">
-                  复核任务流转跟踪：<span class="text-white font-bold font-spec-num">{{ reviewTaskList.length }}</span> 件在线
+                  水量对比偏差总量<span class="text-white font-bold font-spec-num">{{ reviewTaskList.length }}</span> 件
                 </span>
               </div>
               <button
@@ -4422,8 +4408,6 @@
                 @click="showReviewTaskModal = true"
                 class="text-[11px] text-[#00E5FF] hover:text-[#79D8FF] transition flex items-center gap-0.5 cursor-pointer font-medium font-spec-cn"
               >
-                <span>任务看板与反馈跟踪</span>
-                <span>&gt;</span>
               </button>
             </div>
           </div>
@@ -4512,6 +4496,153 @@
             @click="dispatchWarningWorkOrder"
           >
             下发督办工单
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 6-1. MODAL: 预警点位告警信息 ================= -->
+    <div
+      v-if="showWarningEventDetailModal && selectedWarningEvent"
+      data-warning-detail
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 font-spec-cn"
+      @click.self="closeWarningEventDetail"
+    >
+      <div class="spec-card rounded-xl shadow-2xl w-full max-w-3xl max-h-[88vh] overflow-hidden text-white animate-scale-in border border-[rgba(70,180,235,0.4)] flex flex-col">
+        <div class="px-5 py-3.5 bg-gradient-to-r from-[#071F38] to-[#0A2E50] border-b border-[rgba(70,180,235,0.3)] flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span
+              class="relative w-5 h-5 flex items-center justify-center rounded-full border shrink-0"
+              :style="{
+                borderColor: `${getWarningLevelColor(selectedWarningEvent.level)}80`,
+                backgroundColor: `${getWarningLevelColor(selectedWarningEvent.level)}18`,
+              }"
+            >
+              <svg
+                class="w-3 h-3"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                :style="{ color: getWarningLevelColor(selectedWarningEvent.level) }"
+              >
+                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path>
+                <line x1="12" x2="12" y1="9" y2="13"></line>
+                <line x1="12" x2="12.01" y1="17" y2="17"></line>
+              </svg>
+            </span>
+            <span class="font-bold text-sm tracking-wide text-[#E4F6FF]">计量点告警信息</span>
+            <span
+              class="px-2 py-0.5 rounded border text-[9px] font-bold shrink-0"
+              :style="{
+                color: getWarningLevelColor(selectedWarningEvent.level),
+                borderColor: `${getWarningLevelColor(selectedWarningEvent.level)}70`,
+                backgroundColor: `${getWarningLevelColor(selectedWarningEvent.level)}14`,
+              }"
+            >
+              {{ selectedWarningEvent.levelLabel }}
+            </span>
+          </div>
+          <button
+            type="button"
+            class="text-[#5D8AAA] hover:text-white p-1 rounded hover:bg-white/10 transition cursor-pointer"
+            title="关闭告警信息"
+            @click="closeWarningEventDetail"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-4 xl:p-5 overflow-y-auto custom-dark-scrollbar">
+          <div class="mb-3 flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="text-[9.5px] text-[#5D8AAA]">当前计量点</div>
+              <div class="mt-1 text-sm font-bold text-[#E4F6FF] leading-snug break-words">{{ selectedWarningEvent.facilityName }}</div>
+              <div class="mt-1 text-[10px] text-[#8FB6D4]">{{ selectedWarningEvent.enterprise }} · {{ selectedWarningEvent.district }}</div>
+            </div>
+            <div class="shrink-0 text-right">
+              <div class="text-[9.5px] text-[#5D8AAA]">告警类型</div>
+              <div
+                class="mt-1 px-2.5 py-1 rounded border text-[11px] font-bold"
+                :style="{
+                  color: getWarningLevelColor(selectedWarningEvent.level),
+                  borderColor: `${getWarningLevelColor(selectedWarningEvent.level)}65`,
+                  backgroundColor: `${getWarningLevelColor(selectedWarningEvent.level)}16`,
+                }"
+              >
+                {{ selectedWarningEvent.alarmType }}
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-[rgba(70,180,235,0.24)] bg-[rgba(5,20,38,0.66)] overflow-hidden">
+            <div class="grid grid-cols-[86px_minmax(0,1fr)_86px_minmax(0,1fr)] text-[11px] leading-relaxed">
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">单号</div>
+              <div class="px-2.5 py-2 text-[#DCF2FF] font-spec-num break-all border-b border-r border-[rgba(70,180,235,0.16)]">{{ selectedWarningEvent.orderNo }}</div>
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">超时情况</div>
+              <div class="px-2.5 py-2 border-b border-[rgba(70,180,235,0.16)]">
+                <span
+                  class="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                  :class="selectedWarningEvent.timeoutStatus === '未超时'
+                    ? 'text-[#71E7B4] bg-[#3DDC97]/12'
+                    : 'text-[#FF9AA4] bg-[#FF6B7A]/12'"
+                >
+                  {{ selectedWarningEvent.timeoutStatus }}
+                </span>
+              </div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">工单状态</div>
+              <div class="px-2.5 py-2 border-b border-r border-[rgba(70,180,235,0.16)]">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold text-[#FFD88C] bg-[#FFC65C]/12">{{ selectedWarningEvent.orderStatus }}</span>
+              </div>
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">工单类型</div>
+              <div class="px-2.5 py-2 border-b border-[rgba(70,180,235,0.16)]">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold text-[#9BEAFF] bg-[#3FD0FF]/10">{{ selectedWarningEvent.orderType }}</span>
+              </div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">计量设施名称</div>
+              <div class="col-span-3 px-2.5 py-2 text-[#DCF2FF] border-b border-[rgba(70,180,235,0.16)] break-words">{{ selectedWarningEvent.facilityName }}</div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">计量设施编码</div>
+              <div class="px-2.5 py-2 text-[#DCF2FF] font-spec-num break-all border-b border-r border-[rgba(70,180,235,0.16)]">{{ selectedWarningEvent.facilityCode }}</div>
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">最新告警时间</div>
+              <div class="px-2.5 py-2 text-[#DCF2FF] font-spec-num border-b border-[rgba(70,180,235,0.16)]">{{ selectedWarningEvent.latestAlarmTime }}</div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">告警内容</div>
+              <div class="col-span-3 px-2.5 py-2 text-[#DCF2FF] border-b border-[rgba(70,180,235,0.16)] break-words">{{ selectedWarningEvent.alarmContent }}</div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">工单处置时间</div>
+              <div class="col-span-3 px-2.5 py-2 text-[#DCF2FF] font-spec-num border-b border-[rgba(70,180,235,0.16)] break-words">{{ selectedWarningEvent.disposalTimeRange }}</div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">运维单位</div>
+              <div class="px-2.5 py-2 text-[#DCF2FF] border-b border-r border-[rgba(70,180,235,0.16)] break-words">{{ selectedWarningEvent.maintenanceUnit }}</div>
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">运维人员</div>
+              <div class="px-2.5 py-2 text-[#DCF2FF] border-b border-[rgba(70,180,235,0.16)]">{{ selectedWarningEvent.maintenancePerson }}</div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">联系电话</div>
+              <div class="px-2.5 py-2 text-[#DCF2FF] font-spec-num border-b border-r border-[rgba(70,180,235,0.16)]">{{ selectedWarningEvent.contactPhone }}</div>
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">处理附件</div>
+              <div class="px-2.5 py-2 text-[#8FB6D4] border-b border-[rgba(70,180,235,0.16)]">{{ selectedWarningEvent.attachments }}</div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-b border-r border-[rgba(70,180,235,0.16)]">产生告警原因</div>
+              <div class="col-span-3 px-2.5 py-2 text-[#DCF2FF] border-b border-[rgba(70,180,235,0.16)] break-words">{{ selectedWarningEvent.alarmCause }}</div>
+
+              <div class="px-2.5 py-2 text-[#7FA4C0] bg-white/[0.025] border-r border-[rgba(70,180,235,0.16)]">处理情况</div>
+              <div class="col-span-3 px-2.5 py-2 text-[#DCF2FF] break-words">{{ selectedWarningEvent.handlingStatus }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-5 py-3 bg-[rgba(4,14,26,0.9)] border-t border-[rgba(70,180,235,0.2)] flex justify-end text-xs shrink-0">
+          <button
+            type="button"
+            class="px-4 py-1.5 rounded border border-[rgba(70,180,235,0.3)] text-slate-300 hover:bg-white/10 cursor-pointer"
+            @click="closeWarningEventDetail"
+          >
+            关闭
           </button>
         </div>
       </div>
@@ -4848,24 +4979,19 @@
           <div class="flex items-center gap-2 min-w-0">
             <span
               class="w-2.5 h-2.5 rounded-full shrink-0"
-              :class="selectedMeterPoint.meterStatus === 'normal'
-                ? 'bg-[#3DDC97] shadow-[0_0_6px_#3DDC97]'
-                : selectedMeterPoint.meterStatus === 'fault'
-                  ? 'bg-[#FF6B7A] shadow-[0_0_6px_#FF6B7A]'
-                  : 'bg-[#FFC65C] shadow-[0_0_6px_#FFC65C]'"
+              :style="{
+                backgroundColor: getMeterStatusColor(selectedMeterPoint.meterStatus),
+                boxShadow: `0 0 6px ${getMeterStatusColor(selectedMeterPoint.meterStatus)}`,
+              }"
             ></span>
             <h3 class="text-sm font-bold text-white truncate tracking-wide font-spec-cn">
               {{ selectedMeterPoint.name }}
             </h3>
             <span
               class="px-1.5 py-0.2 rounded text-[10px] font-bold border shrink-0 font-spec-cn"
-              :class="selectedMeterPoint.meterStatus === 'normal'
-                ? 'bg-[#3DDC97]/20 text-[#3DDC97] border-[#3DDC97]/40'
-                : selectedMeterPoint.meterStatus === 'fault'
-                  ? 'bg-[#FF6B7A]/20 text-[#FF6B7A] border-[#FF6B7A]/40'
-                  : 'bg-[#FFC65C]/20 text-[#FFC65C] border-[#FFC65C]/40'"
+              :class="getMeterStatusBadgeClass(selectedMeterPoint.meterStatus)"
             >
-              {{ selectedMeterPoint.meterStatus === 'normal' ? '正常' : selectedMeterPoint.meterStatus === 'fault' ? '故障' : '待检定' }}
+              {{ getMeterStatusLabel(selectedMeterPoint.meterStatus) }}
             </span>
           </div>
 
@@ -4937,22 +5063,31 @@
             <span class="text-[#FFC65C] font-bold shrink-0">定检催告:</span>
             <span>{{ selectedMeterPoint.pendingReason || '法定周期已满，请安排送检核验' }}</span>
           </div>
+          <div
+            v-else-if="selectedMeterPoint.meterStatus === 'offline'"
+            class="p-2.5 rounded-lg bg-slate-800/50 border border-[#8FB6D4]/35 text-[11px] text-slate-300 flex items-start gap-1.5 font-spec-cn"
+          >
+            <span class="text-[#B9D1E5] font-bold shrink-0">停用说明:</span>
+            <span>{{ selectedMeterPoint.offlineReason || '计量设施按计划停用，当前不参与实时监控' }}</span>
+          </div>
         </div>
 
         <!-- 弹窗底栏极简按钮 -->
         <div class="px-4 py-2.5 bg-[#06152b] border-t border-[#1b4372] flex items-center justify-between text-xs">
-          <span class="text-slate-400 text-[10px]">{{ selectedMeterPoint.district }} · 遥测在线</span>
+          <span class="text-slate-400 text-[10px]">
+            {{ selectedMeterPoint.district }} ·
+            {{ selectedMeterPoint.meterStatus === 'offline' ? '设备停用' : selectedMeterPoint.meterStatus === 'fault' ? '通信异常' : '遥测在线' }}
+          </span>
           <div class="flex items-center gap-2">
             <button
-              v-if="selectedMeterPoint.meterStatus === 'fault'"
               type="button"
-              class="px-3 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-medium transition cursor-pointer text-xs"
-              @click="dispatchMeterWorkOrder"
+              class="px-3 py-1 rounded bg-[#2f80ed] hover:bg-[#246fcf] text-white font-medium transition cursor-pointer text-xs"
+              @click="openMeterWaterDetail"
             >
-              抢修派单
+              水量查看
             </button>
             <button
-              v-else-if="selectedMeterPoint.meterStatus === 'pending'"
+              v-if="selectedMeterPoint.meterStatus === 'pending'"
               type="button"
               class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white font-medium transition cursor-pointer text-xs"
               @click="bookMeterVerification"
@@ -4967,6 +5102,207 @@
               关闭
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 2-1. MODAL: 计量点水量详情 (静态数据展示) ================= -->
+    <div
+      v-if="showMeterWaterModal && selectedMeterPoint"
+      data-meter-water-detail
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 font-spec-cn"
+      @click.self="closeMeterWaterDetail"
+    >
+      <div class="w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-lg border border-[rgba(70,180,235,0.52)] bg-[linear-gradient(145deg,#071C33_0%,#0A2948_50%,#071A2E_100%)] text-[#DCF2FF] shadow-[0_24px_80px_rgba(0,6,18,0.72)] animate-scale-in flex flex-col">
+        <div class="h-12 px-5 bg-gradient-to-r from-[#071F38] via-[#0A2E50] to-[#0C3A62] border-b border-[rgba(70,180,235,0.35)] flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 2.7 6.8 8.1a7.35 7.35 0 1 0 10.4 0Z"></path>
+              <path d="M9.5 14.5a3.4 3.4 0 0 0 3.4 3.4"></path>
+            </svg>
+            <h3 class="shrink-0 text-base font-bold text-[#E4F6FF] tracking-wide whitespace-nowrap">计量水量</h3>
+            <span class="h-4 w-px bg-[#2A5A85]"></span>
+            <span class="text-[11px] text-[#8FB6D4] truncate">{{ selectedMeterPoint.name }}</span>
+          </div>
+          <button
+            type="button"
+            class="w-8 h-8 flex items-center justify-center rounded text-[#8FB6D4] hover:text-white hover:bg-white/10 transition cursor-pointer"
+            title="关闭水量详情"
+            @click="closeMeterWaterDetail"
+          >
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="min-h-0 flex-1 grid lg:grid-cols-[250px_minmax(0,1fr)]">
+          <aside class="min-h-0 overflow-y-auto bg-[rgba(5,20,38,0.84)] border-b lg:border-b-0 lg:border-r border-[rgba(70,180,235,0.25)] text-[11px]">
+            <div class="bg-gradient-to-r from-[#0C4B78] to-[#082A49] border-l-2 border-[#3FD0FF] px-5 py-2 text-[#E4F6FF] text-[12px] font-bold">基本信息</div>
+            <div class="px-5 py-3 space-y-3">
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">计量设施编码:</span>
+                <span class="font-spec-num text-[#9BEAFF] break-all">{{ selectedMeterPoint.meterCode }}</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">计量设施名称:</span>
+                <span class="text-[#DCF2FF] leading-relaxed break-words">{{ selectedMeterPoint.userEnterprise }}<br>{{ selectedMeterPoint.name }}</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">数据来源:</span>
+                <span class="text-[#DCF2FF]">{{ getMeterWaterSource(selectedMeterPoint) }}</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">流域:</span>
+                <span class="text-[#DCF2FF]">--</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">上报方式:</span>
+                <span class="text-[#DCF2FF]">{{ getMeterWaterReportMethod(selectedMeterPoint) }}</span>
+              </div>
+            </div>
+
+            <div class="mt-2 bg-gradient-to-r from-[#0C4B78] to-[#082A49] border-l-2 border-[#3FD0FF] px-5 py-2 text-[#E4F6FF] text-[12px] font-bold">水量统计</div>
+            <div class="px-5 py-3 space-y-3">
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-baseline">
+                <span class="text-[#7FA4C0]">本月计量水量:</span>
+                <span class="text-[13px] font-bold text-[#DCF2FF] font-spec-num">
+                  {{ getMeterMonthVolume(selectedMeterPoint).toFixed(4) }}<small class="ml-0.5 text-[9px] font-normal text-[#5D8AAA]">万m³</small>
+                </span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-baseline">
+                <span class="text-[#7FA4C0]">本年计量水量:</span>
+                <span class="text-[13px] font-bold text-[#9BEAFF] font-spec-num">
+                  {{ getMeterYearVolume(selectedMeterPoint).toFixed(4) }}<small class="ml-0.5 text-[9px] font-normal text-[#5D8AAA]">万m³</small>
+                </span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">年度证照水量合计:</span>
+                <span class="text-[#DCF2FF] font-spec-num">--</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">年度直报水量:</span>
+                <span class="text-[#DCF2FF] font-spec-num">--</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">年度税务申报水量:</span>
+                <span class="text-[#DCF2FF] font-spec-num">--</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">年许可水量:</span>
+                <span class="text-[#DCF2FF] font-spec-num">--</span>
+              </div>
+              <div class="grid grid-cols-[82px_minmax(0,1fr)] gap-2 items-start">
+                <span class="text-[#7FA4C0]">年取水计划量:</span>
+                <span class="text-[#DCF2FF] font-spec-num">--</span>
+              </div>
+            </div>
+          </aside>
+
+          <section class="min-h-0 overflow-y-auto bg-[radial-gradient(circle_at_top_left,rgba(28,91,139,0.2),transparent_46%)] px-4 py-3 xl:px-5">
+            <div class="flex items-center gap-1.5 text-[16px] font-bold text-[#9BEAFF]">
+              <span>水量统计</span>
+              <span class="mt-1 block h-[3px] w-8 rounded-full bg-[#3FD0FF] shadow-[0_0_8px_rgba(63,208,255,0.55)]"></span>
+            </div>
+
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3 text-[11px]">
+                <span class="min-w-10 px-4 py-1.5 text-center bg-[#146EB4] border border-[#3FD0FF]/55 text-white shadow-[0_0_10px_rgba(63,208,255,0.18)]">日</span>
+                <span class="min-w-10 px-3 py-1.5 text-center text-[#8FB6D4] border border-transparent">月</span>
+                <span class="min-w-10 px-3 py-1.5 text-center text-[#8FB6D4] border border-transparent">季度</span>
+                <span class="min-w-10 px-3 py-1.5 text-center text-[#8FB6D4] border border-transparent">年</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="h-8 min-w-[250px] px-3 bg-[rgba(7,31,56,0.9)] border border-[rgba(70,180,235,0.32)] flex items-center justify-between text-[10px] text-[#9BEAFF] font-spec-num">
+                  <span>2026-06-01</span>
+                  <span class="text-[#5D8AAA]">至</span>
+                  <span>2026-08-25</span>
+                  <svg class="w-3.5 h-3.5 text-[#5D8AAA]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+                    <path d="M16 3v4M8 3v4M3 10h18"></path>
+                  </svg>
+                </div>
+                <span class="h-8 px-4 bg-[#0E74B8] border border-[#3FD0FF]/45 text-white text-[11px] flex items-center shadow-[0_0_10px_rgba(63,208,255,0.16)]">查询</span>
+              </div>
+            </div>
+
+            <div class="relative mt-4 bg-[rgba(4,16,31,0.72)] border border-[rgba(70,180,235,0.24)] px-3 pt-3 pb-2">
+              <div class="absolute top-8 left-7 text-[10px] text-[#7FA4C0]">水量(m³)</div>
+              <div class="absolute top-3 right-4 text-[10px] text-[#9BEAFF] font-spec-num">29,268.43</div>
+              <svg
+                class="block w-full h-[250px] xl:h-[280px]"
+                viewBox="0 0 780 280"
+                preserveAspectRatio="none"
+                role="img"
+                :aria-label="`${selectedMeterPoint.name}计量水量趋势`"
+              >
+                <g stroke="rgba(70,180,235,0.19)" stroke-width="1">
+                  <line x1="58" y1="28" x2="758" y2="28"></line>
+                  <line x1="58" y1="68" x2="758" y2="68"></line>
+                  <line x1="58" y1="108" x2="758" y2="108"></line>
+                  <line x1="58" y1="148" x2="758" y2="148"></line>
+                  <line x1="58" y1="188" x2="758" y2="188"></line>
+                  <line x1="58" y1="228" x2="758" y2="228" stroke="rgba(70,180,235,0.38)"></line>
+                </g>
+                <g fill="#7FA4C0" font-size="9" text-anchor="end" font-family="monospace">
+                  <text x="48" y="31">25,000</text>
+                  <text x="48" y="71">20,000</text>
+                  <text x="48" y="111">15,000</text>
+                  <text x="48" y="151">10,000</text>
+                  <text x="48" y="191">5,000</text>
+                  <text x="48" y="231">0</text>
+                </g>
+                <g fill="#5D8AAA" font-size="8" text-anchor="middle" font-family="monospace">
+                  <text x="70" y="250">2026-06-01</text>
+                  <text x="145" y="250">2026-06-10</text>
+                  <text x="220" y="250">2026-06-19</text>
+                  <text x="295" y="250">2026-06-28</text>
+                  <text x="370" y="250">2026-07-07</text>
+                  <text x="445" y="250">2026-07-16</text>
+                  <text x="520" y="250">2026-07-25</text>
+                  <text x="595" y="250">2026-08-03</text>
+                  <text x="670" y="250">2026-08-12</text>
+                  <text x="745" y="250">2026-08-21</text>
+                </g>
+                <rect x="428" y="44" width="8" height="184" fill="#3FD0FF"></rect>
+                <rect x="447" y="88" width="8" height="140" fill="#2BA8E8"></rect>
+                <rect x="484" y="66" width="264" height="25" fill="#FF6B7A" opacity="0.26"></rect>
+                <g stroke="#FF8A95" stroke-width="1" opacity="0.4">
+                  <line x1="528" y1="66" x2="528" y2="91"></line>
+                  <line x1="570" y1="66" x2="570" y2="91"></line>
+                  <line x1="612" y1="66" x2="612" y2="91"></line>
+                  <line x1="654" y1="66" x2="654" y2="91"></line>
+                  <line x1="696" y1="66" x2="696" y2="91"></line>
+                </g>
+              </svg>
+              <div class="pointer-events-none absolute left-[24%] top-[42%] min-w-[150px] rounded-md border border-[rgba(70,180,235,0.38)] bg-[#082540] px-3 py-2 text-[11px] text-[#DCF2FF] shadow-[0_4px_16px_rgba(0,0,0,0.35)]">
+                <div class="font-spec-num">2026-06-01</div>
+                <div class="mt-1">计量水量: <b class="font-spec-num text-[#9BEAFF]">{{ getMeterDailyDisplayVolume(selectedMeterPoint).toLocaleString('zh-CN') }}m³</b></div>
+              </div>
+            </div>
+
+            <div class="mt-3 border border-[rgba(70,180,235,0.24)] bg-[rgba(5,20,38,0.62)]">
+              <div class="grid grid-cols-[72px_1fr_1.25fr_1fr] bg-[#0B3354] text-[11px] text-[#9BEAFF] font-semibold">
+                <div class="px-3 py-2 text-center border-r border-[rgba(70,180,235,0.2)]">序号</div>
+                <div class="px-3 py-2 text-center border-r border-[rgba(70,180,235,0.2)]">日期</div>
+                <div class="px-3 py-2 text-center border-r border-[rgba(70,180,235,0.2)]">计量水量（m³）</div>
+                <div class="px-3 py-2 text-center">数据状态</div>
+              </div>
+              <div class="grid grid-cols-[72px_1fr_1.25fr_1fr] text-[11px] text-[#DCF2FF] border-t border-[rgba(70,180,235,0.18)]">
+                <div class="px-3 py-2.5 text-center border-r border-[rgba(70,180,235,0.18)] font-spec-num">1</div>
+                <div class="px-3 py-2.5 text-center border-r border-[rgba(70,180,235,0.18)] font-spec-num">2026-08-24</div>
+                <div class="px-3 py-2.5 text-center border-r border-[rgba(70,180,235,0.18)] font-spec-num">{{ getMeterDailyDisplayVolume(selectedMeterPoint).toLocaleString('zh-CN') }}</div>
+                <div class="px-3 py-2.5 text-center text-[#3DDC97]">正常</div>
+              </div>
+              <div class="grid grid-cols-[72px_1fr_1.25fr_1fr] text-[11px] text-[#DCF2FF] border-t border-[rgba(70,180,235,0.18)]">
+                <div class="px-3 py-2.5 text-center border-r border-[rgba(70,180,235,0.18)] font-spec-num">2</div>
+                <div class="px-3 py-2.5 text-center border-r border-[rgba(70,180,235,0.18)] font-spec-num">2026-08-23</div>
+                <div class="px-3 py-2.5 text-center border-r border-[rgba(70,180,235,0.18)] font-spec-num">{{ getMeterPreviousDayVolume(selectedMeterPoint).toLocaleString('zh-CN') }}</div>
+                <div class="px-3 py-2.5 text-center text-[#FF8A95]">极大值、负值</div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -5607,10 +5943,10 @@ const annotationList = ref<AnnotationItem[]>([
     id: 5,
     title: '西宁全域 GIS 数字孪生底图 (核心)',
     source: '西宁市国土三调矢量底图、湟水河全水系地理矢量、区县审批管控占比、超许可计量点及三类超计划告警数据。',
-    interaction: '行政区划支持青海省市州下拉与西宁区县快捷切换；年份使用深色下拉；专题图层可在右上角独立开关。',
+    interaction: '行政区划按省级、市州、区县三级顺序下拉；年份使用深色下拉；专题图层可在右上角独立开关。',
     keyPoints: [
       '筛选区整体下移，行政区划、年份与图层控制在指标看板下方统一排布。',
-      '行政层级支持青海省全部市州下拉选择；选中西宁市时显示7个区县快捷入口，并保留统一搜索。',
+      '行政层级采用省级、市州、区县三级下拉，下级选项随上级区划联动更新。',
       '三项专题图层分别对应审批管控占比、计量超许可点位与直报/税务/执行超计划。',
       '图层1按行政区划四档填色并显示占比；图层2以脉冲告警点位展示超许可计量点。',
       '图层3在7个行政区分别展示蓝色透明悬浮标签，点击任一标签展开本区三类告警明细气泡。',
@@ -5811,7 +6147,7 @@ const filterParams = ref({
   year: '2026',
 });
 
-// ================= 青海省 → 西宁市 → 区县 三级行政区划 =================
+// ================= 青海省 → 市州 → 区县 三级行政区划 =================
 const xiningCountyList = ['城东区', '城中区', '城西区', '城北区', '湟中区', '湟源县', '大通县'];
 const qinghaiCityOptions = [
   '西宁市',
@@ -5823,8 +6159,18 @@ const qinghaiCityOptions = [
   '玉树藏族自治州',
   '海西蒙古族藏族自治州',
 ];
-const quickDistrictList = ['西宁市', ...xiningCountyList];
-const searchableAdministrativeRegions = ['青海省', ...qinghaiCityOptions, ...xiningCountyList];
+const qinghaiCountyOptionsByCity: Record<string, string[]> = {
+  '西宁市': xiningCountyList,
+  '海东市': ['乐都区', '平安区', '民和回族土族自治县', '互助土族自治县', '化隆回族自治县', '循化撒拉族自治县'],
+  '海北藏族自治州': ['门源回族自治县', '祁连县', '海晏县', '刚察县'],
+  '黄南藏族自治州': ['同仁市', '尖扎县', '泽库县', '河南蒙古族自治县'],
+  '海南藏族自治州': ['共和县', '同德县', '贵德县', '兴海县', '贵南县'],
+  '果洛藏族自治州': ['玛沁县', '班玛县', '甘德县', '达日县', '久治县', '玛多县'],
+  '玉树藏族自治州': ['玉树市', '杂多县', '称多县', '治多县', '囊谦县', '曲麻莱县'],
+  '海西蒙古族藏族自治州': ['德令哈市', '格尔木市', '茫崖市', '乌兰县', '都兰县', '天峻县'],
+};
+const allAdministrativeCountyOptions = Object.values(qinghaiCountyOptionsByCity).flat();
+const searchableAdministrativeRegions = ['青海省', ...qinghaiCityOptions, ...allAdministrativeCountyOptions];
 const selectedAdministrativeRegion = ref('西宁市');
 
 const administrativeSelectionLabel = computed(() => {
@@ -5832,10 +6178,22 @@ const administrativeSelectionLabel = computed(() => {
   return selectedAdministrativeRegion.value;
 });
 
+const selectedAdministrativeProvince = computed({
+  get: () => '青海省',
+  set: (province: string) => {
+    if (province === '青海省') {
+      selectAdministrativeRegion('青海省');
+    }
+  },
+});
+
 const selectedAdministrativeCity = computed({
   get: () => {
     const region = selectedAdministrativeRegion.value;
-    if (region === '青海省' || xiningCountyList.includes(region)) return '西宁市';
+    if (region === '青海省') return '西宁市';
+    const countyCity = Object.entries(qinghaiCountyOptionsByCity)
+      .find(([, counties]) => counties.includes(region))?.[0];
+    if (countyCity) return countyCity;
     return qinghaiCityOptions.includes(region) ? region : '西宁市';
   },
   set: (city: string) => {
@@ -5845,8 +6203,28 @@ const selectedAdministrativeCity = computed({
   },
 });
 
+const administrativeCountyOptions = computed(() => qinghaiCountyOptionsByCity[selectedAdministrativeCity.value] || []);
+
+const selectedAdministrativeCounty = computed({
+  get: () => {
+    const region = selectedAdministrativeRegion.value;
+    return allAdministrativeCountyOptions.includes(region) ? region : '';
+  },
+  set: (county: string) => {
+    if (county) {
+      selectAdministrativeRegion(county);
+      return;
+    }
+    selectAdministrativeRegion(selectedAdministrativeCity.value);
+  },
+});
+
 function selectAdministrativeRegion(region: '青海省' | '西宁市' | string) {
-  if (region !== '青海省' && !qinghaiCityOptions.includes(region) && !xiningCountyList.includes(region)) return;
+  if (
+    region !== '青海省'
+    && !qinghaiCityOptions.includes(region)
+    && !allAdministrativeCountyOptions.includes(region)
+  ) return;
   selectedAdministrativeRegion.value = region;
 }
 
@@ -5888,15 +6266,16 @@ onUnmounted(() => {
   document.removeEventListener('pointerdown', handleYearOutsidePointer);
 });
 
-// Layer Toggles (综合场景: 三项专题图层；专项场景: 计量点 / 到报率 / 预警事件)
+// Layer Toggles (综合场景: 三项专题图层；专项场景: 计量点 / 计量监控 / 国控计量点 / 预警事件)
 const activeLayers = ref({
   approvalRatio: true, // 综合应用场景图层1：审批管控占比
   meterOver: true,     // 综合应用场景图层2：计量超许可点位
   overPlanLabel: true, // 综合应用场景图层3：直报/税务/执行超计划悬浮标签
-  arrivalRate: true,  // 专项应用场景：行政区划内整体到报率图层
+  meterMonitoring: true, // 专项应用场景：计量设施运行状态监控图层
   users: false,       // 综合应用场景：重点用水户可选叠加
-  meters: true,       // 专项应用场景：计量点
-  warnings: true,     // 专项应用场景：预警事件
+  meters: false,      // 专项应用场景：计量点
+  nationalControl: false, // 专项应用场景：国控计量点
+  warnings: false,    // 专项应用场景：预警事件
 });
 
 // ================= 水量使用情况 4个等级定义与区域映射 =================
@@ -6896,11 +7275,16 @@ function resetDistrictQuotas() {
 }
 
 
-// 计量点状态筛选 (全部 / 正常 / 故障 / 待检定)
-const meterStatusFilter = ref<'all' | 'normal' | 'fault' | 'pending'>('all');
+// 计量点状态筛选 (全部 / 正常 / 停用 / 故障 / 待检定)
+type MeterStatus = 'normal' | 'offline' | 'fault' | 'pending';
+type MeterStatusFilter = 'all' | MeterStatus;
+
+const meterStatusFilter = ref<MeterStatusFilter>('all');
+const monitoringStatusFilter = ref<MeterStatusFilter>('all');
 
 // 计量点详情弹窗与悬浮提示状态
 const showMeterDetailModal = ref(false);
+const showMeterWaterModal = ref(false);
 const selectedMeterPoint = ref<MeterPoint | null>(null);
 const hoveredMeterPoint = ref<MeterPoint | null>(null);
 
@@ -6912,7 +7296,7 @@ interface MeterPoint {
   installLocation: string;   // 安装位置
   lastCheckDate: string;     // 上次检定日期
   nextCheckDate: string;     // 下次检定日期
-  meterStatus: 'normal' | 'fault' | 'pending'; // 计量状态: 正常 | 故障 | 待检定
+  meterStatus: MeterStatus;  // 计量状态: 正常 | 停用 | 故障 | 待检定
   district: string;          // 行政区划
   userEnterprise: string;    // 所属用水户
   waterType: string;         // 水源类型
@@ -6923,8 +7307,57 @@ interface MeterPoint {
   checkCycle: string;        // 检定周期
   faultDesc?: string;        // 故障描述 (若故障)
   pendingReason?: string;    // 待检说明 (若待检定)
+  offlineReason?: string;    // 停用说明 (若停用)
   x: number;                 // SVG x 坐标
   y: number;                 // SVG y 坐标
+}
+
+function getMeterStatusLabel(status: MeterStatus): string {
+  if (status === 'normal') return '正常';
+  if (status === 'offline') return '停用';
+  if (status === 'fault') return '故障';
+  return '待检定';
+}
+
+function getMeterStatusColor(status: MeterStatus): string {
+  if (status === 'normal') return '#10b981';
+  if (status === 'offline') return '#8FB6D4';
+  if (status === 'fault') return '#ef4444';
+  return '#f59e0b';
+}
+
+function getMeterStatusBadgeClass(status: MeterStatus): string {
+  if (status === 'normal') return 'bg-[#3DDC97]/15 text-[#71E7B4] border-[#3DDC97]/35';
+  if (status === 'offline') return 'bg-[#8FB6D4]/12 text-[#B9D1E5] border-[#8FB6D4]/30';
+  if (status === 'fault') return 'bg-[#FF6B7A]/15 text-[#FF9AA4] border-[#FF6B7A]/35';
+  return 'bg-[#FFC65C]/15 text-[#FFD88C] border-[#FFC65C]/35';
+}
+
+function getMeterWaterSource(meter: MeterPoint): string {
+  if (meter.waterType.includes('市政') || meter.waterType.includes('公共')) return '公共供水（计量）';
+  return '自计量（计量）';
+}
+
+function getMeterWaterReportMethod(meter: MeterPoint): string {
+  return meter.meterStatus === 'offline' ? '人工上报' : '协议接收';
+}
+
+function getMeterDailyDisplayVolume(meter: MeterPoint): number {
+  return meter.dailyAccumulated > 0
+    ? meter.dailyAccumulated
+    : Math.max(120, Math.round(meter.instantFlow * 12));
+}
+
+function getMeterMonthVolume(meter: MeterPoint): number {
+  return (getMeterDailyDisplayVolume(meter) * 21) / 10000;
+}
+
+function getMeterYearVolume(meter: MeterPoint): number {
+  return getMeterMonthVolume(meter) * 8.6;
+}
+
+function getMeterPreviousDayVolume(meter: MeterPoint): number {
+  return Math.max(1, Math.round(getMeterDailyDisplayVolume(meter) * 0.86));
 }
 
 interface WaterUserPoint {
@@ -6948,11 +7381,27 @@ interface WarningEventPoint {
   enterprise: string;
   desc: string;
   time: string;
+  alarmType: string;
+  orderNo: string;
+  orderStatus: string;
+  timeoutStatus: string;
+  orderType: string;
+  facilityName: string;
+  facilityCode: string;
+  latestAlarmTime: string;
+  alarmContent: string;
+  disposalTimeRange: string;
+  maintenanceUnit: string;
+  maintenancePerson: string;
+  contactPhone: string;
+  alarmCause: string;
+  handlingStatus: string;
+  attachments: string;
   x: number;
   y: number;
 }
 
-// 模拟全西宁市 31 个代表性计量点分布 (涵盖 4区3县，区分正常、故障、待检定)
+// 模拟全西宁市 31 个代表性计量点分布 (涵盖 4区3县，区分正常、停用、故障、待检定)
 const meterPointsList = ref<MeterPoint[]>([
   // 城北区
   {
@@ -7128,15 +7577,16 @@ const meterPointsList = ref<MeterPoint[]>([
     installLocation: '城西区昆仑西路88号动力机房',
     lastCheckDate: '2024-07-22',
     nextCheckDate: '2025-07-21',
-    meterStatus: 'normal',
+    meterStatus: 'offline',
     district: '城西区',
     userEnterprise: '青海绿岛酒店物业管理有限公司',
     waterType: '市政中水管网',
-    instantFlow: 19.8,
-    dailyAccumulated: 240,
+    instantFlow: 0,
+    dailyAccumulated: 0,
     checkAgency: '青海省计量检定测试院',
     certificateNo: 'QH-JL-2024-07221',
     checkCycle: '12个月',
+    offlineReason: '换热站按计划停运检修，计量设施已同步停用并保持关阀状态',
     x: 575,
     y: 495,
   },
@@ -7584,15 +8034,16 @@ const meterPointsList = ref<MeterPoint[]>([
     installLocation: '湟源县日月藏族乡农田干渠2号分水闸',
     lastCheckDate: '2024-05-25',
     nextCheckDate: '2025-05-24',
-    meterStatus: 'normal',
+    meterStatus: 'offline',
     district: '湟源县',
     userEnterprise: '日月乡农牧节水灌溉合作联社',
     waterType: '高标准农田地表水',
-    instantFlow: 75.3,
-    dailyAccumulated: 1380,
+    instantFlow: 0,
+    dailyAccumulated: 0,
     checkAgency: '青海省水文水资源测报中心',
     certificateNo: 'QH-SW-2024-05258',
     checkCycle: '12个月',
+    offlineReason: '灌溉季结束，按计划停用分水闸计量设施并完成设备保养',
     x: 385,
     y: 525,
   },
@@ -7619,51 +8070,298 @@ const overPlanWaterUsers = computed(() => waterUsersList.value.filter(u => u.act
 
 // 模拟预警事件分布
 const warningEventsList = ref<WarningEventPoint[]>([
-  { id: 'w-1', title: '东川园区某微电子企业设备断线', level: 'red', levelLabel: '高风险', district: '城东区', enterprise: '青晶微电子半导体', desc: '通信中断超24小时，数据缺失', time: '10:15:22', x: 685, y: 525 },
-  { id: 'w-2', title: '南山公园水泵站流速反向超差', level: 'orange', levelLabel: '中风险', district: '城中区', enterprise: '南山生态景区管理处', desc: '瞬时流速突发负差异常', time: '09:40:11', x: 622, y: 548 },
-  { id: 'w-3', title: '湟源大华耐火车间空管干烧告警', level: 'red', levelLabel: '高风险', district: '湟源县', enterprise: '大华耐火新材料', desc: '管道空管告警，传感器接地异常', time: '08:50:03', x: 435, y: 475 },
-  { id: 'w-4', title: '海湖铝业取水泵房定检超期', level: 'yellow', levelLabel: '低风险', district: '城北区', enterprise: '青海海湖铝业', desc: '法定检定周期届满，待核验', time: '昨天', x: 605, y: 435 },
-  { id: 'w-5', title: '朝阳热电厂冷却水表连续断联', level: 'red', levelLabel: '高风险', district: '城北区', enterprise: '朝阳热电有限责任公司', desc: '4G远传失联，信号极弱', time: '07:20:18', x: 645, y: 425 },
+  {
+    id: 'w-1',
+    title: '东川园区某微电子企业设备断线',
+    level: 'red',
+    levelLabel: '高风险',
+    district: '城东区',
+    enterprise: '青晶微电子半导体',
+    desc: '通信中断超24小时，数据缺失',
+    time: '10:15:22',
+    alarmType: '数据断报',
+    orderNo: 'GJGD20261027000601',
+    orderStatus: '待处置',
+    timeoutStatus: '未超时',
+    orderType: '普通',
+    facilityName: '东川工业园区微电子企业取水计量点',
+    facilityCode: '630102JL00412',
+    latestAlarmTime: '2026-10-27 10:15:22',
+    alarmContent: '终端连续24小时未上报遥测数据，心跳信号中断，系统已自动补0并对账。',
+    disposalTimeRange: '2026-10-27 10:30:00 至 2026-11-03 10:30:00',
+    maintenanceUnit: '城东区水务综合执法大队',
+    maintenancePerson: '张伟',
+    contactPhone: '0971-8123456',
+    alarmCause: '现场4G通信模块无响应',
+    handlingStatus: '已派单，等待运维人员到场核查',
+    attachments: '--',
+    x: 685,
+    y: 525,
+  },
+  {
+    id: 'w-2',
+    title: '南山公园水泵站流速反向超差',
+    level: 'orange',
+    levelLabel: '中风险',
+    district: '城中区',
+    enterprise: '南山生态景区管理处',
+    desc: '瞬时流速突发负差异常',
+    time: '09:40:11',
+    alarmType: '负值告警',
+    orderNo: 'GJGD20261027000602',
+    orderStatus: '工单处理中',
+    timeoutStatus: '未超时',
+    orderType: '普通',
+    facilityName: '南山公园水泵站进水计量点',
+    facilityCode: '630103JL00186',
+    latestAlarmTime: '2026-10-27 09:40:11',
+    alarmContent: '瞬时流量连续3个采集周期出现负值，系统已标记异常并暂停该时段水量累计。',
+    disposalTimeRange: '2026-10-27 09:48:00 至 2026-11-03 09:48:00',
+    maintenanceUnit: '城中区供水保障所',
+    maintenancePerson: '李海平',
+    contactPhone: '0971-8234678',
+    alarmCause: '疑似流量计接线极性反接',
+    handlingStatus: '运维人员已到场，正在校验信号接线',
+    attachments: '--',
+    x: 622,
+    y: 548,
+  },
+  {
+    id: 'w-3',
+    title: '湟源大华耐火车间空管干烧告警',
+    level: 'red',
+    levelLabel: '高风险',
+    district: '湟源县',
+    enterprise: '大华耐火新材料',
+    desc: '管道空管告警，传感器接地异常',
+    time: '08:50:03',
+    alarmType: '空管告警',
+    orderNo: 'GJGD20261027000603',
+    orderStatus: '待审核',
+    timeoutStatus: '未超时',
+    orderType: '紧急',
+    facilityName: '大华耐火车间生产用水计量点',
+    facilityCode: '630123JL00073',
+    latestAlarmTime: '2026-10-27 08:50:03',
+    alarmContent: '管道内液位持续低于传感器测量下限，触发空管告警并停止瞬时流量计算。',
+    disposalTimeRange: '2026-10-27 09:00:00 至 2026-11-03 09:00:00',
+    maintenanceUnit: '湟源县供水安全督查组',
+    maintenancePerson: '韩青海',
+    contactPhone: '0971-8432157',
+    alarmCause: '生产车间临时停水检修',
+    handlingStatus: '现场已恢复供水，待区县主管部门复核',
+    attachments: '--',
+    x: 435,
+    y: 475,
+  },
+  {
+    id: 'w-4',
+    title: '海湖铝业取水泵房日水量超阈值',
+    level: 'yellow',
+    levelLabel: '低风险',
+    district: '城北区',
+    enterprise: '青海海湖铝业',
+    desc: '日累计水量超过核定阈值',
+    time: '昨天',
+    alarmType: '超阈值',
+    orderNo: 'GJGD20261027000604',
+    orderStatus: '待处置',
+    timeoutStatus: '未超时',
+    orderType: '普通',
+    facilityName: '海湖铝业取水泵房主计量点',
+    facilityCode: '630104JL00092',
+    latestAlarmTime: '2026-10-26 23:58:36',
+    alarmContent: '当日累计取水量超过核定日阈值8.6%，系统已生成超阈值告警。',
+    disposalTimeRange: '2026-10-27 08:10:00 至 2026-11-03 08:10:00',
+    maintenanceUnit: '城北区水务综合执法大队',
+    maintenancePerson: '马建国',
+    contactPhone: '0971-8312560',
+    alarmCause: '生产负荷临时增加',
+    handlingStatus: '待取水户补充说明当日用水计划调整情况',
+    attachments: '--',
+    x: 605,
+    y: 435,
+  },
+  {
+    id: 'w-5',
+    title: '朝阳热电厂冷却水表连续断联',
+    level: 'red',
+    levelLabel: '高风险',
+    district: '城北区',
+    enterprise: '朝阳热电有限责任公司',
+    desc: '4G远传失联，信号极弱',
+    time: '07:20:18',
+    alarmType: '未上报',
+    orderNo: 'GJGD20261027000605',
+    orderStatus: '待处置',
+    timeoutStatus: '已超时',
+    orderType: '紧急',
+    facilityName: '朝阳热电厂冷却水回用计量点',
+    facilityCode: '630104JL00305',
+    latestAlarmTime: '2026-10-27 07:20:18',
+    alarmContent: '冷却水表连续12小时未上报数据，现场信号强度低于通信阈值。',
+    disposalTimeRange: '2026-10-27 07:30:00 至 2026-11-03 07:30:00',
+    maintenanceUnit: '市水利信息化运维组',
+    maintenancePerson: '赵守信',
+    contactPhone: '0971-8396321',
+    alarmCause: '厂区通信基站临时停电',
+    handlingStatus: '超时未反馈，已升级督办',
+    attachments: '--',
+    x: 645,
+    y: 425,
+  },
 ]);
 
-// 计量点数量统计 (全部、正常、故障、待检定)
+// 计量点数量统计 (全部、正常、停用、故障、待检定)
 const meterStats = computed(() => {
   const total = meterPointsList.value.length;
   const normal = meterPointsList.value.filter(m => m.meterStatus === 'normal').length;
+  const offline = meterPointsList.value.filter(m => m.meterStatus === 'offline').length;
   const fault = meterPointsList.value.filter(m => m.meterStatus === 'fault').length;
   const pending = meterPointsList.value.filter(m => m.meterStatus === 'pending').length;
-  return { total, normal, fault, pending };
+  return { total, normal, offline, fault, pending };
 });
 
-// 筛选后的计量点列表
-const filteredMeterPoints = computed(() => {
+const districtMeterPoints = computed(() => {
   return meterPointsList.value.filter(m => {
     if (filterParams.value.district !== '西宁市' && m.district !== filterParams.value.district) {
       return false;
     }
+    return true;
+  });
+});
+
+// 国控计量点按现有代表性站点标记，行政区和状态仍沿用同一套数据。
+const nationalControlMeterIds = new Set([
+  'm-cb-1',
+  'm-cb-4',
+  'm-cx-1',
+  'm-cz-1',
+  'm-cd-1',
+  'm-hz-1',
+  'm-dt-1',
+  'm-hy-1',
+]);
+
+const nationalControlMeterPoints = computed(() =>
+  districtMeterPoints.value.filter(meter => nationalControlMeterIds.has(meter.id))
+);
+
+const meterStatusLegendMeta: Array<{
+  status: MeterStatus;
+  key: string;
+  label: string;
+  color: string;
+  iconClass: string;
+}> = [
+  { status: 'normal', key: 'normal', label: '正常', color: '#10b981', iconClass: 'w-2.5 h-2.5 rounded-full border' },
+  { status: 'offline', key: 'offline', label: '停用', color: '#8FB6D4', iconClass: 'w-2.5 h-2.5 rounded-sm border' },
+  { status: 'fault', key: 'fault', label: '故障', color: '#ef4444', iconClass: 'w-2.5 h-2.5 rounded-full border' },
+  { status: 'pending', key: 'pending', label: '待检定', color: '#f59e0b', iconClass: 'w-2.5 h-2.5 rounded-full border' },
+];
+
+function buildMeterStatusLegendItems(points: MeterPoint[]) {
+  return meterStatusLegendMeta.map(item => ({
+    ...item,
+    value: points.filter(point => point.meterStatus === item.status).length,
+    borderColor: '#E8F5FF',
+  }));
+}
+
+const meterPointLegendItems = computed(() => buildMeterStatusLegendItems(districtMeterPoints.value));
+const nationalControlLegendItems = computed(() => buildMeterStatusLegendItems(nationalControlMeterPoints.value));
+
+const warningLegendItems = computed(() => [
+  { key: 'red', label: '高风险预警', value: warningEventsList.value.filter(item => item.level === 'red').length, color: '#ef4444' },
+  { key: 'orange', label: '中风险预警', value: warningEventsList.value.filter(item => item.level === 'orange').length, color: '#f97316' },
+  { key: 'yellow', label: '低风险预警', value: warningEventsList.value.filter(item => item.level === 'yellow').length, color: '#f59e0b' },
+]);
+
+const hasActiveSpecialMapLayer = computed(() =>
+  activeLayers.value.meters
+  || activeLayers.value.meterMonitoring
+  || activeLayers.value.nationalControl
+  || activeLayers.value.warnings
+);
+
+const mapLegendTitle = computed(() => {
+  if (scenarioMode.value === 'comprehensive') return '专题图层图例';
+  if (activeLayers.value.meters) return '计量点图例';
+  if (activeLayers.value.meterMonitoring) return '计量监控图例';
+  if (activeLayers.value.nationalControl) return '国控计量点图例';
+  if (activeLayers.value.warnings) return '预警事件图例';
+  return '地图图例';
+});
+
+// 计量点基础图层筛选
+const filteredMeterPoints = computed(() => {
+  return districtMeterPoints.value.filter(m => {
     if (meterStatusFilter.value === 'all') return true;
     return m.meterStatus === meterStatusFilter.value;
   });
 });
 
+// 计量监控图层筛选：默认展示五类全部点位
+const visibleMeterPoints = computed(() => {
+  if (activeLayers.value.nationalControl) return nationalControlMeterPoints.value;
+  if (!activeLayers.value.meterMonitoring) return filteredMeterPoints.value;
+  return districtMeterPoints.value.filter(m =>
+    monitoringStatusFilter.value === 'all' || m.meterStatus === monitoringStatusFilter.value
+  );
+});
+
 // 打开计量点详情弹窗
 function openMeterDetail(meter: MeterPoint) {
   selectedMeterPoint.value = meter;
+  showMeterWaterModal.value = false;
   showMeterDetailModal.value = true;
 }
 
-// 切换计量点图层 (同时保证图例显示)
-function toggleMeterLayer() {
-  activeLayers.value.meters = !activeLayers.value.meters;
-  if (activeLayers.value.meters) {
-    showMapLegend.value = true;
+// 专项地图图层互斥：计量点 / 计量监控 / 国控计量点 / 预警事件
+function setSpecialMapLayer(layer: 'meters' | 'meterMonitoring' | 'nationalControl' | 'warnings') {
+  const shouldEnable = !activeLayers.value[layer];
+  activeLayers.value.meters = false;
+  activeLayers.value.meterMonitoring = false;
+  activeLayers.value.nationalControl = false;
+  activeLayers.value.warnings = false;
+
+  if (!shouldEnable) return;
+
+  activeLayers.value[layer] = true;
+  showMapLegend.value = true;
+  if (layer === 'meterMonitoring') {
+    monitoringStatusFilter.value = 'all';
   }
 }
 
-// 计量点运维工单流转
-function dispatchMeterWorkOrder() {
+function toggleMeterLayer() {
+  setSpecialMapLayer('meters');
+}
+
+function toggleMeterMonitoringLayer() {
+  setSpecialMapLayer('meterMonitoring');
+}
+
+function toggleNationalControlLayer() {
+  setSpecialMapLayer('nationalControl');
+}
+
+function toggleWarningLayer() {
+  setSpecialMapLayer('warnings');
+}
+
+function selectMeterMonitoringStatus(status: MeterStatusFilter) {
+  monitoringStatusFilter.value = status;
+}
+
+function openMeterWaterDetail() {
+  if (!selectedMeterPoint.value) return;
   showMeterDetailModal.value = false;
-  navigate('fault');
+  showMeterWaterModal.value = true;
+}
+
+function closeMeterWaterDetail() {
+  showMeterWaterModal.value = false;
 }
 
 // 计量点预约定检
@@ -7823,7 +8521,7 @@ const controlTargetLinePath = computed(() => {
 });
 
 // ================= 行政区划全局统一搜索 (地图左上角) =================
-const isDistrictPanelCollapsed = ref(false);
+const isDistrictPanelCollapsed = ref(true);
 const globalSearchText = ref('');
 const currentDistrictUsersCount = computed(() => {
   if (filterParams.value.district === '西宁市') return waterUsersList.value.length;
@@ -7893,7 +8591,7 @@ function selectSearchUser(user: WaterUserPoint) {
 function selectSearchWarning(warn: WarningEventPoint) {
   selectedAdministrativeRegion.value = warn.district;
   filterParams.value.district = warn.district;
-  handleEventClick(warn.title);
+  openWarningEventDetail(warn);
   globalSearchText.value = '';
 }
 
@@ -8413,10 +9111,16 @@ const trendChartData = computed(() => {
 // Warning Modal state
 const showWarningModal = ref(false);
 const selectedEvent = ref('');
+const showWarningEventDetailModal = ref(false);
+const selectedWarningEventId = ref<string | null>(null);
 const showCertificateWarningModal = ref(false);
 const selectedCertificateWarningId = ref<string | null>(null);
 const showMeterOverPointModal = ref(false);
 const selectedMeterOverPointId = ref<string | null>(null);
+
+const selectedWarningEvent = computed(() =>
+  warningEventsList.value.find(event => event.id === selectedWarningEventId.value) ?? null
+);
 
 const selectedCertificateWarning = computed(() =>
   licenseWarningMarkers.value.find(marker => marker.id === selectedCertificateWarningId.value) ?? null
@@ -8481,8 +9185,27 @@ const selectedCertificateChartMax = computed(() =>
   Math.max(...selectedCertificateWaterChart.value.map(metric => metric.value), 0)
 );
 
+function getWarningLevelColor(level: WarningEventPoint['level']): string {
+  if (level === 'red') return '#FF6B7A';
+  if (level === 'orange') return '#FF9F43';
+  return '#FFC65C';
+}
+
+function openWarningEventDetail(event: WarningEventPoint) {
+  showWarningModal.value = false;
+  showCertificateWarningModal.value = false;
+  showMeterOverPointModal.value = false;
+  selectedWarningEventId.value = event.id;
+  showWarningEventDetailModal.value = true;
+}
+
+function closeWarningEventDetail() {
+  showWarningEventDetailModal.value = false;
+}
+
 function openCertificateWarningDetail(marker: LicenseWarningMarker) {
   showWarningModal.value = false;
+  showWarningEventDetailModal.value = false;
   showMeterOverPointModal.value = false;
   selectedCertificateWarningId.value = marker.id;
   showCertificateWarningModal.value = true;
@@ -8495,6 +9218,7 @@ function closeCertificateWarningDetail() {
 function openMeterOverPointDetail(marker: LicenseWarningMarker) {
   if (marker.typeId !== 'meterOver') return;
   showWarningModal.value = false;
+  showWarningEventDetailModal.value = false;
   showCertificateWarningModal.value = false;
   selectedMeterOverPointId.value = marker.id;
   showMeterOverPointModal.value = true;
@@ -8931,6 +9655,7 @@ const topMapMetrics = computed<TopMapMetric[]>(() => {
 });
 
 function handleEventClick(eventName: string) {
+  showWarningEventDetailModal.value = false;
   showCertificateWarningModal.value = false;
   showMeterOverPointModal.value = false;
   selectedEvent.value = eventName;
@@ -8939,6 +9664,7 @@ function handleEventClick(eventName: string) {
 
 function dispatchWarningWorkOrder() {
   showWarningModal.value = false;
+  showWarningEventDetailModal.value = false;
   showCertificateWarningModal.value = false;
   showMeterOverPointModal.value = false;
   navigate('fault');
@@ -9196,6 +9922,22 @@ const meterDeviceSummary = computed(() => {
     pending,
     onlineRate: total > 0 ? `${((online / total) * 100).toFixed(1)}%` : '0.0%',
   };
+});
+
+const meterMonitoringLegendItems = computed(() => {
+  const summary = meterDeviceSummary.value;
+  return [
+    { key: 'total', filter: 'all' as const, label: '站点总数', value: summary.total, color: '#DCF2FF', borderColor: '#8FB6D4', textColor: '#DCF2FF' },
+    { key: 'normal', filter: 'normal' as const, label: '正常站点', value: summary.online, color: '#3FD0FF', borderColor: '#B9F3FF', textColor: '#DCF2FF' },
+    { key: 'offline', filter: 'offline' as const, label: '停用站点', value: summary.offline, color: '#8FB6D4', borderColor: '#C7D6E5', textColor: '#DCF2FF' },
+    { key: 'fault', filter: 'fault' as const, label: '故障异常', value: summary.fault, color: '#FF6B7A', borderColor: '#FFD0D5', textColor: '#DCF2FF' },
+    { key: 'pending', filter: 'pending' as const, label: '待检定', value: summary.pending, color: '#FFC65C', borderColor: '#FFF0C2', textColor: '#DCF2FF' },
+  ].map(item => ({
+    ...item,
+    iconClass: item.key === 'offline'
+      ? 'w-2.5 h-2.5 rounded-sm border'
+      : 'w-2.5 h-2.5 rounded-full border',
+  }));
 });
 
 interface FacilityStatusChartUnit extends DistrictDeviceStat {
@@ -9628,7 +10370,13 @@ function dispatchReviewTask(item: StandardCompareItem) {
 <style scoped>
 .dashboard-dark-select {
   color-scheme: dark;
-  background-color: #07172f;
+  background-color: rgba(30, 123, 232, 0.28);
+  backdrop-filter: blur(6px);
+  box-shadow: inset 0 1px 0 rgba(155, 234, 255, 0.08);
+}
+
+.dashboard-dark-select:hover {
+  background-color: rgba(41, 142, 255, 0.38);
 }
 
 .dashboard-dark-select option {

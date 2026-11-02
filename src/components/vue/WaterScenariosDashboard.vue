@@ -263,7 +263,11 @@
 
         <!-- GIS SVG Map of Xining (Surrounded by glowing neon cyan border) -->
         <div class="absolute inset-0 flex items-center justify-center p-6 pointer-events-none">
-          <svg viewBox="0 0 1000 760" class="w-full h-full max-h-[88vh] overflow-visible pointer-events-auto">
+          <svg
+            viewBox="0 0 1000 760"
+            class="w-full h-full max-h-[88vh] overflow-visible pointer-events-auto"
+            @click="clearMapBubbles"
+          >
             <defs>
               <!-- Glowing neon drop shadow filter for Xining boundary -->
               <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -409,11 +413,9 @@
                 <g
                   v-if="isMapLegendTypeActive(marker.typeId)"
                   :transform="`translate(${marker.x}, ${marker.y})`"
-                  :class="marker.typeId === 'meterOver' ? 'cursor-help select-none' : 'cursor-pointer select-none'"
+                  class="cursor-pointer select-none"
                   :aria-label="marker.typeId === 'meterOver' ? `${marker.meterName}，${marker.meterCode}，累计计量水量 ${formatWaterVolume(marker.currentValue)} 万立方米` : undefined"
-                  @mouseenter="showLicenseMarkerHover(marker)"
-                  @mouseleave="hideLicenseMarkerHover(marker)"
-                  @click.stop="marker.typeId !== 'meterOver' && handleLicenseWarningMarker(marker)"
+                  @click.stop="handleLicenseWarningMarker(marker)"
                 >
                   <!-- 计量超许可：红色证照点位 -->
                   <template v-if="marker.typeId === 'meterOver'">
@@ -483,7 +485,7 @@
               </template>
             </g>
 
-            <!-- 计量超许可点位：纯悬浮气泡，不触发点击弹窗 -->
+            <!-- 计量超许可点位：点击展开气泡，再次点击收起 -->
             <g
               v-if="hoveredMeterOverMarker && meterOverHoverStats"
               :transform="`translate(${hoveredMeterOverMarker.x}, ${hoveredMeterOverMarker.y - 12})`"
@@ -491,10 +493,10 @@
               class="select-none"
             >
               <rect
-                x="-148"
-                y="-182"
-                width="296"
-                height="172"
+                x="-138"
+                y="-194"
+                width="276"
+                height="184"
                 rx="7"
                 fill="#06152B"
                 fill-opacity="0.98"
@@ -504,46 +506,34 @@
               />
               <polygon points="0,0 -6,-10 6,-10" fill="#06152B" stroke="rgba(255,107,122,0.78)" stroke-width="1" />
 
-              <circle cx="-132" cy="-165" r="3" fill="#FF6B7A" filter="drop-shadow(0 0 4px rgba(255,107,122,0.9))" />
-              <text x="-124" y="-161.5" fill="#9BEAFF" font-size="9.5" font-family="monospace" font-weight="bold">
-                {{ hoveredMeterOverMarker.meterCode }}
-              </text>
-              <text x="132" y="-161.5" text-anchor="end" fill="#FF9DA7" font-size="7.5" font-weight="bold">
-                计量超许可 {{ hoveredMeterOverMarker.ratio.toFixed(1) }}%
-              </text>
-              <line x1="-132" y1="-153" x2="132" y2="-153" stroke="rgba(70,180,235,0.24)" stroke-width="0.7" />
-
-              <text x="-132" y="-141" fill="#6F91AA" font-size="6.5" font-family="var(--spec-cn)">计量点名称</text>
-              <text x="-132" y="-129" fill="#FFFFFF" font-size="9" font-family="var(--spec-cn)" font-weight="700">
-                {{ hoveredMeterOverMarker.meterName }}
-              </text>
-
-              <text x="-132" y="-114" fill="#6F91AA" font-size="6.5" font-family="var(--spec-cn)">取水权人</text>
-              <text x="-86" y="-114" fill="#DCF2FF" font-size="8" font-family="var(--spec-cn)">
-                {{ hoveredMeterOverMarker.licensee }}
-              </text>
-              <text x="-132" y="-99" fill="#6F91AA" font-size="6.5" font-family="var(--spec-cn)">关联证照</text>
-              <text x="-86" y="-99" fill="#FFC65C" font-size="8" font-family="monospace">
-                {{ hoveredMeterOverMarker.licenseNo }}
-              </text>
-              <text x="-132" y="-84" fill="#6F91AA" font-size="6.5" font-family="var(--spec-cn)">接入方式</text>
-              <text x="-86" y="-84" fill="#9BEAFF" font-size="8" font-family="var(--spec-cn)">
-                {{ hoveredMeterOverMarker.accessMethod }}
-              </text>
-
-              <line x1="-132" y1="-72" x2="132" y2="-72" stroke="rgba(70,180,235,0.2)" stroke-width="0.7" />
-              <text x="-132" y="-59" fill="#8FB6D4" font-size="7" font-family="var(--spec-cn)">对应证照年度水量（万m³）</text>
-
-              <g
-                v-for="(metric, metricIndex) in meterOverHoverWaterMetrics"
-                :key="`meter-hover-${metric.label}`"
-                :transform="`translate(${(metricIndex % 3) * 94}, ${metricIndex >= 3 ? 22 : 0})`"
-              >
-                <text x="-132" y="-45" :fill="metric.color" font-size="6.5" font-family="var(--spec-cn)">
-                  {{ metric.label }}
+              <g font-family="var(--spec-cn)">
+                <text x="-120" y="-170" fill="#6F91AA" font-size="7.5">取水权人</text>
+                <text x="120" y="-170" text-anchor="end" fill="#FFFFFF" font-size="8.5" font-weight="700">
+                  {{ hoveredMeterOverMarker.meterName }}
                 </text>
-                <text x="-132" y="-36" fill="#FFFFFF" font-size="8.4" font-family="monospace" font-weight="700">
-                  {{ formatWaterVolume(metric.value) }}
+                <line x1="-120" y1="-158" x2="120" y2="-158" stroke="rgba(70,180,235,0.18)" stroke-width="0.7" />
+
+                <text x="-120" y="-136" fill="#6F91AA" font-size="7.5">证照编号</text>
+                <text x="120" y="-136" text-anchor="end" fill="#FFC65C" font-size="8" font-family="monospace">
+                  {{ hoveredMeterOverMarker.licenseNo }}
+                </text>
+                <line x1="-120" y1="-124" x2="120" y2="-124" stroke="rgba(70,180,235,0.18)" stroke-width="0.7" />
+
+                <text x="-120" y="-102" fill="#6F91AA" font-size="7.5">计量水量（万m³）</text>
+                <text x="120" y="-102" text-anchor="end" fill="#FF8A95" font-size="9" font-family="monospace" font-weight="700">
+                  {{ formatWaterVolume(meterOverHoverStats.metered) }}
+                </text>
+                <line x1="-120" y1="-90" x2="120" y2="-90" stroke="rgba(70,180,235,0.18)" stroke-width="0.7" />
+
+                <text x="-120" y="-68" fill="#6F91AA" font-size="7.5">许可水量（万m³）</text>
+                <text x="120" y="-68" text-anchor="end" fill="#FFC65C" font-size="9" font-family="monospace" font-weight="700">
+                  {{ formatWaterVolume(meterOverHoverStats.licensed) }}
+                </text>
+                <line x1="-120" y1="-56" x2="120" y2="-56" stroke="rgba(70,180,235,0.18)" stroke-width="0.7" />
+
+                <text x="-120" y="-34" fill="#FF9DA7" font-size="7.5" font-weight="700">计量超许可水量（万m³）</text>
+                <text x="120" y="-34" text-anchor="end" fill="#FF6B7A" font-size="9.5" font-family="monospace" font-weight="700">
+                  {{ formatWaterVolume(meterOverHoverStats.metered - meterOverHoverStats.licensed) }}
                 </text>
               </g>
             </g>
@@ -557,7 +547,7 @@
                 :class="{ 'is-selected': selectedOverPlanDistrictName === summary.name && showOverPlanBubble }"
                 role="button"
                 tabindex="0"
-                :aria-label="`${summary.name}三类超计划告警：${summary.groups.map(group => `${group.label}${group.items.length}条`).join('，')}`"
+                :aria-label="`${summary.name}其他告警：${summary.groups.map(group => `${group.label}${group.items.length}条`).join('，')}`"
                 @click.stop="toggleOverPlanDistrictBubble(summary.name)"
                 @keydown.enter.prevent="toggleOverPlanDistrictBubble(summary.name)"
               >
@@ -647,7 +637,7 @@
                   <line x1="-22.5" y1="-6.5" x2="-22.5" y2="8.5" stroke="rgba(155,234,255,0.24)" stroke-width="0.5" />
                   <line x1="22.5" y1="-6.5" x2="22.5" y2="8.5" stroke="rgba(155,234,255,0.24)" stroke-width="0.5" />
                   <text x="0" y="-12" text-anchor="middle" fill="#79CDEB" font-family="var(--spec-cn)" font-size="6" font-weight="600" letter-spacing="0.6" pointer-events="none">
-                    {{ summary.name }} · 超计划
+                    {{ summary.name }} · 超阈值
                   </text>
                   <title>{{ summary.name }} · 直报超许可 {{ summary.groups[0].items.length }} | 税务超计划 {{ summary.groups[1].items.length }} | 执行超计划 {{ summary.groups[2].items.length }} · 点击查看明细</title>
                 </g>
@@ -892,9 +882,9 @@
                 :transform="`translate(${meter.x}, ${meter.y})`"
                 :data-meter-status="meter.meterStatus"
                 class="cursor-pointer"
-                @click="openMeterDetail(meter)"
-                @mouseenter="hoveredMeterPoint = meter"
-                @mouseleave="hoveredMeterPoint = null"
+                @click="handleMeterPointClick(meter)"
+                @mouseenter="handleMeterPointHover(meter)"
+                @mouseleave="clearMeterPointHover"
               >
                 <!-- 透明碰撞层 (Hit Area): 适中鼠标捕获半径，防止悬浮抖动 -->
                 <circle cx="0" cy="0" r="14" fill="transparent" />
@@ -1015,6 +1005,65 @@
                   <line x1="0" y1="-1.2" x2="0" y2="0" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" pointer-events="none" />
                   <line x1="0" y1="0" x2="1.0" y2="0.6" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" pointer-events="none" />
                 </template>
+              </g>
+
+              <!-- 监测站点图层：点击点位展示地图气泡 -->
+              <g
+                v-if="activeLayers.meters && selectedMonitoringMeterPoint"
+                :transform="`translate(${selectedMonitoringMeterPoint.x}, ${selectedMonitoringMeterPoint.y - 12})`"
+                pointer-events="none"
+                class="select-none"
+              >
+                <rect
+                  x="-138"
+                  y="-186"
+                  width="276"
+                  height="176"
+                  rx="7"
+                  fill="#06152B"
+                  fill-opacity="0.98"
+                  stroke="rgba(63,208,255,0.72)"
+                  stroke-width="1"
+                  filter="drop-shadow(0 8px 18px rgba(0,0,0,0.82))"
+                />
+                <polygon points="0,0 -6,-10 6,-10" fill="#06152B" stroke="rgba(63,208,255,0.72)" stroke-width="1" />
+
+                <circle
+                  cx="-124"
+                  cy="-162"
+                  r="3"
+                  :fill="getMeterStatusColor(selectedMonitoringMeterPoint.meterStatus)"
+                />
+                <text x="-115" y="-159" fill="#FFFFFF" font-size="9" font-family="var(--spec-cn)" font-weight="700">
+                  {{ selectedMonitoringMeterPoint.name.length > 19 ? selectedMonitoringMeterPoint.name.slice(0, 19) + '...' : selectedMonitoringMeterPoint.name }}
+                </text>
+                <text
+                  x="122"
+                  y="-159"
+                  text-anchor="end"
+                  :fill="getMeterStatusColor(selectedMonitoringMeterPoint.meterStatus)"
+                  font-size="8.5"
+                  font-family="var(--spec-cn)"
+                  font-weight="700"
+                >
+                  {{ getMeterStatusLabel(selectedMonitoringMeterPoint.meterStatus) }}
+                </text>
+                <line x1="-122" y1="-147" x2="122" y2="-147" stroke="rgba(70,180,235,0.22)" stroke-width="0.7" />
+
+                <g font-family="var(--spec-cn)" font-size="8">
+                  <text x="-122" y="-132" fill="#6F91AA">计量编码</text>
+                  <text x="122" y="-132" text-anchor="end" fill="#3FD0FF" font-family="monospace">{{ selectedMonitoringMeterPoint.meterCode }}</text>
+                  <text x="-122" y="-106" fill="#6F91AA">器具类型</text>
+                  <text x="122" y="-106" text-anchor="end" fill="#DCF2FF">{{ selectedMonitoringMeterPoint.deviceType }}</text>
+                  <text x="-122" y="-80" fill="#6F91AA">所属用水户</text>
+                  <text x="122" y="-80" text-anchor="end" fill="#DCF2FF">{{ selectedMonitoringMeterPoint.userEnterprise }}</text>
+                  <text x="-122" y="-54" fill="#6F91AA">安装位置</text>
+                  <text x="122" y="-54" text-anchor="end" fill="#DCF2FF">{{ selectedMonitoringMeterPoint.installLocation }}</text>
+                  <text x="-122" y="-28" fill="#6F91AA">检定有效期</text>
+                  <text x="122" y="-28" text-anchor="end" fill="#DCF2FF" font-family="monospace">
+                    {{ selectedMonitoringMeterPoint.lastCheckDate }} ~ {{ selectedMonitoringMeterPoint.nextCheckDate }}
+                  </text>
+                </g>
               </g>
 
               <!-- 计量点悬停即时信息浮窗 (Hover Tooltip Pin, 紧随微标点) -->
@@ -2126,9 +2175,24 @@
         <!-- B. 专项业务应用场景 (左侧模块 1: 计量设施总体情况 & 模块 2: 重点取水户概况 - 紧凑合理布局，消除空白) -->
         <template v-else>
           <!-- ================= 专项 Card 1: 计量设施总体情况 ================= -->
-          <div class="spec-card rounded-lg p-3 flex-1 min-h-0 flex flex-col gap-2 overflow-hidden">
+          <div
+            id="dev-anno-13"
+            class="spec-card rounded-lg p-3 flex-1 min-h-0 flex flex-col gap-2 overflow-hidden transition-all duration-300"
+            :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 13 }"
+          >
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'special'"
+              class="absolute top-1 left-1 z-40 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-[10px] shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 13 }"
+              @mouseenter="activeAnnotationId = 13"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(13)"
+              title="开发标注 #13: 计量设施统筹管理"
+            >
+              13
+            </div>
             <!-- Card Header -->
-            <div class="flex items-center justify-between pb-1.5 shrink-0">
+            <div class="flex items-center justify-between pb-1.5 shrink-0 pl-5">
               <div class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-[#3FD0FF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2" stroke-width="1.8" />
@@ -2182,7 +2246,7 @@
                   <span class="text-[10px] text-[#8FB6D4] font-normal">(与上方总量联动)</span>
                 </div>
                 <span class="text-[9px] text-[#FFC65C] font-spec-cn">
-                  {{ filterParams.district === '西宁市' ? '区县' : '当前区划' }} · {{ currentFacilityUnits.length }} 个管理单位
+                  本级 + 下级 · {{ facilityStatusChartUnits.length }} 个对比单位
                 </span>
               </div>
 
@@ -2212,7 +2276,7 @@
               <!-- 当前区划下级单位：正常、故障、停用、待检定 -->
               <div class="flex-1 min-h-[175px] 2xl:min-h-[195px] flex flex-col justify-between">
                 <div class="flex items-center justify-between text-[10px] mb-1 shrink-0 font-spec-cn pt-0.5">
-                  <span class="text-[#8FB6D4]">下级管理单位站点状态对比</span>
+                  <span class="text-[#8FB6D4]">本级与下级管理单位站点状态对比</span>
                   <div class="flex items-center gap-3">
                     <div class="flex items-center gap-1">
                       <span class="w-2.5 h-2 rounded-xs bg-[#3FD0FF]"></span>
@@ -2234,7 +2298,7 @@
                 </div>
 
                 <div class="w-full flex-1 min-h-[155px] relative">
-                  <svg viewBox="0 0 380 160" class="w-full h-full overflow-visible" role="img" aria-label="当前行政区划下级管理单位正常站点、故障站点、停用站点和待检定站点对比">
+                  <svg viewBox="0 0 380 160" class="w-full h-full overflow-visible" role="img" aria-label="当前行政区划本级及下级管理单位正常站点、故障站点、停用站点和待检定站点对比">
                     <defs>
                       <linearGradient id="facilityNormalGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stop-color="#3FD0FF" stop-opacity="1" />
@@ -2275,7 +2339,7 @@
                       <rect
                         :x="item.barX[0]"
                         :y="126 - (item.online / facilityStatusChartMax) * 108"
-                        :width="currentFacilityUnits.length > 4 ? 7 : 14"
+                        :width="facilityStatusChartUnits.length > 4 ? 7 : 14"
                         :height="(item.online / facilityStatusChartMax) * 108"
                         fill="url(#facilityNormalGrad)"
                         rx="2"
@@ -2286,7 +2350,7 @@
                       <rect
                         :x="item.barX[1]"
                         :y="126 - (item.fault / facilityStatusChartMax) * 108"
-                        :width="currentFacilityUnits.length > 4 ? 7 : 14"
+                        :width="facilityStatusChartUnits.length > 4 ? 7 : 14"
                         :height="(item.fault / facilityStatusChartMax) * 108"
                         fill="url(#facilityFaultGrad)"
                         rx="2"
@@ -2297,7 +2361,7 @@
                       <rect
                         :x="item.barX[2]"
                         :y="126 - (item.offline / facilityStatusChartMax) * 108"
-                        :width="currentFacilityUnits.length > 4 ? 7 : 14"
+                        :width="facilityStatusChartUnits.length > 4 ? 7 : 14"
                         :height="(item.offline / facilityStatusChartMax) * 108"
                         fill="url(#facilityOfflineGrad)"
                         rx="2"
@@ -2308,7 +2372,7 @@
                       <rect
                         :x="item.barX[3]"
                         :y="126 - (item.pending / facilityStatusChartMax) * 108"
-                        :width="currentFacilityUnits.length > 4 ? 7 : 14"
+                        :width="facilityStatusChartUnits.length > 4 ? 7 : 14"
                         :height="(item.pending / facilityStatusChartMax) * 108"
                         fill="url(#facilityPendingGrad)"
                         rx="2"
@@ -2326,30 +2390,45 @@
               <!-- 设施运行与在线度简报底栏 -->
               <div class="pt-1.5 border-t border-[rgba(70,180,235,0.16)] flex items-center justify-between text-[10.5px] text-[#8FB6D4] shrink-0 font-spec-cn">
                 <span>设施正常率：<span class="text-[#3DDC97] font-bold font-spec-num">{{ meterDeviceSummary.onlineRate }}</span></span>
-                <span>统计范围：<span class="text-[#DCF2FF]">{{ currentFacilityUnits.length }} 个管理单位</span></span>
+                <span>统计范围：<span class="text-[#DCF2FF]">{{ facilityStatusChartUnits.length }} 个对比单位</span></span>
               </div>
             </div>
           </div>
 
           <!-- ================= 专项 Card 1-B: 计量设施状态监控 ================= -->
-          <div class="spec-card rounded-lg p-3 shrink-0 flex flex-col gap-2">
-            <div class="flex items-center justify-between pb-1.5">
+          <div
+            id="dev-anno-14"
+            class="spec-card rounded-lg p-3 shrink-0 flex flex-col gap-2 transition-all duration-300"
+            :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 14 }"
+          >
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'special'"
+              class="absolute top-1 left-1 z-40 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-[10px] shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 14 }"
+              @mouseenter="activeAnnotationId = 14"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(14)"
+              title="开发标注 #14: 计量设施状态实时监控"
+            >
+              14
+            </div>
+            <div class="flex items-center justify-between pb-1.5 pl-5">
               <div class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-[#FFC65C] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <path d="M12 3 3 7v5c0 4.2 3.4 7.4 9 9 5.6-1.6 9-4.8 9-9V7l-9-4Z"></path>
                   <path d="M12 8v5"></path>
                   <path d="M12 16h.01"></path>
                 </svg>
-                <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">计量设施状态监控</h2>
+                <h2 class="text-sm 2xl:text-[15.5px] font-semibold text-[#E4F6FF] tracking-[0.8px]">计量设施状态实时监控</h2>
               </div>
               <span class="text-[9px] text-[#8FB6D4] font-spec-cn">
-                当天事件 · 合计
+                当天 · 合计
                 <b class="ml-1 text-[#FFC65C] font-spec-num">{{ meterAbnormalStats.reduce((sum, item) => sum + item.count, 0) }}</b>
                 条
               </span>
             </div>
             <div class="spec-header-divider mb-0.5"></div>
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-5 gap-1.5">
               <div
                 v-for="item in meterAbnormalStats"
                 :key="item.key"
@@ -2890,22 +2969,74 @@
 
         <!-- ================= Floating Map Controls (Top Right of Center Area - 顶部对齐行政区划，统一 top-28) ================= -->
         <div class="absolute top-40 right-4 pointer-events-auto z-30 flex flex-col items-end gap-2">
-          <!-- Layer Toolbox (综合场景: 用水户叠加; 专项场景: 计量点 / 计量监控 / 预警事件) -->
+          <!-- Layer Toolbox (综合场景: 用水户叠加; 专项场景: 监测站点 / 计量监控 / 告警工单) -->
           <div class="spec-card flex flex-col rounded-xl p-2.5 shadow-2xl text-xs w-[120px] 2xl:w-[128px]">
             <!-- Header -->
             <div class="px-1 py-0.5 flex items-center justify-between border-b border-[rgba(70,180,235,0.2)] mb-1.5">
               <span class="text-[11px] font-bold text-white tracking-wide font-spec-cn">
                 {{ scenarioMode === 'comprehensive' ? '专题图层' : '地图图层' }}
               </span>
-              <button
-                type="button"
-                class="text-[9px] text-[#8FB6D4] hover:text-[#00E5FF] transition cursor-pointer px-1 py-0.5 rounded hover:bg-white/5"
-                title="重置全域视角"
-                @click="resetMapView"
-              >
-                重置
-              </button>
+              <div class="flex items-center gap-0.5">
+                <button
+                  type="button"
+                  class="text-[9px] text-[#8FB6D4] hover:text-[#00E5FF] transition cursor-pointer px-0.5 py-0.5 rounded hover:bg-white/5"
+                  :aria-expanded="showMapLayerHelp"
+                  title="查看图层统计口径与交互说明"
+                  @click.stop="showMapLayerHelp = !showMapLayerHelp"
+                >
+                  说明
+                </button>
+                <button
+                  type="button"
+                  class="text-[9px] text-[#8FB6D4] hover:text-[#00E5FF] transition cursor-pointer px-0.5 py-0.5 rounded hover:bg-white/5"
+                  title="重置全域视角"
+                  @click="resetMapView"
+                >
+                  重置
+                </button>
+              </div>
             </div>
+
+            <transition name="fade">
+              <div
+                v-if="showMapLayerHelp"
+                class="absolute right-full top-0 z-[80] mr-2 w-[286px] rounded-xl border border-[rgba(63,208,255,0.42)] bg-[linear-gradient(160deg,rgba(7,27,49,0.99),rgba(5,18,35,0.99))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.72)]"
+                @click.stop
+              >
+                <span class="absolute -right-1.5 top-4 h-3 w-3 rotate-45 border-r border-t border-[rgba(63,208,255,0.42)] bg-[#071B31]"></span>
+                <div class="relative flex items-start justify-between gap-3 border-b border-[rgba(70,180,235,0.2)] pb-2">
+                  <div>
+                    <div class="text-[11px] font-bold text-[#E4F6FF] font-spec-cn">图层说明</div>
+                    <div class="mt-0.5 text-[9px] text-[#5D8AAA] font-spec-cn">
+                      {{ scenarioMode === 'comprehensive' ? '综合应用场景' : '专项业务应用场景' }}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="text-[#5D8AAA] hover:text-white p-0.5 rounded hover:bg-white/10 transition cursor-pointer"
+                    title="关闭图层说明"
+                    @click="showMapLayerHelp = false"
+                  >
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 6 6 18"></path>
+                      <path d="m6 6 12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="relative mt-2 space-y-2">
+                  <div
+                    v-for="item in mapLayerHelpItems"
+                    :key="item.label"
+                    class="border-l-2 pl-2.5"
+                    :style="{ borderColor: item.color }"
+                  >
+                    <div class="text-[10.5px] font-bold font-spec-cn" :style="{ color: item.color }">{{ item.label }}</div>
+                    <p class="mt-0.5 text-[9.5px] leading-relaxed text-[#A8C4D8] font-spec-cn">{{ item.description }}</p>
+                  </div>
+                </div>
+              </div>
+            </transition>
 
             <!-- A. 综合应用场景：三项专题图层，当前接入图层1 -->
             <template v-if="scenarioMode === 'comprehensive'">
@@ -2981,7 +3112,7 @@
                     </span>
                   </span>
                   <span class="flex flex-col items-center gap-0.5">
-                    <span class="text-[10px] leading-none whitespace-nowrap font-medium">三类超计划</span>
+                    <span class="text-[10px] leading-none whitespace-nowrap font-medium">其他预警</span>
                   </span>
                 </button>
               </div>
@@ -3011,7 +3142,7 @@
                       </svg>
                     </span>
                   </span>
-                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">计量点</span>
+                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">监测站点</span>
                 </button>
 
                 <!-- 2. 计量设施运行状态监控图层 -->
@@ -3035,7 +3166,7 @@
                       </svg>
                     </span>
                   </span>
-                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">计量监控</span>
+                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">实时预警</span>
                 </button>
 
                 <!-- 3. 国控计量点图层 -->
@@ -3080,7 +3211,7 @@
                       </svg>
                     </span>
                   </span>
-                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">预警事件</span>
+                  <span class="text-[10px] leading-none whitespace-nowrap font-medium">告警工单</span>
                 </button>
               </div>
             </template>
@@ -3187,7 +3318,7 @@
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-1.5">
                       <span class="w-1 h-3 rounded-full bg-[#9BEAFF]"></span>
-                      <span class="text-[11px] font-bold text-[#E4F6FF] font-spec-cn">三类超计划悬浮标签</span>
+                      <span class="text-[11px] font-bold text-[#E4F6FF] font-spec-cn">其他告警</span>
                     </div>
                   </div>
                   <div class="mt-1.5 flex flex-col gap-1">
@@ -3940,10 +4071,25 @@
         <!-- B. 专项业务应用场景 (右侧模块 3: 异常情况处置 & 模块 4: 取水数据对比分析与复核跟踪 - 精炼色彩) -->
         <template v-else>
           <!-- ================= 专项 Card 3: 异常情况处置与运维能效评估 ================= -->
-          <div class="spec-card p-3 flex-1 min-h-0 flex flex-col justify-between overflow-hidden relative">
+          <div
+            id="dev-anno-15"
+            class="spec-card p-3 flex-1 min-h-0 flex flex-col justify-between overflow-hidden relative transition-all duration-300"
+            :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 15 }"
+          >
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'special'"
+              class="absolute top-1 left-1 z-40 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-[10px] shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 15 }"
+              @mouseenter="activeAnnotationId = 15"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(15)"
+              title="开发标注 #15: 告警工单统计与运维单位能效排名"
+            >
+              15
+            </div>
             <!-- Card Header -->
             <div>
-              <div class="flex items-center justify-between pb-1.5">
+              <div class="flex items-center justify-between pb-1.5 pl-5">
                 <div class="flex items-center gap-2">
                   <svg class="w-4 h-4 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
                     <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
@@ -4172,10 +4318,25 @@
           </div>
 
           <!-- ================= 专项 Card 4: 取水数据对比分析与复核跟踪 ================= -->
-          <div class="spec-card p-3 2xl:p-3.5 flex-1 min-h-0 flex flex-col justify-between overflow-hidden relative">
+          <div
+            id="dev-anno-16"
+            class="spec-card p-3 2xl:p-3.5 flex-1 min-h-0 flex flex-col justify-between overflow-hidden relative transition-all duration-300"
+            :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 16 }"
+          >
+            <div
+              v-if="showAnnotationBadges && scenarioMode === 'special'"
+              class="absolute top-1 left-1 z-40 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-[#FFD043] to-[#FF9F00] text-[#0A1626] font-extrabold text-[10px] shadow-[0_0_12px_rgba(255,184,0,0.95)] border-2 border-white cursor-pointer select-none transition-all duration-300 hover:scale-125"
+              :class="{ 'scale-125 ring-4 ring-[#FFB800]/60 animate-bounce': activeAnnotationId === 16 }"
+              @mouseenter="activeAnnotationId = 16"
+              @mouseleave="activeAnnotationId = null"
+              @click="scrollToAnnotation(16)"
+              title="开发标注 #16: 取水数据对比分析"
+            >
+              16
+            </div>
             <!-- Card Header with Engine Controls -->
             <div>
-              <div class="flex items-center justify-between pb-2">
+              <div class="flex items-center justify-between pb-2 pl-5">
                 <div class="flex items-center gap-2">
                   <svg class="w-4 h-4 text-[#00E5FF] shrink-0" viewBox="0 0 16 16" fill="none">
                     <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#00E5FF" stroke-width="1.2" fill="none" />
@@ -4184,33 +4345,19 @@
                   <h2 class="text-sm 2xl:text-base font-bold text-white tracking-wide font-spec-cn">取水数据对比分析</h2>
                 </div>
 
-                <!-- Actions: Time Window & Review Tracking Button -->
+                <!-- Actions: Time Window -->
                 <div class="flex items-center gap-1.5 font-spec-cn">
                   <!-- Time Window Select (自动重算对比数据) -->
                   <select
                     v-model="compareTimeWindow"
                     @change="triggerCompareAnalysis"
-                    class="bg-[rgba(10,36,58,0.8)] border border-[rgba(70,180,235,0.3)] rounded-md px-2 py-1 text-slate-100 text-[11px] focus:outline-none focus:border-[#00E5FF] cursor-pointer"
+                    class="dashboard-dark-select border border-[rgba(63,208,255,0.42)] rounded-md px-2 py-1 text-[#DCF2FF] text-[11px] focus:outline-none focus:border-[#3FD0FF] cursor-pointer"
                     title="切换对比时间窗口"
                   >
-                    <option value="month">当月计划期</option>
-                    <option value="30d">近30天累计</option>
-                    <option value="quarter">二季度(4-6月)</option>
-                    <option value="year">2025年度累计</option>
+                    <option value="month">本月累计</option>
+                    <option value="quarter">本季度累计</option>
+                    <option value="year">本年累计</option>
                   </select>
-
-                  <!-- 复核任务跟踪中心按钮 -->
-                  <button
-                    type="button"
-                    @click="showReviewTaskModal = true"
-                    class="px-2 py-1 rounded-md bg-[#00E5FF]/10 hover:bg-[#00E5FF]/20 text-[#00E5FF] text-[11px] border border-[#00E5FF]/40 flex items-center gap-1 cursor-pointer transition"
-                    title="查看复核任务流转与跟踪中心"
-                  >
-                    <span>复核跟踪</span>
-                    <span class="w-4 h-4 rounded-full bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/50 text-[10px] font-spec-num font-bold flex items-center justify-center">
-                      {{ reviewTaskList.filter(t => t.status !== 'closed').length }}
-                    </span>
-                  </button>
                 </div>
               </div>
               <div class="spec-header-divider mb-2"></div>
@@ -4235,11 +4382,15 @@
                     <span class="text-slate-300">3年均值</span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-xs bg-[#FFC65C]"></span>
+                    <svg class="w-4 h-1.5" viewBox="0 0 16 6" aria-hidden="true">
+                      <line x1="1" y1="3" x2="15" y2="3" stroke="#FFC65C" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
                     <span class="text-slate-300">当月计划</span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-xs bg-[#8AAEC8]"></span>
+                    <svg class="w-4 h-1.5" viewBox="0 0 16 6" aria-hidden="true">
+                      <line x1="1" y1="3" x2="15" y2="3" stroke="#8AAEC8" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 2.5" />
+                    </svg>
                     <span class="text-slate-300">许可水量</span>
                   </div>
                 </div>
@@ -4285,30 +4436,6 @@
                       <title>{{ item.name }} 近3年同期均值: {{ item.threeYearAvg }} 万m³</title>
                     </rect>
 
-                    <!-- Monthly Plan Bar (Amber #f59e0b) -->
-                    <rect
-                      :x="54 + idx * 68"
-                      :y="65 - Math.max(4, (item.monthlyPlan / 3500) * 50)"
-                      width="5"
-                      :height="Math.max(4, (item.monthlyPlan / 3500) * 50)"
-                      fill="#FFC65C"
-                      rx="1"
-                    >
-                      <title>{{ item.name }} 当月计划: {{ item.monthlyPlan }} 万m³</title>
-                    </rect>
-
-                    <!-- Licensed Remaining Bar (Cool Slate #64748b) -->
-                    <rect
-                      :x="60 + idx * 68"
-                      :y="65 - Math.max(4, (item.licensedRemaining / 3500) * 50)"
-                      width="5"
-                      :height="Math.max(4, (item.licensedRemaining / 3500) * 50)"
-                      fill="#64748b"
-                      rx="1"
-                    >
-                      <title>{{ item.name }} 许可剩余: {{ item.licensedRemaining }} 万m³</title>
-                    </rect>
-
                     <!-- Label -->
                     <text
                       :x="55 + idx * 68"
@@ -4320,6 +4447,55 @@
                     >
                       {{ item.name.slice(0, 4) }}
                     </text>
+                  </g>
+
+                  <!-- 当月计划：实线 -->
+                  <polyline
+                    :points="standardCompareList.map((item, idx) => `${55 + idx * 68},${65 - Math.max(4, (item.monthlyPlan / 3500) * 50)}`).join(' ')"
+                    fill="none"
+                    stroke="#FFC65C"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    filter="drop-shadow(0 0 3px rgba(255,198,92,0.45))"
+                    pointer-events="none"
+                  />
+                  <g v-for="(item, idx) in standardCompareList" :key="'cmp-plan-point-' + item.id" pointer-events="none">
+                    <circle
+                      :cx="55 + idx * 68"
+                      :cy="65 - Math.max(4, (item.monthlyPlan / 3500) * 50)"
+                      r="2.2"
+                      fill="#FFC65C"
+                      stroke="#071F38"
+                      stroke-width="0.8"
+                    >
+                      <title>{{ item.name }} 当月计划: {{ item.monthlyPlan }} 万m³</title>
+                    </circle>
+                  </g>
+
+                  <!-- 许可水量：虚线 -->
+                  <polyline
+                    :points="standardCompareList.map((item, idx) => `${55 + idx * 68},${65 - Math.max(4, (item.licensedRemaining / 3500) * 50)}`).join(' ')"
+                    fill="none"
+                    stroke="#8AAEC8"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-dasharray="5 3"
+                    filter="drop-shadow(0 0 3px rgba(138,174,200,0.35))"
+                    pointer-events="none"
+                  />
+                  <g v-for="(item, idx) in standardCompareList" :key="'cmp-license-point-' + item.id" pointer-events="none">
+                    <circle
+                      :cx="55 + idx * 68"
+                      :cy="65 - Math.max(4, (item.licensedRemaining / 3500) * 50)"
+                      r="2"
+                      fill="#8AAEC8"
+                      stroke="#071F38"
+                      stroke-width="0.8"
+                    >
+                      <title>{{ item.name }} 许可水量: {{ item.licensedRemaining }} 万m³</title>
+                    </circle>
                   </g>
                 </svg>
               </div>
@@ -4403,12 +4579,6 @@
                   水量对比偏差总量<span class="text-white font-bold font-spec-num">{{ reviewTaskList.length }}</span> 件
                 </span>
               </div>
-              <button
-                type="button"
-                @click="showReviewTaskModal = true"
-                class="text-[11px] text-[#00E5FF] hover:text-[#79D8FF] transition flex items-center gap-0.5 cursor-pointer font-medium font-spec-cn"
-              >
-              </button>
             </div>
           </div>
         </template>
@@ -6023,12 +6193,61 @@ const annotationList = ref<AnnotationItem[]>([
   {
     id: 12,
     title: '重点取水户概况 (专项业务场景)',
-    source: '取水许可电子证照库与取用水户名录，按取水许可证维度统计规模以上重点取水企业。',
+    source: '取水许可电子证照库与取用水户名录，按【取水许可证】维度统计规模以上重点取水企业。',
     interaction: '重点取水户数量、年许可总量、年累计取水与今日告警按当前统计口径汇总；点击排名企业进入一户一档。',
     keyPoints: [
       '企业数量以有效取水许可证为统计单元，同一企业多张证照按证照分别归集后再去重统计规上企业。',
       '年许可总量按规上企业证照的许可水量汇总，并展示其占全域许可水量的比例。',
       '取水量排名与许可执行进度均关联企业证照、计量水量和年度累计取水数据。',
+    ],
+  },
+  {
+    id: 13,
+    title: '计量设施统筹管理',
+    source: '计量设备台账提供计量点，根据不太状态展示；中央发展资金年度统计按 2023-2026 年归集计量点；单位对比取当前地图行政区划范围内的管理单位。',
+    interaction: '切换地图行政区划后，顶部站点状态与下方管理单位柱状对比按当前区划过滤；悬停柱体可查看正常、故障、停用和待检定数量。',
+    keyPoints: [
+      '站点总量按正常、停用、故障异常、待检定四态求和。',
+      '中央发展资金：根据计量的【数据来源类型】进行统计，年度统计展示 2023-2026 年计量点总量，并拆分正常、故障、停用数量，与上方当前站点总量分别表达。',
+      '管本级与下级管理单位站点状态对比按正常、故障、停用、待检定四类分组，同组柱体共用纵轴刻度，用于比较各区县或当前区划内管理单位的规模与状态结构。',
+      '筛选青海省展示省本级+下级区县；筛选西宁全域时展示 7 个区县+市本级；选择某一区县后仅保留该管理单位。',
+    ],
+  },
+  {
+    id: 14,
+    title: '计量设施状态实时监控 (五类告警)',
+    source: '当天计量设备异常告警汇总， 数据来源【协议归集-异常告警-数据异常】',
+    interaction: '告警卡片展示当天各类型条数；地图中通过【实时监控图层】统一控制，点击图层图表，统一控制是否展示；切换地图区县时顶部四态指标同五个步更新',
+    keyPoints: [
+      '极大值告警：点击后地图中展示对应的点位图层，如其他图层开启，点击时关闭其他图层，展示【实时监控图层】，且仅展示当天的告警类型点位',
+      '水位异常 ：交互逻辑同上',
+      '瞬时流量异：交互逻辑同上',
+      '负值告警：交互逻辑同上',
+      '电压异常：交互逻辑同上',
+    ],
+  },
+  {
+    id: 15,
+    title: '异常工单处置统计与运维单位能效排名',
+    source: '告警工单处置台账提供待处置、处置中、待水量修订和已完成修订数量；运维能效排名取各单位受理工单、办结工单进行计算。',
+    interaction: '点击表格行政区划可联动地图定位【联动告警工单图层】，再次点击或点击全域汇总恢复西宁市全域；切换地图区县时顶部四态指标同步更新。',
+    keyPoints: [
+      '工单总量按待处置、处置中、待水量修订、已完成修订四态统计，合计等于四态之和；西宁全域样例共 76 起，其中已完成修订 58 起。',
+      '地图区县筛选会重算顶部四态指标并高亮对应表格行；表格保留 7 个区县清单，便于横向比较。',
+      '运维单位能效排名按【执行率】从高到低展示，明细同时给出办结工单数/受理工单数，执行率=办结工单÷受理工单',
+      '行政区划筛选当前只作用于工单处置统计，不改写运维单位全域排名；如需区域榜，应再按单位所属区划增加过滤维度。',
+    ],
+  },
+  {
+    id: 16,
+    title: '取水数据对比分析',
+    source: '以证照的维度统计计量水量、近 3 年同期均值、计划水量和许可水量。',
+    interaction: '切换本月累计、本季度累计或本年累计后，柱状图和差值表按同一时间窗重算。',
+    keyPoints: [
+      '多维度水量对比：以12行政区划的维度进行证照计量水量、近三年均值、当月计划水量、许可水量做对比',
+      '偏差率按“(当前计量 - 基准) / 基准 × 100%”计算，同时比较近 3 年同期均值和当前时间窗计划水量。',
+      '任一偏差绝对值达到 20% 即标记为异常，正偏差记为突增，负偏差记为骤减，并带入复核建议。',
+      '“许可水量”列实际采用许可剩余水量口径，避免与年度许可总量混淆。',
     ],
   },
 ]);
@@ -6276,6 +6495,57 @@ const activeLayers = ref({
   meters: false,      // 专项应用场景：计量点
   nationalControl: false, // 专项应用场景：国控计量点
   warnings: false,    // 专项应用场景：预警事件
+});
+
+interface MapLayerHelpItem {
+  label: string;
+  description: string;
+  color: string;
+}
+
+const showMapLayerHelp = ref(false);
+const mapLayerHelpItems = computed<MapLayerHelpItem[]>(() => {
+  if (scenarioMode.value === 'comprehensive') {
+    return [
+      {
+        label: '审批管控占比',
+        description: '展示当前行政区划取水许可审批量（河道内）与区域管控指标的占比。',
+        color: '#FFC65C',
+      },
+      {
+        label: '计量超许可',
+        description: '以证照维度标记，按证照首个取水工程经纬度落点；点击点位查看证照基础信息。',
+        color: '#FF6B7A',
+      },
+      {
+        label: '其他预警',
+        description: '按行政区划汇总直报超许可、税务超计划、执行超月计划三类预警；点击区划图标查看明细。',
+        color: '#38BDF8',
+      },
+    ];
+  }
+  return [
+    {
+      label: '监测站点',
+      description: '展示当前行政区划计量站点分布与运行状态；点击点位查看站点基础信息。',
+      color: '#3FD0FF',
+    },
+    {
+      label: '实时预警',
+      description: '展示当前行政区划计量设施实时运行状态，可按正常、停用、故障、待检定筛选点位。',
+      color: '#38BDF8',
+    },
+    {
+      label: '国控计量点',
+      description: '展示当前行政区划内的国控计量点；点击点位查看计量设施详情。',
+      color: '#FFC65C',
+    },
+    {
+      label: '告警工单',
+      description: '按风险等级展示预警事件点位；点击点位查看预警事件与工单处置明细。',
+      color: '#FF6B7A',
+    },
+  ];
 });
 
 // ================= 水量使用情况 4个等级定义与区域映射 =================
@@ -6866,19 +7136,6 @@ const meterOverHoverStats = computed(() => {
   };
 });
 
-const meterOverHoverWaterMetrics = computed(() => {
-  const stats = meterOverHoverStats.value;
-  if (!stats) return [];
-  return [
-    { label: '累计计量水量', value: stats.metered, color: '#FF8A95' },
-    { label: '直报水量', value: stats.reported, color: '#9BEAFF' },
-    { label: '税务水量', value: stats.tax, color: '#77B9FF' },
-    { label: '许可水量', value: stats.licensed, color: '#FFC65C' },
-    { label: '计划水量', value: stats.planned, color: '#DCF2FF' },
-    { label: '执行水量', value: stats.execution, color: '#C4B5FD' },
-  ];
-});
-
 interface ApprovalControlLevel {
   id: 'over100' | '75to100' | '50to75' | 'below50';
   range: string;
@@ -7119,20 +7376,11 @@ function getLicenseWarningTypeLabel(typeId: LicenseWarningTypeId): string {
   return '执行超用水计划';
 }
 
-function showLicenseMarkerHover(marker: LicenseWarningMarker) {
-  if (marker.typeId === 'meterOver') {
-    hoveredMeterOverMarker.value = marker;
-  }
-}
-
-function hideLicenseMarkerHover(marker: LicenseWarningMarker) {
-  if (hoveredMeterOverMarker.value?.id === marker.id) {
-    hoveredMeterOverMarker.value = null;
-  }
-}
-
 function handleLicenseWarningMarker(marker: LicenseWarningMarker) {
-  if (marker.typeId === 'meterOver') return;
+  if (marker.typeId === 'meterOver') {
+    hoveredMeterOverMarker.value = hoveredMeterOverMarker.value?.id === marker.id ? null : marker;
+    return;
+  }
   filterParams.value.district = marker.district;
   hoveredDistrictName.value = marker.district;
   openCertificateWarningDetail(marker);
@@ -7286,6 +7534,7 @@ const monitoringStatusFilter = ref<MeterStatusFilter>('all');
 const showMeterDetailModal = ref(false);
 const showMeterWaterModal = ref(false);
 const selectedMeterPoint = ref<MeterPoint | null>(null);
+const selectedMonitoringMeterPoint = ref<MeterPoint | null>(null);
 const hoveredMeterPoint = ref<MeterPoint | null>(null);
 
 interface MeterPoint {
@@ -8312,13 +8561,39 @@ const visibleMeterPoints = computed(() => {
 
 // 打开计量点详情弹窗
 function openMeterDetail(meter: MeterPoint) {
+  selectedMonitoringMeterPoint.value = null;
   selectedMeterPoint.value = meter;
   showMeterWaterModal.value = false;
   showMeterDetailModal.value = true;
 }
 
+function handleMeterPointClick(meter: MeterPoint) {
+  if (activeLayers.value.meters) {
+    hoveredMeterPoint.value = null;
+    selectedMonitoringMeterPoint.value = selectedMonitoringMeterPoint.value?.id === meter.id ? null : meter;
+    return;
+  }
+  openMeterDetail(meter);
+}
+
+function handleMeterPointHover(meter: MeterPoint) {
+  if (!activeLayers.value.meters) {
+    hoveredMeterPoint.value = meter;
+  }
+}
+
+function clearMeterPointHover() {
+  hoveredMeterPoint.value = null;
+}
+
+function clearMapBubbles() {
+  hoveredMeterOverMarker.value = null;
+  selectedMonitoringMeterPoint.value = null;
+}
+
 // 专项地图图层互斥：计量点 / 计量监控 / 国控计量点 / 预警事件
 function setSpecialMapLayer(layer: 'meters' | 'meterMonitoring' | 'nationalControl' | 'warnings') {
+  selectedMonitoringMeterPoint.value = null;
   const shouldEnable = !activeLayers.value[layer];
   activeLayers.value.meters = false;
   activeLayers.value.meterMonitoring = false;
@@ -9862,8 +10137,8 @@ const meterAbnormalStats = [
   { key: 'message', label: '极大值告警', count: 6, desc: '帧头或校验位异常', color: '#FFC65C' },
   { key: 'parse', label: '水位异常', count: 3, desc: '规约字段解析失败', color: '#A78BFA' },
   { key: 'data', label: '瞬时流量异常', count: 9, desc: '负值、突增或恒值', color: '#3FD0FF' },
-  { key: 'voltage', label: '负值告警', count: 2, desc: '终端供电电压越限', color: '#FF6B7A' },
-  { key: 'voltage', label: '负值告警', count: 2, desc: '终端供电电压越限', color: '#FF6B7A' },
+  { key: 'negative', label: '负值告警', count: 2, desc: '瞬时流量出现负值', color: '#FF6B7A' },
+  { key: 'voltage', label: '终端电压异常', count: 2, desc: '终端供电电压越限', color: '#F97316' },
 ];
 
 interface CentralFundYearStat {
@@ -9900,6 +10175,56 @@ const districtDeviceStats = ref<DistrictDeviceStat[]>([
   { district: '大通县', total: 36, online: 32, offline: 2, fault: 1, pending: 1, rate: 88.9 },
   { district: '湟源县', total: 29, online: 23, offline: 2, fault: 2, pending: 2, rate: 79.3 },
 ]);
+
+const nonXiningCityDeviceStats: Omit<DistrictDeviceStat, 'rate'>[] = [
+  { district: '海东市', total: 204, online: 181, offline: 10, fault: 5, pending: 8 },
+  { district: '海北藏族自治州', total: 96, online: 84, offline: 6, fault: 2, pending: 4 },
+  { district: '黄南藏族自治州', total: 74, online: 64, offline: 5, fault: 2, pending: 3 },
+  { district: '海南藏族自治州', total: 132, online: 116, offline: 8, fault: 3, pending: 5 },
+  { district: '果洛藏族自治州', total: 58, online: 50, offline: 4, fault: 1, pending: 3 },
+  { district: '玉树藏族自治州', total: 69, online: 60, offline: 5, fault: 2, pending: 2 },
+  { district: '海西蒙古族藏族自治州', total: 158, online: 139, offline: 9, fault: 4, pending: 6 },
+];
+
+function summarizeFacilityUnits(district: string, list: DistrictDeviceStat[]): DistrictDeviceStat {
+  const total = list.reduce((sum, item) => sum + item.total, 0);
+  const online = list.reduce((sum, item) => sum + item.online, 0);
+  return {
+    district,
+    total,
+    online,
+    offline: list.reduce((sum, item) => sum + item.offline, 0),
+    fault: list.reduce((sum, item) => sum + item.fault, 0),
+    pending: list.reduce((sum, item) => sum + item.pending, 0),
+    rate: total > 0 ? Number(((online / total) * 100).toFixed(1)) : 0,
+  };
+}
+
+const cityFacilityUnits = computed<DistrictDeviceStat[]>(() => [
+  summarizeFacilityUnits('西宁市', districtDeviceStats.value),
+  ...nonXiningCityDeviceStats.map(item => ({
+    ...item,
+    rate: item.total > 0 ? Number(((item.online / item.total) * 100).toFixed(1)) : 0,
+  })),
+]);
+
+const facilityComparisonUnits = computed<DistrictDeviceStat[]>(() => {
+  const region = selectedAdministrativeRegion.value;
+  if (region === '青海省') {
+    return [
+      summarizeFacilityUnits('青海省', cityFacilityUnits.value),
+      ...cityFacilityUnits.value,
+    ];
+  }
+
+  const citySummary = cityFacilityUnits.value.find(item => item.district === region);
+  if (citySummary) {
+    const childUnits = region === '西宁市' ? districtDeviceStats.value : [];
+    return [citySummary, ...childUnits];
+  }
+
+  return districtDeviceStats.value.filter(item => item.district === region);
+});
 
 const currentFacilityUnits = computed(() => {
   const target = normalizeDistrictName(filterParams.value.district);
@@ -9947,7 +10272,7 @@ interface FacilityStatusChartUnit extends DistrictDeviceStat {
 }
 
 const facilityStatusChartUnits = computed<FacilityStatusChartUnit[]>(() => {
-  const list = currentFacilityUnits.value;
+  const list = facilityComparisonUnits.value;
   const groupWidth = 342 / Math.max(1, list.length);
   const barWidth = list.length > 4 ? 7 : 14;
   const gap = list.length > 4 ? 2 : 3;
@@ -9957,7 +10282,7 @@ const facilityStatusChartUnits = computed<FacilityStatusChartUnit[]>(() => {
     const startX = centerX - barsWidth / 2;
     return {
       ...item,
-      shortName: item.district.replace(/[区县]$/, ''),
+      shortName: item.district.replace(/(蒙古族藏族自治州|藏族自治州|自治州|市|区|县)$/, ''),
       centerX,
       barX: [
         startX,
@@ -9970,7 +10295,7 @@ const facilityStatusChartUnits = computed<FacilityStatusChartUnit[]>(() => {
 });
 
 const facilityStatusChartMax = computed(() => {
-  const maxValue = Math.max(...currentFacilityUnits.value.map(item => item.online), 1);
+  const maxValue = Math.max(...facilityStatusChartUnits.value.map(item => item.online), 1);
   return maxValue <= 20 ? 20 : Math.ceil(maxValue / 20) * 20;
 });
 
@@ -10109,7 +10434,7 @@ const maintenanceTeamRanks = ref<MaintenanceTeamRank[]>([
 ]);
 
 // 4. 标准化对比分析引擎与复核跟踪
-const compareTimeWindow = ref<'month' | '30d' | 'quarter' | 'year'>('month');
+const compareTimeWindow = ref<'month' | 'quarter' | 'year'>('month');
 const isComparing = ref(false);
 
 interface StandardCompareItem {
@@ -10262,8 +10587,7 @@ function triggerCompareAnalysis() {
   setTimeout(() => {
     isComparing.value = false;
     let factor = 1.0;
-    if (compareTimeWindow.value === '30d') factor = 0.95;
-    else if (compareTimeWindow.value === 'quarter') factor = 2.82;
+    if (compareTimeWindow.value === 'quarter') factor = 2.82;
     else if (compareTimeWindow.value === 'year') factor = 11.2;
 
     const baseData = [

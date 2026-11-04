@@ -824,13 +824,14 @@
               </g>
             </g>
 
-            <!-- Layer C: 预警事件图层 (高风险红 / 中风险橙 / 低风险黄，纤巧紧凑雷达波) -->
+            <!-- Layer C: 预警事件图层 (待处置 / 处置中 / 待水量修订，纤巧紧凑雷达波) -->
             <g v-if="scenarioMode !== 'comprehensive' && activeLayers.warnings">
               <g
                 v-for="w in warningEventsList"
                 :key="'warn-' + w.id"
                 :transform="`translate(${w.x}, ${w.y})`"
                 :data-warning-level="w.level"
+                :data-warning-status="getWarningStatusCategory(w.orderStatus)"
                 :data-warning-type="w.alarmType"
                 class="cursor-pointer"
                 @click="openWarningEventDetail(w)"
@@ -838,16 +839,16 @@
                 <circle
                   cx="0"
                   cy="0"
-                  :r="w.level === 'red' ? 7.5 : 6"
-                  :fill="w.level === 'red' ? '#ef4444' : w.level === 'orange' ? '#f97316' : '#f59e0b'"
+                  :r="getWarningStatusCategory(w.orderStatus) === 'pending' ? 7.5 : 6"
+                  :fill="getWarningStatusColor(w.orderStatus)"
                   fill-opacity="0.35"
                   class="animate-ping"
                 />
                 <circle
                   cx="0"
                   cy="0"
-                  :r="w.level === 'red' ? 4 : 3.2"
-                  :fill="w.level === 'red' ? '#dc2626' : w.level === 'orange' ? '#ea580c' : '#d97706'"
+                  :r="getWarningStatusCategory(w.orderStatus) === 'pending' ? 4 : 3.2"
+                  :fill="getWarningStatusColor(w.orderStatus)"
                   stroke="#ffffff"
                   stroke-width="1"
                   filter="drop-shadow(0 1px 4px rgba(0,0,0,0.9))"
@@ -2177,7 +2178,7 @@
           <!-- ================= 专项 Card 1: 计量设施总体情况 ================= -->
           <div
             id="dev-anno-13"
-            class="spec-card rounded-lg p-3 flex-1 min-h-0 flex flex-col gap-2 overflow-hidden transition-all duration-300"
+            class="spec-card rounded-lg p-3 flex-1 min-h-[500px] flex flex-col gap-2 overflow-hidden transition-all duration-300"
             :class="{ 'ring-2 ring-[#FFB800] shadow-[0_0_24px_rgba(255,184,0,0.65)]': activeAnnotationId === 13 }"
           >
             <div
@@ -2250,25 +2251,50 @@
                 </span>
               </div>
 
-              <!-- 近四年中央发展资金计量点总量 -->
+              <!-- 2022-2025 年中央发展资金计划、接入与年到报率 -->
               <div class="grid grid-cols-4 gap-1.5 shrink-0">
                 <div
                   v-for="item in centralFundYearStats"
                   :key="'central-fund-' + item.year"
-                  class="p-2 rounded-lg border border-[rgba(70,180,235,0.18)] bg-[rgba(10,36,58,0.55)] flex flex-col justify-between"
+                  class="relative overflow-hidden p-2 rounded-lg border border-[rgba(70,180,235,0.18)] bg-[rgba(10,36,58,0.55)] flex flex-col justify-between"
+                  :aria-label="`${item.year}年中央发展资金：计划数${item.planned}处，接入数${item.connected}处，年到报率${item.reportRate.toFixed(2)}%`"
                 >
+                  <span
+                    class="absolute inset-x-0 top-0 h-px"
+                    :style="{ background: `linear-gradient(90deg, transparent, #FFC65C ${item.reportRate}%, transparent)` }"
+                    aria-hidden="true"
+                  ></span>
                   <div class="flex items-center justify-between gap-1 min-w-0">
                     <span class="text-[10px] font-semibold text-[#DCF2FF] font-spec-num">{{ item.year }}</span>
-                    <span class="text-[8px] text-[#5D8AAA] font-spec-cn">计量点</span>
+                    <span class="text-[8px] text-[#5D8AAA] font-spec-cn">年度</span>
                   </div>
-                  <div class="flex items-baseline gap-0.5 mt-1 font-spec-num">
-                    <span class="text-lg 2xl:text-xl font-bold text-white">{{ item.total }}</span>
-                    <span class="text-[9px] text-[#8FB6D4]">处</span>
+                  <div class="mt-1 grid grid-cols-2 gap-1 font-spec-num">
+                    <div class="min-w-0">
+                      <span class="block text-[8px] leading-none text-[#5D8AAA] font-spec-cn whitespace-nowrap">计划数</span>
+                      <span class="mt-1 flex items-baseline gap-0.5 whitespace-nowrap">
+                        <b class="text-base 2xl:text-lg font-bold leading-none text-[#DCF2FF]">{{ item.planned }}</b>
+                        <span class="text-[8px] text-[#8FB6D4]">处</span>
+                      </span>
+                    </div>
+                    <div class="min-w-0 border-l border-[rgba(70,180,235,0.14)] pl-1.5">
+                      <span class="block text-[8px] leading-none text-[#5D8AAA] font-spec-cn whitespace-nowrap">接入数</span>
+                      <span class="mt-1 flex items-baseline gap-0.5 whitespace-nowrap">
+                        <b class="text-base 2xl:text-lg font-bold leading-none text-[#3FD0FF]">{{ item.connected }}</b>
+                        <span class="text-[8px] text-[#8FB6D4]">处</span>
+                      </span>
+                    </div>
                   </div>
-                  <div class="mt-1 pt-1 border-t border-[rgba(70,180,235,0.12)] text-[8px] leading-tight text-[#5D8AAA] font-spec-cn whitespace-nowrap">
-                    正常 <b class="text-[#3FD0FF] font-spec-num">{{ item.normal }}</b>
-                    · 故障 <b class="text-[#FF6B7A] font-spec-num">{{ item.fault }}</b>
-                    · 停用 <b class="text-[#8FB6D4] font-spec-num">{{ item.offline }}</b>
+                  <div class="mt-1.5 pt-1 border-t border-[rgba(70,180,235,0.12)]">
+                    <div class="flex items-center justify-between gap-1 whitespace-nowrap font-spec-cn">
+                      <span class="text-[8px] text-[#8FB6D4]">年到报率</span>
+                      <b class="text-[9.5px] font-spec-num text-[#FFC65C]">{{ item.reportRate.toFixed(2) }}%</b>
+                    </div>
+                    <div class="mt-1 h-1 overflow-hidden rounded-full bg-[rgba(70,180,235,0.14)]">
+                      <span
+                        class="block h-full rounded-full bg-gradient-to-r from-[#FF9F43] to-[#FFD278] shadow-[0_0_6px_rgba(255,198,92,0.65)]"
+                        :style="{ width: `${item.reportRate}%` }"
+                      ></span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2428,38 +2454,35 @@
               </span>
             </div>
             <div class="spec-header-divider mb-0.5"></div>
-            <div class="grid grid-cols-5 gap-1.5">
+            <div class="grid grid-cols-5 divide-x divide-[rgba(70,180,235,0.24)]">
               <div
                 v-for="item in meterAbnormalStats"
                 :key="item.key"
-                class="rounded-lg border px-2.5 py-2 min-w-0"
-                :style="{
-                  borderColor: `${item.color}45`,
-                  backgroundColor: `${item.color}0E`,
-                }"
+                class="min-w-0 px-1.5 py-1"
                 :title="item.desc"
               >
-                <div class="flex items-center justify-between gap-1">
-                  <div class="flex min-w-0 items-center gap-1">
-                    <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <ellipse cx="12" cy="20.4" rx="7" ry="2" fill="#0F766E" fill-opacity="0.42" />
-                      <path
-                        d="M12 3 21.2 18.1q1.2 2.2-1.3 2.2H4.1q-2.5 0-1.3-2.2Z"
-                        fill="#2DD4BF"
-                        stroke="#99F6E4"
-                        stroke-width="0.8"
-                        stroke-linejoin="round"
-                        filter="drop-shadow(0 0 2px rgba(45,212,191,0.85))"
-                      />
-                      <path d="M12 6.2 18.3 17.2H5.7Z" fill="#5EEAD4" fill-opacity="0.28" />
-                      <line x1="12" y1="9.2" x2="12" y2="13.8" stroke="#ECFEFF" stroke-width="1.7" stroke-linecap="round" />
-                      <circle cx="12" cy="16.1" r="0.95" fill="#ECFEFF" />
-                    </svg>
-                    <span class="truncate text-[9px] text-[#8FB6D4] font-spec-cn">{{ item.label }}</span>
-                  </div>
-                  <span class="shrink-0 text-lg font-bold leading-none font-spec-num" :style="{ color: item.color }">{{ item.count }}</span>
+                <div class="flex min-w-0 items-center justify-center gap-1 whitespace-nowrap">
+                  <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <ellipse cx="12" cy="20.4" rx="7" ry="2" fill="#0F766E" fill-opacity="0.42" />
+                    <path
+                      d="M12 3 21.2 18.1q1.2 2.2-1.3 2.2H4.1q-2.5 0-1.3-2.2Z"
+                      fill="#2DD4BF"
+                      stroke="#99F6E4"
+                      stroke-width="0.8"
+                      stroke-linejoin="round"
+                      filter="drop-shadow(0 0 2px rgba(45,212,191,0.85))"
+                    />
+                    <path d="M12 6.2 18.3 17.2H5.7Z" fill="#5EEAD4" fill-opacity="0.28" />
+                    <line x1="12" y1="9.2" x2="12" y2="13.8" stroke="#ECFEFF" stroke-width="1.7" stroke-linecap="round" />
+                    <circle cx="12" cy="16.1" r="0.95" fill="#ECFEFF" />
+                  </svg>
+                  <span class="text-[8.5px] font-medium leading-tight text-[#8FB6D4] font-spec-cn">{{ item.label }}</span>
                 </div>
-                <span class="mt-1 block truncate text-[8px] text-[#5D8AAA]">{{ item.desc }}</span>
+                <div class="mt-1 flex items-baseline justify-center gap-0.5">
+                  <span class="text-xl font-bold leading-none font-spec-num" :style="{ color: item.color }">{{ item.count }}</span>
+                  <span class="text-[8px] text-[#5D8AAA] font-spec-cn">条</span>
+                </div>
+                <span class="mt-1 block min-h-[22px] text-center text-[7.5px] leading-[1.4] text-[#6F91AA] font-spec-cn">{{ item.desc }}</span>
               </div>
             </div>
           </div>
@@ -4197,7 +4220,7 @@
                 </div>
                 <!-- 已完成修订 -->
                 <div class="bg-[rgba(10,36,58,0.55)] border border-[rgba(61,220,151,0.3)] rounded p-1">
-                  <span class="text-[9.5px] text-[#3DDC97] font-spec-cn block">已完成修订</span>
+                  <span class="text-[9.5px] text-[#3DDC97] font-spec-cn block">已完成</span>
                   <div class="text-sm font-bold font-spec-num text-[#3DDC97] mt-0.5">
                     {{ currentWorkOrderTotals.completed }} <span class="text-[9px] font-normal text-[#3DDC97]/80">起</span>
                   </div>
@@ -4253,22 +4276,6 @@
                         {{ item.total }}
                       </td>
                     </tr>
-                    <!-- Total Row -->
-                    <tr
-                      class="bg-[rgba(10,36,58,0.9)] font-bold border-t border-[rgba(70,180,235,0.3)] sticky bottom-0 cursor-pointer hover:bg-[rgba(10,36,58,1)] transition"
-                      @click="filterParams.district = '西宁市'"
-                      title="点击切换为全域总览"
-                    >
-                      <td class="py-1.5 px-1.5 font-spec-cn text-[#9BEAFF] flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#9BEAFF]"></span>
-                        <span>全域汇总</span>
-                      </td>
-                      <td class="py-1.5 px-1 text-right text-[#FFC65C]">{{ currentWorkOrderTotals.pending }}</td>
-                      <td class="py-1.5 px-1 text-right text-[#00E5FF]">{{ currentWorkOrderTotals.processing }}</td>
-                      <td class="py-1.5 px-1 text-right text-[#38BDF8]">{{ currentWorkOrderTotals.revisionNeeded }}</td>
-                      <td class="py-1.5 px-1 text-right text-[#3DDC97]">{{ currentWorkOrderTotals.completed }}</td>
-                      <td class="py-1.5 px-1.5 text-right text-[#00E5FF] font-bold">{{ currentWorkOrderTotals.total }}</td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -4280,10 +4287,6 @@
                 <div class="flex items-center gap-1.5">
                   <span class="text-white">运维单位能效排名</span>
                   <span class="text-[9.5px] text-[#5D8AAA] font-normal font-spec-cn">区域滚动展示</span>
-                </div>
-                <div class="text-[10px] text-[#5D8AAA] font-spec-num">
-                  <span class="mx-1 text-slate-600">|</span>
-                  成功率: <span class="text-[#3DDC97] font-bold">{{ operationEfficiencyMetrics.successRate }}%</span>
                 </div>
               </div>
 
@@ -6101,8 +6104,8 @@ const annotationList = ref<AnnotationItem[]>([
   {
     id: 1,
     title: '顶部标签栏 / 全局控制',
-    source: '时间取浏览器本地时间；实时气象接口获取西宁市气温(18℃)；常态化预警待办工单中枢(12起待办)。',
-    interaction: '顶部依次展示星期、气温、当前时间；常态化预警铃铛可唤起调度面板；点击工作台退出大屏模式。',
+    source: '时间取浏览器本地时间；',
+    interaction: '顶部依次展示星期、当前时间；点击工作台退出大屏模式。进入业务系统',
     keyPoints: [
       '顶部名匾采用SVG切角科技底衬，标题居中自适应。',
       '快捷键 A 开关右侧标注框，悬停清单条目可高亮对应模块。',
@@ -6112,11 +6115,11 @@ const annotationList = ref<AnnotationItem[]>([
   {
     id: 2,
     title: '区域用水态势分析 (左侧总览)',
-    source: '全域用水数据库，包含计量水量、直报水量、税务水量、许可水量、计划水量与管控指标占比数据。',
-    interaction: '与地图左上角行政区划、年份下拉独立筛选栏实时联动；鼠标悬浮柱体或数据节点弹出6项指标对比浮窗；点击区划联动全域地图定位。',
+    source: '全域用水数据库，包含计量水量、直报水量、税务水量、许可水量（当前行政区划的证照数据进行）、计划水量、管控指标数据。',
+    interaction: '与地图左上角行政区划、年份下拉独立筛选栏实时联动；鼠标悬浮柱体或数据节点弹出6项指标对比浮窗；点击地图行政区划联动改变数据',
     keyPoints: [
       '【行政区域用水对比】：如果是省级，就展示各个市州的水量数据对比，如果是市级，就展示各个区县的水量数据对比；如果是区县，则展示当前县的水量数据对比',
-      '【行政区划用水统计趋势】：以月维度统计实际用水（柱）与计划用水（折线），与中间行政区划（如城东区、城北区、西宁市等）实时联动重算与超计划红柱告警。',
+      '【用水计划执行情况】：以月维度统计实际用水（柱）与计划用水（折线），与中间行政区划（如城东区、城北区、西宁市等）实时联动重算；实际用水超计划红柱告警。',
     ],
   },
   {
@@ -6235,11 +6238,11 @@ const annotationList = ref<AnnotationItem[]>([
   {
     id: 13,
     title: '计量设施统筹管理',
-    source: '计量设备台账提供计量点，根据不太状态展示；中央发展资金年度统计按 2023-2026 年归集计量点；单位对比取当前地图行政区划范围内的管理单位。',
+    source: '计量设备台账提供计量点，根据设备状态展示；中央发展资金年度统计按 2022-2025 年归集计划数、接入数和年到报率；单位对比取当前地图行政区划范围内的管理单位。',
     interaction: '切换地图行政区划后，顶部站点状态与下方管理单位柱状对比按当前区划过滤；悬停柱体可查看正常、故障、停用和待检定数量。',
     keyPoints: [
       '站点总量按正常、停用、故障异常、待检定四态求和。',
-      '中央发展资金：根据计量的【数据来源类型】进行统计，年度统计展示 2023-2026 年计量点总量，并拆分正常、故障、停用数量，与上方当前站点总量分别表达。',
+      '中央发展资金：根据计量的【数据来源类型】进行统计，年度统计展示 2022-2025 年计划数、接入数和年到报率，与上方当前站点总量分别表达。',
       '管本级与下级管理单位站点状态对比按正常、故障、停用、待检定四类分组，同组柱体共用纵轴刻度，用于比较各区县或当前区划内管理单位的规模与状态结构。',
       '筛选青海省展示省本级+下级区县；筛选西宁全域时展示 7 个区县+市本级；选择某一区县后仅保留该管理单位。',
     ],
@@ -6261,7 +6264,7 @@ const annotationList = ref<AnnotationItem[]>([
     id: 15,
     title: '异常工单处置统计与运维单位能效排名',
     source: '告警工单处置台账提供待处置、处置中、待水量修订和已完成修订数量；运维能效排名取各单位受理工单、办结工单进行计算。',
-    interaction: '点击表格行政区划可联动地图定位【联动告警工单图层】，再次点击或点击全域汇总恢复西宁市全域；切换地图区县时顶部四态指标同步更新。',
+    interaction: '点击表格行政区划可联动地图定位【联动告警工单图层】，再次点击已选行恢复西宁市全域；切换地图区县时顶部四态指标同步更新。',
     keyPoints: [
       '工单总量按待处置、处置中、待水量修订、已完成修订四态统计，合计等于四态之和；西宁全域样例共 76 起，其中已完成修订 58 起。',
       '地图区县筛选会重算顶部四态指标并高亮对应表格行；表格保留 7 个区县清单，便于横向比较。',
@@ -8522,11 +8525,35 @@ function buildMeterStatusLegendItems(points: MeterPoint[]) {
 const meterPointLegendItems = computed(() => buildMeterStatusLegendItems(districtMeterPoints.value));
 const nationalControlLegendItems = computed(() => buildMeterStatusLegendItems(nationalControlMeterPoints.value));
 
-const warningLegendItems = computed(() => [
-  { key: 'red', label: '高风险预警', value: warningEventsList.value.filter(item => item.level === 'red').length, color: '#ef4444' },
-  { key: 'orange', label: '中风险预警', value: warningEventsList.value.filter(item => item.level === 'orange').length, color: '#f97316' },
-  { key: 'yellow', label: '低风险预警', value: warningEventsList.value.filter(item => item.level === 'yellow').length, color: '#f59e0b' },
-]);
+type WarningStatusCategory = 'pending' | 'processing' | 'revision';
+
+const warningStatusLegendMeta: Array<{
+  key: WarningStatusCategory;
+  label: string;
+  color: string;
+}> = [
+  { key: 'pending', label: '待处置', color: '#FFC65C' },
+  { key: 'processing', label: '处置中', color: '#00E5FF' },
+  { key: 'revision', label: '待水量修订', color: '#38BDF8' },
+];
+
+function getWarningStatusCategory(orderStatus: string): WarningStatusCategory {
+  if (orderStatus.includes('处理')) return 'processing';
+  if (orderStatus.includes('审核') || orderStatus.includes('修订')) return 'revision';
+  return 'pending';
+}
+
+function getWarningStatusColor(orderStatus: string): string {
+  const category = getWarningStatusCategory(orderStatus);
+  return warningStatusLegendMeta.find(item => item.key === category)?.color ?? '#FFC65C';
+}
+
+const warningLegendItems = computed(() =>
+  warningStatusLegendMeta.map(item => ({
+    ...item,
+    value: warningEventsList.value.filter(event => getWarningStatusCategory(event.orderStatus) === item.key).length,
+  }))
+);
 
 const hasActiveSpecialMapLayer = computed(() =>
   activeLayers.value.meters
@@ -10175,22 +10202,21 @@ const meterAbnormalStats = [
   { key: 'parse', label: '水位异常', count: 3, desc: '规约字段解析失败', color: '#A78BFA' },
   { key: 'data', label: '瞬时流量异常', count: 9, desc: '负值、突增或恒值', color: '#3FD0FF' },
   { key: 'negative', label: '负值告警', count: 2, desc: '瞬时流量出现负值', color: '#FF6B7A' },
-  { key: 'voltage', label: '终端电压异常', count: 2, desc: '终端供电电压越限', color: '#F97316' },
+  { key: 'voltage', label: '累计水量异常', count: 2, desc: '终端供电电压越限', color: '#F97316' },
 ];
 
 interface CentralFundYearStat {
   year: string;
-  total: number;
-  normal: number;
-  fault: number;
-  offline: number;
+  planned: number;
+  connected: number;
+  reportRate: number;
 }
 
 const centralFundYearStats: CentralFundYearStat[] = [
-  { year: '2023', total: 42, normal: 37, fault: 3, offline: 2 },
-  { year: '2024', total: 46, normal: 41, fault: 3, offline: 2 },
-  { year: '2025', total: 50, normal: 45, fault: 3, offline: 2 },
-  { year: '2026', total: 54, normal: 48, fault: 2, offline: 2 },
+  { year: '2022', planned: 38, connected: 35, reportRate: 89.2 },
+  { year: '2023', planned: 42, connected: 40, reportRate: 90.1 },
+  { year: '2024', planned: 46, connected: 44, reportRate: 91.7 },
+  { year: '2025', planned: 50, connected: 48, reportRate: 92.84 },
 ];
 
 interface DistrictDeviceStat {
